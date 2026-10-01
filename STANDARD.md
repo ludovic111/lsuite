@@ -4,6 +4,12 @@ lsuite (always lowercase) is a free, open-source creative suite: **ryolune** (mu
 **kimchi** (video), **zenith** (hub: projects, day, agents). Like a creative suite you pay for,
 but MIT licensed, written in Rust, and **every app can be driven end to end by an AI agent**.
 
+| App | Repository | Local folder (next to this repo) |
+| --- | --- | --- |
+| ryolune · music · the reference implementation | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) | `../ryolune` |
+| kimchi · video | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) | `../kimchi` |
+| zenith · hub | [ludovic111/zenith](https://github.com/ludovic111/zenith) | `../zenith` |
+
 This file is the contract every app meets. Each app's `CLAUDE.md` has an "lsuite" section with
 the gaps that app still has against it. When an app closes a gap, update its section and the
 status table at the bottom of this file. Decided by the owner on 2026-10-01.
