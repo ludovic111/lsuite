@@ -1,14 +1,14 @@
 # The lsuite standard
 
 lsuite (always lowercase) is a free, open-source creative suite: **ryolune** (music),
-**kimchi** (video), **zenith** (hub: projects, day, agents). Like a creative suite you pay for,
+**kimchi** (video), **zenith** (code: a Mac app for coding with agents). Like a creative suite you pay for,
 but MIT licensed, written in Rust, and **every app can be driven end to end by an AI agent**.
 
 | App | Repository | Local folder (next to this repo) |
 | --- | --- | --- |
 | ryolune · music · the reference implementation | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) | `../ryolune` |
 | kimchi · video | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) | `../kimchi` |
-| zenith · hub | [ludovic111/zenith](https://github.com/ludovic111/zenith) | `../zenith` |
+| zenith · code | [ludovic111/zenith](https://github.com/ludovic111/zenith) | `../zenith` |
 
 This file is the contract every app meets. Each app's `CLAUDE.md` has an "lsuite" section with
 the gaps that app still has against it. When an app closes a gap, update its section and the
@@ -65,8 +65,9 @@ The apps are separate programs but must be usable as one suite, by a person and 
 - **Hand-offs** (first targets):
   - ryolune → kimchi: export a mix or stems straight onto a kimchi project's audio track.
   - kimchi → ryolune: send a cut's audio, length and markers to ryolune to score it.
-  - zenith: shows each installed lsuite app (version, update available, open documents when
-    running) and can delegate work to it through its MCP server.
+  - zenith (undecided since it became a coding app on 2026-10-01): could show each installed
+    lsuite app (version, update available, open documents when running) and delegate work to it
+    through its MCP server.
 - Shared vocabulary in command names where the concept is the same (`history.undo`,
   `history.redo`, `app.version`, `app.checkUpdates`, `session.overview` / `project.overview`,
   `export.*`).
@@ -91,13 +92,13 @@ The apps are separate programs but must be usable as one suite, by a person and 
 
 | | ryolune | kimchi | zenith |
 | --- | --- | --- | --- |
-| Command registry, one undo | ✅ | partly: edits are plain data in Rust, no named registry | partly: actions spread over API routes |
-| CLI | ✅ `ryolune-cli` | partly: `kimchi generate / render` only | partly: HTTP `/api/context` |
-| MCP | ✅ `ryolune-mcp --live` | ❌ | partly: read + a few actions |
-| Built-in agent | ✅ | partly: generation only | ✅ |
-| Signed auto-update | ✅ | ✅ (Tauri updater) | partly: updates from GitHub, no signed binary release |
-| Release binaries, all platforms | ✅ notarized macOS | ✅ notarized macOS (since 0.1.1) | ❌ runs from source |
-| Rust core | ✅ | ✅ | ❌ (Next.js; Rust port started on a branch) |
+| Command registry, one undo | ✅ | partly: edits are plain data in Rust, no named registry | partly: typed WebSocket RPC methods, no `family.verb` registry |
+| CLI | ✅ `ryolune-cli` | partly: `kimchi generate / render` only | partly: `zenith-code auth / project` only |
+| MCP | ✅ `ryolune-mcp --live` | ❌ | partly: `/mcp` handed to each thread's agent (links its pull requests) |
+| Built-in agent | ✅ | partly: generation only | ✅ Claude Code and Codex threads |
+| Signed auto-update | ✅ | ✅ (Tauri updater) | ❌ rebuilt from source (`npm run mac:install`) |
+| Release binaries, all platforms | ✅ notarized macOS | ✅ notarized macOS (since 0.1.1) | ❌ built from source, macOS only |
+| Rust core | ✅ | ✅ | ✅ server (`crates/zenith-code`) and Tauri app (`crates/zenith-app`); React interface |
 | Discovery (`~/.lsuite/apps`) | ❌ | ❌ | ❌ |
 | Hand-offs | ❌ | ❌ | ❌ |
 | README / site / support links | ✅ | ✅ | ✅ |

@@ -7,7 +7,7 @@ open-source creative suite whose apps can be driven end to end by an AI agent.
 | --- | --- | --- |
 | ryolune · music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) |
 | kimchi · video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) |
-| zenith · hub | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) |
+| zenith · code | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) |
 
 Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
 

@@ -102,7 +102,7 @@ p { margin: 0; text-wrap: pretty; }
   .nav__apps a { padding: 6px 8px; font-size: 13px; }
   .nav__apps .dot { display: none; }
   .brand span { display: none; }
-  .nav__get { display: none; }
+  .nav__end .nav__get { display: none; }
   .btn--sponsor { padding: 0 11px; }
 }
 
