@@ -70,23 +70,27 @@ function ready() {
     block.append(btn);
   });
 
-  // Theme gallery (ryolune page): one tab list for the theme, one for the mode.
+  // Theme gallery (ryolune page): tab lists keyed by `data-key` (`mode`, and `theme` if the app
+  // has several). The picture is `theme-<theme>-<mode>.webp`; the caption is the selected tab's
+  // `data-desc` (the theme tab's when there is one, else the mode tab's).
   const gallery = document.querySelector('[data-gallery]');
   if (gallery) {
     const img = gallery.querySelector('img');
     const shot = gallery.querySelector('.gallery__shot');
     const desc = gallery.querySelector('.gallery__desc');
-    const state = { theme: 'skeuo', mode: 'dark' };
+    const state = { theme: gallery.dataset.theme || 'ryolune', mode: 'dark' };
     const show = () => {
       const src = `/assets/img/ryolune/theme-${state.theme}-${state.mode}.webp`;
-      const tab = gallery.querySelector(`[data-theme="${state.theme}"]`);
-      desc.innerHTML = tab.dataset.desc;
+      const tab =
+        gallery.querySelector(`[data-key="theme"] [data-theme="${state.theme}"]`) ||
+        gallery.querySelector(`[data-key="mode"] [data-mode="${state.mode}"]`);
+      if (desc && tab?.dataset.desc) desc.innerHTML = tab.dataset.desc;
       if (img.getAttribute('src') === src) return;
       shot.classList.add('is-loading');
       const next = new Image();
       next.onload = next.onerror = () => {
         img.src = src;
-        img.alt = `ryolune in the ${tab.textContent} theme, ${state.mode} mode`;
+        img.alt = `ryolune in ${state.mode} mode`;
         shot.classList.remove('is-loading');
       };
       next.src = src;

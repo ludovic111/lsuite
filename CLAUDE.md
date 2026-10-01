@@ -6,10 +6,10 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 
 ## Next session (2026-10-01)
 
-- [ ] **ryolune 0.12** merged on 2026-10-01 (one theme "ryolune" in dark and light instead of six,
-      more agent providers, outside agents in one step, sounds generated from a description, a
-      Sample Keys instrument). Update `ryolune/index.html`: hero version (when the 0.12 release
-      is published on GitHub), the themes section (replace the six-theme gallery with dark/light),
-      features, agent section, and retake captures from `../ryolune/site/img/`.
+- [x] ryolune 0.12 page (2026-10-01): New in 0.12, one theme dark/light gallery, 35 plugins,
+      199 commands, new agents. Versions on pages are `%VERSION:<app>%`, filled by `server.js`
+      from the latest published GitHub release, so the hero shows 0.11.1 until the 0.12.0 release
+      is published (its release run failed on Apple notarization: the Apple developer agreement
+      must be accepted, then re-run). Retake captures from `../ryolune/site/img/` when they change.
 - [ ] Keep the agent-readiness table on the home page and `STANDARD.md`'s status table in step
       as kimchi and zenith close their gaps.

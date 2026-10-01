@@ -27,6 +27,9 @@ npm test
   `body.app-<name>`), `main.js` (reveals, "Download for your OS", copy buttons, the ryolune theme
   gallery), fonts (Manrope, IBM Plex Mono, OFL), images and the ryolune film.
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
+- `%VERSION:<app>%` becomes the version of the app's latest published GitHub release (cached
+  10 min, `FALLBACK_VERSIONS` when GitHub cannot be reached), so a page never announces a version
+  that cannot be downloaded yet.
 - CSP is `'self'` only: no inline scripts, no third-party requests.
 
 ## Routes
@@ -56,9 +59,8 @@ npm test
 
 ## Updating an app's page
 
-The copy is written from each app's README and release notes. When an app ships: update its
-version in the hero line, the JSON-LD `softwareVersion`, the card on the suite page, and the
-download notes. Screenshots live in `assets/img/<app>/` (2000x1250 WebP; kimchi's comes from its
+The copy is written from each app's README and release notes. When an app ships: versions update by themselves;
+update what's new, features and screenshots. Screenshots live in `assets/img/<app>/` (2000x1250 WebP; kimchi's comes from its
 demo UI: `npm run ui:dev`, `/?editor&t=13&sel=c2&tab=generate&mode=video&prompt=…`, 1600x1000 at
 1.25x, `cwebp -q 76`). Open Graph images are 1200x630 captures of each page's hero in
 `assets/img/og/`.

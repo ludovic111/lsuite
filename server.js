@@ -99,22 +99,40 @@ const KIMCHI = {
 };
 
 const releaseCache = new Map();
-/** Asset download URLs of a repository's latest release, cached for ten minutes. */
-async function latestAssets(repo) {
+/** A repository's latest published release (`tag`, asset `urls`), cached for ten minutes. */
+async function latestRelease(repo) {
   const hit = releaseCache.get(repo);
-  if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit.urls;
+  if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit;
   try {
     const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
       headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'lsuite-site' },
       signal: AbortSignal.timeout(4000),
     });
     if (!res.ok) throw new Error(String(res.status));
-    const urls = (await res.json()).assets.map((a) => a.browser_download_url);
-    releaseCache.set(repo, { at: Date.now(), urls });
-    return urls;
+    const json = await res.json();
+    const release = { at: Date.now(), tag: json.tag_name, urls: json.assets.map((a) => a.browser_download_url) };
+    releaseCache.set(repo, release);
+    return release;
   } catch {
-    return hit?.urls ?? [];
+    return hit ?? { tag: null, urls: [] };
   }
+}
+
+// Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
+// latest published release, so the page never announces a version you cannot download yet.
+const FALLBACK_VERSIONS = { ryolune: '0.11.1', kimchi: '0.1.0', zenith: '0.1.0' };
+const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith' };
+
+/** `{ app: version }` for every app whose version a page asks for. */
+export async function appVersions(apps) {
+  const out = {};
+  await Promise.all(
+    apps.map(async (app) => {
+      const { tag } = REPOS[app] ? await latestRelease(REPOS[app]) : {};
+      out[app] = tag ? tag.replace(/^v/, '') : FALLBACK_VERSIONS[app] ?? '';
+    }),
+  );
+  return out;
 }
 
 /** Where `/<app>/download[/<platform>]` sends the visitor. */
@@ -128,7 +146,7 @@ export async function downloadTarget(app, wanted, userAgent) {
     const platform = wanted || KIMCHI.byOs[osFor(userAgent)];
     const pattern = KIMCHI.patterns[platform];
     if (!pattern) return KIMCHI.releases;
-    const url = (await latestAssets(KIMCHI.repo)).find((u) => pattern.test(u));
+    const url = (await latestRelease(KIMCHI.repo)).urls.find((u) => pattern.test(u));
     return url ?? KIMCHI.releases;
   }
   return null;
@@ -200,7 +218,7 @@ async function stampOf(path) {
 }
 
 /** A page as served: includes filled, its app marked current in the nav, versions stamped. */
-export async function renderPage(file, origin) {
+export async function renderPage(file, origin, versions) {
   let html = await readFile(join(ROOT, file), 'utf8');
   for (const name of ['nav', 'foot']) {
     if (html.includes(`<!-- include:${name} -->`)) {
@@ -212,6 +230,11 @@ export async function renderPage(file, origin) {
   for (const [whole, quote, path] of [...html.matchAll(/(["'])(\/assets\/[\w./-]+\.(?:js|css))\?v=[\w.-]*\1/g)]) {
     const stamp = await stampOf(path);
     if (stamp) html = html.replaceAll(whole, `${quote}${path}?v=${stamp}${quote}`);
+  }
+  const apps = [...new Set([...html.matchAll(/%VERSION:(\w+)%/g)].map((m) => m[1]))];
+  if (apps.length) {
+    const known = versions ?? (await appVersions(apps));
+    html = html.replace(/%VERSION:(\w+)%/g, (_, app) => known[app] ?? FALLBACK_VERSIONS[app] ?? '');
   }
   return html.replaceAll('%ORIGIN%', origin);
 }

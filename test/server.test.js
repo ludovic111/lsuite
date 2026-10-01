@@ -45,12 +45,13 @@ test('donations only go to https', () => {
 
 test('pages are rendered with the nav, the footer and the current app', async () => {
   for (const app of ['ryolune', 'kimchi', 'zenith']) {
-    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz');
+    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
+    assert.ok(!/%VERSION:/.test(html), `${app}: versions filled`);
     assert.ok(!html.includes('<!-- include:'), `${app}: includes filled`);
     assert.ok(html.includes(`data-app="${app}" aria-current="page"`), `${app}: current in nav`);
     assert.ok(!html.includes('%ORIGIN%'), `${app}: origin filled`);
     assert.match(html, /\/assets\/styles\.css\?v=[0-9a-f]{10}/);
   }
-  const home = await renderPage('index.html', 'https://lsuite.xyz');
+  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
   assert.ok(!home.includes('aria-current'));
 });

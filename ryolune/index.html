@@ -15,7 +15,7 @@
   <meta property="og:url" content="%ORIGIN%/ryolune">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/ryolune.png">
   <meta name="twitter:card" content="summary_large_image">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ryolune","url":"%ORIGIN%/ryolune","description":"A free, open-source digital audio workstation for macOS, Windows and Linux with a built-in agent.","applicationCategory":"MultimediaApplication","applicationSubCategory":"Digital audio workstation","operatingSystem":"macOS 11+, Windows, Linux","softwareVersion":"0.11.1","downloadUrl":"https://github.com/ludovic111/ryolune/releases/latest","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isPartOf":{"@type":"WebSite","name":"lsuite","url":"%ORIGIN%/"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ryolune","url":"%ORIGIN%/ryolune","description":"A free, open-source digital audio workstation for macOS, Windows and Linux with a built-in agent.","applicationCategory":"MultimediaApplication","applicationSubCategory":"Digital audio workstation","operatingSystem":"macOS 11+, Windows, Linux","softwareVersion":"%VERSION:ryolune%","downloadUrl":"https://github.com/ludovic111/ryolune/releases/latest","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isPartOf":{"@type":"WebSite","name":"lsuite","url":"%ORIGIN%/"}}</script>
   <link rel="preload" href="/assets/fonts/manrope-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/styles.css?v=1">
   <script src="/assets/main.js?v=1"></script>
@@ -33,17 +33,17 @@
         <div><div class="appid__name">ryolune</div><div class="appid__kind">lsuite · music</div></div>
       </div>
       <h1 class="display reveal" style="--d:1">Finish the song.<br>Hand the busywork <span class="accent">to an agent.</span></h1>
-      <p class="lede reveal" style="--d:2">ryolune is a complete DAW: record while you hear yourself through your effects, arrange, edit MIDI, mix on a real mixer and export stems, with 34 stock plugins and your own VST3, CLAP and Audio Units. When you would rather not quantise forty notes by hand, ask the built-in agent, or plug Claude Code, Codex or any MCP client straight into the song. Every edit it makes is one undo away.</p>
+      <p class="lede reveal" style="--d:2">ryolune is a complete DAW: record while you hear yourself through your effects, arrange, edit MIDI, mix on a real mixer and export stems, with 35 stock plugins and your own VST3, CLAP and Audio Units. When you would rather not quantise forty notes by hand, ask the built-in agent, or plug Claude Code, Codex, Cursor or any MCP client straight into the song. Every edit it makes is one undo away.</p>
       <div class="hero__actions reveal" style="--d:3">
         <a class="btn btn--primary" href="#downloads" data-download="ryolune" data-href-macos="/ryolune/download/macos-arm64" data-href-windows="/ryolune/download/windows-x86_64" data-href-linux="/ryolune/download/linux-x86_64"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span data-os>Download ryolune</span></a>
         <a class="btn" href="#downloads">All platforms</a>
         <a class="btn" href="https://github.com/ludovic111/ryolune">Source on GitHub</a>
       </div>
-      <p class="fine hero__fine reveal" style="--d:4">Version 0.11.1 · free and MIT licensed · macOS, Windows, Linux · no account, no subscription, no telemetry · <a href="#support">donations welcome</a></p>
+      <p class="fine hero__fine reveal" style="--d:4">Version %VERSION:ryolune% · free and MIT licensed · macOS, Windows, Linux · no account, no subscription, no telemetry · <a href="#support">donations welcome</a></p>
     </div>
     <div class="wrap">
       <figure class="shot shot--hero reveal" style="--d:3">
-        <img src="/assets/img/ryolune/arrangement.webp" width="2000" height="1250" alt="ryolune's arrangement: section markers, regions with fades, a piano roll with a controller lane, the channel strip and the agent panel" fetchpriority="high">
+        <img src="/assets/img/ryolune/arrangement.webp" width="2000" height="1250" alt="ryolune's arrangement in the dark theme: section markers, regions with fades, a piano roll with a controller lane, the channel strip and the agent panel" fetchpriority="high">
       </figure>
     </div>
   </section>
@@ -51,11 +51,30 @@
   <section class="section" style="padding-top: 0; border-top: 0;">
     <div class="wrap">
       <div class="stats reveal">
-        <div><b>34</b><span>stock instruments and effects</span></div>
-        <div><b>190</b><span>commands for window, CLI, MCP and agent</span></div>
+        <div><b>35</b><span>stock instruments and effects</span></div>
+        <div><b>199</b><span>commands for window, CLI, MCP and agent</span></div>
         <div><b>3</b><span>operating systems</span></div>
         <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="new" aria-labelledby="new-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">New in 0.12</span>
+        <h2 class="h2 reveal" id="new-title">One window, drawn with care. Sounds on demand.</h2>
+        <p class="lede reveal" style="--d:1">0.12 redraws the whole window around one theme instead of six: graphite by night, porcelain by day, a single gold accent and controls that look like studio hardware without pretending to be it. Nothing moved and nothing was taken away. The agent now runs on many more services, connects to the agents you already use, and makes loops, sounds and instruments from a description.</p>
+      </div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">Design</span><h3>One theme, dark or light</h3><p>A calm lightness ladder, crisp one-pixel edges and one soft light from above. Dark is deep graphite with sunk displays and white fader caps; light is the same window in porcelain. Or let it follow your system.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Generate</span><h3>Loops, sounds and instruments</h3><p>Describe it and ryolune asks ElevenLabs, Stable Audio, fal.ai or your own endpoint, then fits it to your bars and key. An instrument lands in Sample Keys, ready to play. Each placement is one undo step.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">AI control</span><h3>Every agent you use</h3><p>Gemini, OpenRouter, Mistral, Groq, DeepSeek, xAI, Ollama and LM Studio join the built-in agent, and Claude Code, Codex, Cursor, VS Code or any MCP app connect to the open window in one step.</p></div>
+        <div class="cell reveal"><span class="cell__k">Instrument</span><h3>Sample Keys</h3><p>The twelfth stock instrument plays any sound across the keyboard from its root note, with tune, attack, release, gate or one-shot, sustain pedal and pitch bend. The sound is saved inside the song.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Transport and mixer</span><h3>Easier to read at a glance</h3><p>A centred display with the transport keys in one tray, knobs that wear a ring filled with their value, and mute, solo and arm lit blue, yellow and red.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Support</span><h3>A heart in the title bar</h3><p>ryolune stays free with nothing locked. The heart at the top right opens its GitHub Sponsors page, if you want to give once or monthly.</p></div>
+      </div>
+      <p class="fine reveal" style="margin-top:18px"><a href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.12.0.md">Full 0.12 release notes</a></p>
     </div>
   </section>
 
@@ -69,7 +88,7 @@
         <div class="cell reveal"><span class="cell__k">Record and arrange</span><h3>Hear yourself, then shape the song</h3><p>Arm a track and hear yourself through its effects, with a count-in that never clips the first word. Name sections with markers and loop them; split, trim, fade and snap from bars to 1/64. Drop audio or MIDI straight on the window.</p></div>
         <div class="cell reveal" style="--d:1"><span class="cell__k">MIDI</span><h3>Three editors on the same notes</h3><p>Piano roll, score and step views, with a controller lane for mod wheel, sustain, pitch bend and pressure. Quantise, humanise, legato, velocity ramps, fit to scale and transpose.</p></div>
         <div class="cell reveal" style="--d:2"><span class="cell__k">Mixing</span><h3>A real mixer</h3><p>Fader, pan, mute, solo, arm, monitoring and live meters per channel, eight inserts a strip, your own buses and sends, a master chain and sample-accurate automation for any parameter.</p></div>
-        <div class="cell reveal"><span class="cell__k">Stock plugins</span><h3>34, sorted by sound</h3><p>Eleven instruments, from a polysynth and an electric piano to an 808 and a string ensemble, and twenty-three effects. Each panel draws what it does from the same maths as the audio.</p></div>
+        <div class="cell reveal"><span class="cell__k">Stock plugins</span><h3>35, sorted by sound</h3><p>Twelve instruments, from a polysynth and an electric piano to an 808, a string ensemble and Sample Keys, and twenty-three effects. Each panel draws what it does from the same maths as the audio.</p></div>
         <div class="cell reveal" style="--d:1"><span class="cell__k">Your plugins</span><h3>VST3, CLAP and Audio Units</h3><p>Scanned in a separate process so one bad plugin cannot take the app down, filed by sound with favourites and recents, state saved inside the project. Or write native plugins in Rust with the SDK.</p></div>
         <div class="cell reveal" style="--d:2"><span class="cell__k">Export</span><h3>Mixes and stems</h3><p>WAV up to 96 kHz or 32-bit float, AIFF, FLAC and Ogg Vorbis, for the song, a range or one file per track, plus 960-PPQ MIDI.</p></div>
         <div class="cell reveal"><span class="cell__k">Tempo</span><h3>Songs that breathe</h3><p>Tempo changes and ramps on a tempo track: a half-time bridge or a slow ritardando. Notes and markers stay on their bars; exports and the metronome follow.</p></div>
@@ -84,11 +103,12 @@
       <div class="stack">
         <span class="eyebrow">Agent</span>
         <h2 class="h2 reveal" id="agent-title">Ask for the edit. Keep the undo.</h2>
-        <p class="lede reveal" style="--d:1">The agent panel streams its reply while it works and shows one card per command it runs. It uses the model you already pay for: Codex or Claude Code from their CLIs, an Anthropic or OpenAI key, or any OpenAI-compatible endpoint, including a local one.</p>
+        <p class="lede reveal" style="--d:1">The agent panel streams its reply while it works and shows one card per command it runs. It uses the model you already pay for: Codex or Claude Code from their CLIs, an Anthropic, OpenAI, Gemini, OpenRouter, Mistral, Groq, DeepSeek or xAI key, or Ollama and LM Studio on this computer.</p>
         <ul class="bullets reveal" style="--d:2">
           <li><span><b>Slash commands for the common asks.</b> <code>/beat</code>, <code>/chords</code>, <code>/humanize</code>, <code>/mix</code>, <code>/arrange</code>, <code>/diagnose</code>, or plain language.</span></li>
           <li><span><b>Undo from here.</b> The Changes tab lists every change the agent made. Roll back to any point, or redo forward again.</span></li>
           <li><span><b>On a leash you hold.</b> Permissions gate file access, transport, replacing the session, settings and quitting, for the panel and MCP clients alike.</span></li>
+          <li><span><b>Bring your own agent.</b> Settings › Agent › Use another agent gives Claude Code, Codex, Cursor, VS Code, Claude Desktop, Gemini CLI, Windsurf, opencode, Zed and any MCP app a ready connection to the open window.</span></li>
           <li><span><b>Nothing leaves your machine</b> until you connect a provider and send a prompt. Everything else works offline.</span></li>
         </ul>
       </div>
@@ -107,6 +127,7 @@
 <span class="line">ryolune-cli session.overview</span>
 <span class="line">ryolune-cli track.add --kind midi --name Keys --instrument "E-Piano Mk I"</span>
 <span class="line">ryolune-cli plugin.list --query reverb</span>
+<span class="line">ryolune-cli generate.audio --prompt "dusty lo-fi drum loop" --bars 4</span>
 <span class="line">ryolune-cli history.undo</span>
 <span class="line">ryolune-cli --file song.ryolune session.exportAudio --path mix.flac</span>
 <span class="line"></span>
@@ -129,39 +150,31 @@
             <source src="/assets/video/ryolune-film-1080p.mp4" type="video/mp4">
           </video>
         </div>
-        <figcaption><b>22 seconds, with sound.</b> Recorded from the window itself: the agent answers a request and writes its notes in teal, ⌘Z takes them back, then the mixer, a stock plugin and the themes.</figcaption>
+        <figcaption><b>22 seconds, with sound.</b> Recorded from the window itself: the agent answers a request and writes its notes, ⌘Z takes them back, then the mixer and a stock plugin. Filmed in 0.10, before the redesign.</figcaption>
       </figure>
       <figure class="reveal" style="margin-top: 48px;">
-        <div class="shot"><img src="/assets/img/ryolune/mixer.webp" width="2000" height="1250" alt="ryolune's mixer: every channel side by side with live meters" loading="lazy"></div>
-        <figcaption><b>Mix.</b> Press <kbd>X</kbd> for every channel side by side with live meters.</figcaption>
+        <div class="shot"><img src="/assets/img/ryolune/mixer.webp" width="2000" height="1250" alt="ryolune's mixer in the dark theme: every channel side by side with live meters" loading="lazy"></div>
+        <figcaption><b>Mix.</b> Press <kbd>X</kbd> for every channel side by side with live meters. Shown in dark; <a href="#themes">see it in light</a>.</figcaption>
       </figure>
     </div>
   </section>
 
   <section class="section" id="themes" aria-labelledby="themes-title">
-    <div class="wrap" data-gallery>
+    <div class="wrap" data-gallery data-theme="ryolune">
       <div class="section__head">
-        <span class="eyebrow">Themes</span>
-        <h2 class="h2 reveal" id="themes-title">Six themes, each in dark and light.</h2>
-        <p class="lede reveal" style="--d:1">Pick the look you want to stare at for six hours, or let the mode follow your system. Every theme is computed, not painted: one neutral ramp, one accent, and text contrast tested on every surface.</p>
+        <span class="eyebrow">One theme, in the app</span>
+        <h2 class="h2 reveal" id="themes-title">Graphite by night. Porcelain by day.</h2>
+        <p class="lede reveal" style="--d:1">ryolune has one look, drawn with restraint: a calm lightness ladder, crisp one-pixel edges, a single soft light from above and one accent, lunar gold, for the playhead, what is lit and what the agent touched. Choose dark or light in Settings › Interface, or let it follow your system. Text contrast is tested on every surface in both modes.</p>
       </div>
       <div class="gallery__bar reveal">
-        <div class="tabs" role="tablist" aria-label="Theme" data-key="theme">
-          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-theme="modern" data-desc="&lt;b&gt;Modern.&lt;/b&gt; Flat and quiet. Depth from a five-step lightness ladder and one-pixel lines; a single accent; nothing glows.">Modern</button>
-          <button role="tab" type="button" aria-selected="true" tabindex="0" data-theme="skeuo" data-desc="&lt;b&gt;Skeuomorphic.&lt;/b&gt; Milled hardware under one light from above. Graphite in the dark, champagne aluminium in the light, smoked-glass displays in both.">Skeuomorphic</button>
-          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-theme="aero" data-desc="&lt;b&gt;Frutiger Aero.&lt;/b&gt; Glass, water and sky. Lens buttons with a bright upper reflection, a daylight frame by day and an aurora by night.">Frutiger Aero</button>
-          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-theme="console" data-desc="&lt;b&gt;Console.&lt;/b&gt; A warm analogue studio desk: walnut cheeks, brass controls and amber meters, after dark or by day.">Console</button>
-          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-theme="ink" data-desc="&lt;b&gt;Ink.&lt;/b&gt; Paper and ink. Flat, crisp type and lines, and a single red accent for the playhead, record and focus.">Ink</button>
-          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-theme="neon" data-desc="&lt;b&gt;Neon.&lt;/b&gt; Violet glass lit from inside, with magenta and cyan light on the playhead, meters and focus.">Neon</button>
-        </div>
         <div class="tabs" role="tablist" aria-label="Mode" data-key="mode">
-          <button role="tab" type="button" aria-selected="true" tabindex="0" data-mode="dark">Dark</button>
-          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-mode="light">Light</button>
+          <button role="tab" type="button" aria-selected="true" tabindex="0" data-mode="dark" data-desc="&lt;b&gt;Dark.&lt;/b&gt; Deep graphite with displays sunk into it, white fader caps and a gold playhead. Made for long sessions in a dim room.">Dark</button>
+          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-mode="light" data-desc="&lt;b&gt;Light.&lt;/b&gt; The same ladder in porcelain: white controls standing proud of a pale desk, shade at a third of the strength, an amber accent.">Light</button>
         </div>
       </div>
       <figure class="reveal">
-        <div class="shot gallery__shot"><img src="/assets/img/ryolune/theme-skeuo-dark.webp" width="2000" height="1250" alt="ryolune in the Skeuomorphic theme, dark mode" loading="lazy"></div>
-        <p class="gallery__desc" aria-live="polite"><b>Skeuomorphic.</b> Milled hardware under one light from above. Graphite in the dark, champagne aluminium in the light, smoked-glass displays in both.</p>
+        <div class="shot gallery__shot"><img src="/assets/img/ryolune/theme-ryolune-dark.webp" width="2000" height="1250" alt="ryolune in dark mode" loading="lazy"></div>
+        <p class="gallery__desc" aria-live="polite"><b>Dark.</b> Deep graphite with displays sunk into it, white fader caps and a gold playhead. Made for long sessions in a dim room.</p>
       </figure>
     </div>
   </section>
@@ -185,7 +198,7 @@
     <div class="wrap">
       <div class="section__head">
         <span class="eyebrow">Download</span>
-        <h2 class="h2 reveal" id="downloads-title">Download ryolune 0.11</h2>
+        <h2 class="h2 reveal" id="downloads-title">Download ryolune %VERSION:ryolune%</h2>
         <p class="lede reveal" style="--d:1">Free and MIT licensed, every update included. Archives include the <code>ryolune-cli</code> and <code>ryolune-mcp</code> companions, and the app updates itself from signed releases.</p>
       </div>
       <div class="dl reveal">
