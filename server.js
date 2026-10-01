@@ -282,6 +282,11 @@ export async function handle(req, res) {
   const bare = pathname.replace(/\/index\.html$/, '/').replace(/(.)\/+$/, '$1');
   if (bare !== pathname && PAGES[bare]) return redirect(res, 301, bare + url.search, 'public, max-age=3600');
 
+  // ryolune was called Ondera until 0.11.
+  if (pathname === '/ondera' || pathname.startsWith('/ondera/')) {
+    return redirect(res, 301, '/ryolune' + pathname.slice('/ondera'.length) + url.search, 'public, max-age=86400');
+  }
+
   if (PAGES[pathname]) {
     const html = await renderPage(PAGES[pathname], originOf(req));
     return send(res, 200, html, TYPES['.html'], 'no-cache', req);
