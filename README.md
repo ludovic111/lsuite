@@ -43,16 +43,16 @@ npm test
 
 - `LSUITE_CANONICAL_HOST=lsuite.xyz` on the host: any other host name (www, the Railway domain)
   gets a 301 to the same path on lsuite.xyz.
-- **ryolune.com moved here.** `MOVED_HOSTS` in `server.js` sends `ryolune.com`,
-  `www.ryolune.com` and the old Railway domain `site-production-7751.up.railway.app` to
-  `https://lsuite.xyz/ryolune` + the same path, so the links the ryolune app ships keep working
-  (`ryolune.com/support` → `/ryolune/support`, `ryolune.com/download/macos-arm64` →
-  `/ryolune/download/macos-arm64`; the browser keeps `#downloads` and other anchors, and the
-  ryolune page keeps the same section ids).
-- Railway allows two custom domains per service on the current plan, so there are two services
-  running this same repository: **lsuite-site** (project `lsuite`: lsuite.xyz, www.lsuite.xyz)
-  and **ryolune-site** (project `ondera-site`: ryolune.com, www.ryolune.com, whose DNS at
-  Porkbun did not change). Both set `LSUITE_CANONICAL_HOST=lsuite.xyz`.
+- **ryolune.com** is a Porkbun URL forward (permanent 301, path included, wildcard so www
+  follows) to `https://lsuite.xyz/ryolune`: `ryolune.com/support` → `/ryolune/support`,
+  `ryolune.com/download/macos-arm64` → `/ryolune/download/macos-arm64`, and the browser keeps
+  `#downloads` and other anchors (the ryolune page keeps the same section ids). Its DNS is
+  Porkbun's forwarder (ALIAS and `*` CNAME to `uixie.porkbun.com`); no Railway service is involved.
+  `MOVED_HOSTS` in `server.js` does the same redirect should those hosts ever point here.
+- `/ondera` and `/ondera/*` redirect to `/ryolune` (its name before 0.11).
+- The former ryolune site service (Railway project `ondera-site`) was deleted on 2026-10-01; its
+  domain `site-production-7751.up.railway.app`, which ryolune 0.11.0 linked from Help › Support,
+  no longer answers. 0.11.1 and later link to ryolune.com/support.
 
 ## Updating an app's page
 
