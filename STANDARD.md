@@ -116,4 +116,4 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 | Discovery (`~/.lsuite/apps`) | ❌ | ❌ | ❌ |
 | Hand-offs | ❌ | ❌ | ❌ |
 | README / site / support links (site on the design system) | ✅ | ✅ | ✅ |
-| lsuite design system (`design/`) | ❌ (gold accent, own theme) | ❌ (own Svelte theme) | ❌ (shadcn theme) |
+| lsuite design system (`design/`) | ❌ (gold accent, own theme) | ❌ (own Svelte theme) | ❌ (own theme in `code/apps/web`) |

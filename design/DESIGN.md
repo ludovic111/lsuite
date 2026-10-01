@@ -20,7 +20,7 @@ family. Each app has an 11-step scale (`--ls-<app>-50 … -950`).
 | --- | --- | --- | --- | --- |
 | ryolune · music | 185° teal | `#00c5b4` | `#009586` | Audition |
 | kimchi · video | 32° chili coral | `#f7806a` | `#c3513d` | PowerPoint |
-| zenith · hub | 262° blue | `#72a6ff` | `#4777d2` | Photoshop, Word |
+| zenith · code | 262° blue | `#72a6ff` | `#4777d2` | Photoshop, Word |
 | *reserved* | violet 300°, green 150°, amber 75°, pink 350° | | | next apps |
 
 `--ls-accent`, `--ls-accent-hover`, `--ls-accent-text` (text and links on the page background),

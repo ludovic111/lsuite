@@ -14,7 +14,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 - [x] zenith page (2026-10-01): rewritten for the new zenith, a Mac app for coding with agents
       (Claude Code and Codex threads, Rust server, Tauri app); `zmock` now illustrates a thread.
       The old dashboard, Ask zenith, the agent team and the `zenith_*` MCP tools are gone: don't
-      advertise them. `assets/img/og/zenith.png` still shows the old dashboard: retake it.
+      advertise them. `assets/img/og/zenith.png` retaken from the new page (2026-10-01).
 - [ ] Keep the agent-readiness table on the home page and `STANDARD.md`'s status table in step
       as kimchi and zenith close their gaps.
 - [x] **Design system on the site itself** (2026-10-01): pages load `/design/tokens.css` before
