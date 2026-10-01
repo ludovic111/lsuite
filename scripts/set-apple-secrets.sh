@@ -35,7 +35,9 @@ if [ -n "$p12" ]; then
   read -rsp "Password of $(basename "$p12"): " password
   echo
   # The private key must be in the file, or CI cannot sign ("Mes certificats" in Keychain Access).
-  if ! openssl pkcs12 -in "$p12" -passin "pass:$password" -nocerts -nodes 2>/dev/null | grep -q "PRIVATE KEY"; then
+  # Keychain Access exports with legacy ciphers (RC2/3DES) that OpenSSL 3 only reads with -legacy.
+  has_key() { openssl pkcs12 -in "$p12" -passin "pass:$password" -nocerts -nodes "$@" 2>/dev/null | grep -q "PRIVATE KEY"; }
+  if ! has_key && ! has_key -legacy; then
     echo "$(basename "$p12") has no private key, or the password is wrong. Export it from Keychain Access > My Certificates." >&2
     exit 1
   fi
