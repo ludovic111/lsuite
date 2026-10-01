@@ -115,5 +115,5 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 | Rust core | ✅ | ✅ | ✅ server (`crates/zenith-code`) and Tauri app (`crates/zenith-app`); React interface |
 | Discovery (`~/.lsuite/apps`) | ❌ | ❌ | ❌ |
 | Hand-offs | ❌ | ❌ | ❌ |
-| README / site / support links | ✅ | ✅ | ✅ |
+| README / site / support links (site on the design system) | ✅ | ✅ | ✅ |
 | lsuite design system (`design/`) | ❌ (gold accent, own theme) | ❌ (own Svelte theme) | ❌ (shadcn theme) |

@@ -23,8 +23,9 @@ npm test
 - `partials/nav.html` and `partials/foot.html` are inserted where a page says
   `<!-- include:nav -->` / `<!-- include:foot -->`; the nav link of the page's app gets
   `aria-current="page"`. `%ORIGIN%` becomes the request's origin (Open Graph, canonical).
-- `assets/` is the only static folder: `styles.css` (every page; the accent comes from
-  `body.app-<name>`), `main.js` (reveals, "Download for your OS", copy buttons, the ryolune theme
+- `assets/` is the only static folder: `styles.css` (every page, built on the design system's
+  `/design/tokens.css`, loaded first; `data-app` on `<html>` picks the app's color, light and dark
+  follow the system), `main.js` (reveals, "Download for your OS", copy buttons, the ryolune theme
   gallery), fonts (Manrope, IBM Plex Mono, OFL), images and the ryolune film.
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
 - `%VERSION:<app>%` becomes the version of the app's latest published GitHub release (cached

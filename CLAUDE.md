@@ -17,8 +17,8 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
       advertise them. `assets/img/og/zenith.png` still shows the old dashboard: retake it.
 - [ ] Keep the agent-readiness table on the home page and `STANDARD.md`'s status table in step
       as kimchi and zenith close their gaps.
-- [ ] **Design system on the site itself** (decided 2026-10-01): the site predates `design/`. Its
-      app colors in `assets/styles.css` (`--ryolune #82d6d1`, `--kimchi #ff6a45`, `--zenith #84a2ff`)
-      should come from `design/tokens.css` (accent / accent-text steps), and its cards, nav and code
-      blocks should use the glass tiers over `.ls-backdrop`. Keep `/design` (`design/index.html`) as
-      the live reference; rebuild `tokens.css` with `node design/build.mjs` after editing `tokens.json`.
+- [x] **Design system on the site itself** (2026-10-01): pages load `/design/tokens.css` before
+      `assets/styles.css`, whose variables all map onto `--ls-*`; app pages set `data-app` on
+      `<html>` (signature color, aurora backdrop); nav, cards, cells, tables, stats, downloads, FAQ,
+      bands and footer are glass tier 1, terminals and code tier 2; screenshots stay solid. Light and
+      dark follow the system. No hard-coded color is left in `styles.css` or the pages: add a token.
