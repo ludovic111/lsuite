@@ -1,0 +1,15 @@
+{
+  "name": "lsuite-site",
+  "private": true,
+  "version": "0.1.0",
+  "description": "lsuite.xyz: the site of lsuite (ryolune, kimchi, zenith). Static pages served by a dependency-free Node server.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "PORT=4321 node server.js",
+    "test": "node --test"
+  }
+}

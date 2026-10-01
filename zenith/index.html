@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>zenith — your projects, your day and your agents, at a glance · lsuite</title>
+  <meta name="description" content="zenith is a free, open-source local dashboard for people who build many things at once: every project's health, deploys and code, what is waiting for you, and a team of AI agents you hand work to in one tap. It runs on your machine and never sends your data anywhere.">
+  <meta name="theme-color" content="#0c0c0b">
+  <link rel="canonical" href="%ORIGIN%/zenith">
+  <link rel="icon" href="/assets/img/icons/zenith.webp" type="image/webp">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="lsuite">
+  <meta property="og:title" content="zenith — your projects, your day and your agents, at a glance">
+  <meta property="og:description" content="A local dashboard that acts: ask in one sentence, an agent starts on it in the right project. It prepares; you approve. Free and MIT licensed.">
+  <meta property="og:url" content="%ORIGIN%/zenith">
+  <meta property="og:image" content="%ORIGIN%/assets/img/og/zenith.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="/assets/fonts/manrope-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/styles.css?v=1">
+  <script src="/assets/main.js?v=1"></script>
+</head>
+<body class="app-zenith">
+<!-- include:nav -->
+
+<main id="content">
+  <section class="hero">
+    <div class="hero__glow"></div>
+    <div class="hero__grid"></div>
+    <div class="wrap hero__in">
+      <div class="appid reveal">
+        <img class="appid__mark" src="/assets/img/icons/zenith.webp" width="56" height="56" alt="">
+        <div><div class="appid__name">zenith</div><div class="appid__kind">lsuite · hub</div></div>
+      </div>
+      <h1 class="display reveal" style="--d:1">Everything you build,<br><span class="accent">at a glance.</span> And it acts.</h1>
+      <p class="lede reveal" style="--d:2">zenith is a local dashboard for people who build many things at once: every project's health, deploys, code and AI agents, your calendar, mail, money and news, plus zenith code, a full coding workspace for Claude Code and Codex. Ask it anything in one sentence and an agent starts on it, in the right project. It prepares; you approve.</p>
+      <div class="hero__actions reveal" style="--d:3">
+        <a class="btn btn--primary" href="#start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l6-6-6-6M12 19h8"/></svg>Get started</a>
+        <a class="btn" href="https://github.com/ludovic111/zenith">Source on GitHub</a>
+      </div>
+      <p class="fine hero__fine reveal" style="--d:4">Version 0.1 · free and MIT licensed · macOS and Linux · answers only on 127.0.0.1 · English and French</p>
+    </div>
+    <div class="wrap">
+      <figure class="shot shot--hero reveal" style="--d:3" aria-label="Illustration of the zenith home: Ask zenith, the Now list and the projects table">
+        <div class="zmock" aria-hidden="true">
+          <div class="zmock__side">
+            <b><svg viewBox="0 0 40 40"><circle cx="20" cy="22" r="13" fill="none" stroke="currentColor" stroke-width="3.5"/><circle cx="20" cy="9" r="6" fill="currentColor"/></svg>zenith</b>
+            <span class="on">Home</span><span>Now</span><span>My day</span><span>Watch</span>
+            <small>Projects</small>
+            <span><i style="background:#7fd18a"></i>ryolune</span><span><i style="background:#7fd18a"></i>kimchi</span><span><i style="background:#f2c14e"></i>lsuite</span><span><i style="background:#7fd18a"></i>zenith</span>
+            <small>Spaces</small>
+            <span>Overview</span><span>Team</span><span>Code</span>
+          </div>
+          <div class="zmock__main">
+            <div class="zmock__ask"><svg viewBox="0 0 40 40"><circle cx="20" cy="22" r="13" fill="none" stroke="currentColor" stroke-width="3.5"/><circle cx="20" cy="9" r="6" fill="currentColor"/></svg>Ask zenith: "fix the failing CI on kimchi and open a PR"<kbd>⌘J</kbd></div>
+            <div class="zmock__row">
+              <div class="zmock__panel">
+                <h4>Now · waiting for you</h4>
+                <div class="zmock__item"><i class="zmock__dot" style="background:#ff7a6b"></i><em>CI failing on kimchi · main</em><u>Hand off</u></div>
+                <div class="zmock__item"><i class="zmock__dot" style="background:#f2c14e"></i><em>3 new issues on ryolune</em><u>Hand off</u></div>
+                <div class="zmock__item"><i class="zmock__dot" style="background:#f2c14e"></i><em>Certificate renews in 9 days</em><u>Hand off</u></div>
+                <div class="zmock__item"><i class="zmock__dot" style="background:#7fd18a"></i><em>Release notes for 0.12 drafted</em><u>Review</u></div>
+              </div>
+              <div class="zmock__panel">
+                <h4>Projects</h4>
+                <table>
+                  <tr><td><b>ryolune</b></td><td>up · 84 ms</td></tr>
+                  <tr><td><b>kimchi</b></td><td>CI red</td></tr>
+                  <tr><td><b>lsuite</b></td><td>deploying</td></tr>
+                  <tr><td><b>zenith</b></td><td>up · 3 agents</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="zmock__row">
+              <div class="zmock__panel">
+                <h4>Agents at work</h4>
+                <div class="zmock__item"><i class="zmock__dot" style="background:var(--zenith)"></i><em>kimchi · fixing release workflow</em><u>diff</u></div>
+                <div class="zmock__item"><i class="zmock__dot" style="background:var(--zenith)"></i><em>ryolune · answering issue #212</em><u>draft</u></div>
+              </div>
+              <div class="zmock__panel">
+                <h4>Commits · six months</h4>
+                <div class="zmock__bars"><i style="height:30%"></i><i style="height:45%"></i><i style="height:38%"></i><i style="height:60%"></i><i style="height:52%"></i><i style="height:74%"></i><i style="height:66%"></i><i style="height:80%"></i><i style="height:58%"></i><i style="height:90%"></i><i style="height:72%"></i><i style="height:100%"></i></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </figure>
+      <p class="fine" style="margin-top: 14px;">An illustration with sample data. zenith only ever shows your own, on your own machine.</p>
+    </div>
+  </section>
+
+  <section class="section" id="acts" aria-labelledby="acts-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">It acts</span>
+        <h2 class="h2 reveal" id="acts-title">A dashboard you can hand work to.</h2>
+        <p class="lede reveal" style="--d:1">zenith knows what is going on across every project, so its agents start with the context instead of asking for it.</p>
+      </div>
+      <div class="grid grid--4">
+        <div class="cell reveal"><span class="cell__k">⌘J</span><h3>Ask zenith</h3><p>One box, everywhere: say what you want and an agent does it, opening as a thread. It routes to the project you name, or to your life agent.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Now</span><h3>What is waiting for you</h3><p>A failing payment, buyers to answer, a broken CI, a birthday. Most pressing first, each one handed to an agent in one tap.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Team</span><h3>Agents with a name</h3><p>Your agent and its bots, each with a role, a personality, memory and shared skills, on your Claude or ChatGPT subscription. Reachable from Telegram.</p></div>
+        <div class="cell reveal" style="--d:3"><span class="cell__k">Autonomy</span><h3>Ahead of you</h3><p>Agents learn from you every night, look around every few hours to prepare what is coming and keep dependencies up to date. Each project decides how much they may do.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pages" aria-labelledby="pages-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">What you get</span>
+        <h2 class="h2 reveal" id="pages-title">Your whole practice on one screen.</h2>
+      </div>
+      <div class="table-wrap reveal">
+        <table class="matrix">
+          <caption class="sr">zenith's pages</caption>
+          <thead><tr><th scope="col">Page</th><th scope="col">What it shows</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Home</th><td>Today in one line, Ask zenith, Now, every project in one table (status, latency, key numbers, commits), money, agents at work, six months of commits.</td></tr>
+            <tr><th scope="row">Projects</th><td>One page per project: uptime, latency, traffic and deploys, CI, issues and PRs, releases and downloads, App Store reviews, revenue, agent sessions, notes.</td></tr>
+            <tr><th scope="row">Code</th><td>zenith code: chat with Claude Code, Codex and other agents inside any project, with diffs, terminals, worktrees and approvals.</td></tr>
+            <tr><th scope="row">My day</th><td>Weather, air quality, calendar, birthdays, what is waiting for you, now playing, screen time, spending, work rhythm.</td></tr>
+            <tr><th scope="row">Watch</th><td>Who talks about your projects, notifications, new stars, contributions, news, markets, the state of your Mac.</td></tr>
+            <tr><th scope="row">Subscriptions</th><td>Everything you pay for, monthly total in your currency, next charges, failing payments, Claude and ChatGPT plan gauges.</td></tr>
+            <tr><th scope="row">Directory</th><td>Every project's names, handles, domains (registrar, renewal, certificate, email), stores and services.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="agents" aria-labelledby="agents-title">
+    <div class="wrap split split--top">
+      <div class="stack">
+        <span class="eyebrow">For your agents</span>
+        <h2 class="h2 reveal" id="agents-title">What zenith knows, your agents know.</h2>
+        <p class="lede reveal" style="--d:1">Every 10 minutes zenith writes a Markdown brief of everything it knows, one file per project. Any agent can read it, and act through zenith while it runs.</p>
+        <ul class="bullets reveal" style="--d:2">
+          <li><span><b>To read:</b> <code>zenith_brief</code>, <code>zenith_project</code>, <code>zenith_document</code>, <code>zenith_search_notes</code>, <code>zenith_read_note</code>.</span></li>
+          <li><span><b>To act:</b> <code>zenith_now</code>, <code>zenith_delegate</code> to start another agent in a project, <code>zenith_agent</code>, <code>zenith_done</code>.</span></li>
+          <li><span><b>It asks first.</b> The agent drafts, branches and proposes; it asks before sending, paying, deleting or deploying.</span></li>
+        </ul>
+      </div>
+      <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># Claude Code</span></span>
+<span class="line">claude mcp add zenith --scope user -- node ~/zenith/scripts/mcp/zenith-mcp.mjs</span>
+<span class="line"></span>
+<span class="line"><span class="c"># Codex</span></span>
+<span class="line">codex mcp add zenith -- node ~/zenith/scripts/mcp/zenith-mcp.mjs</span>
+<span class="line"></span>
+<span class="line"><span class="c"># or plain HTTP, for anything else</span></span>
+<span class="line">curl http://127.0.0.1:4747/api/context</span>
+<span class="line">curl http://127.0.0.1:4747/llms.txt</span></pre></div>
+    </div>
+  </section>
+
+  <section class="section" id="start" aria-labelledby="start-title">
+    <div class="wrap split split--top">
+      <div class="stack">
+        <span class="eyebrow">Quick start</span>
+        <h2 class="h2 reveal" id="start-title">Running in a minute.</h2>
+        <p class="lede reveal" style="--d:1">You need macOS or Linux, Node.js 22.16+ and git. The first launch opens a welcome in six short steps: language, name and city, your projects (found in your code folder), your agent and its team, and their routines. No file to edit.</p>
+        <p class="muted reveal" style="--d:2">On a Mac, <code>npm run mac:install</code> builds zenith.app, a native window with a translucent sidebar, native menus, notifications and a Dock badge when a service goes down, and keeps the server running in the background.</p>
+      </div>
+      <div class="stack">
+        <div class="code reveal" style="--d:1"><pre><span class="line">git clone https://github.com/ludovic111/zenith.git</span>
+<span class="line">cd zenith</span>
+<span class="line">npm install</span>
+<span class="line">npm run dev          <span class="c"># http://127.0.0.1:4748</span></span>
+<span class="line"></span>
+<span class="line"><span class="c"># the coding workspace, once</span></span>
+<span class="line">npm run code:build</span>
+<span class="line"></span>
+<span class="line"><span class="c"># the Mac app</span></span>
+<span class="line">npm run mac:install</span></pre></div>
+        <p class="fine reveal">zenith's interface is Next.js and React today. Its coding-agents server and Mac app are being rewritten in Rust, like the rest of lsuite.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="privacy" aria-labelledby="privacy-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Privacy</span>
+        <h2 class="h2 reveal" id="privacy-title">It knows a lot. It tells no one.</h2>
+      </div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">Local only</span><h3>127.0.0.1, nothing else</h3><p>The server listens on your machine only and rejects any other host name, so a web page cannot reach it either.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Keys</span><h3>Stay server-side</h3><p>API keys live in a git-ignored file and are only used for the calls you configured. Nothing goes to a third party otherwise.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Contributing</span><h3>Checked before you push</h3><p><code>npm run privacy</code> scans every tracked file for your identifying values and secrets, and can run before each push.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="more-title">
+    <div class="wrap">
+      <div class="section__head"><span class="eyebrow eyebrow--plain">Also in lsuite</span><h2 class="h3" id="more-title" style="font-size:1.5rem">Same idea, other crafts.</h2></div>
+      <div class="others">
+        <a class="card app-ryolune" href="/ryolune"><img src="/assets/img/icons/ryolune.webp" width="44" height="44" alt=""><div><span class="card__name">ryolune</span><span class="muted">The open-source DAW your AI can drive</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-kimchi" href="/kimchi"><img src="/assets/img/icons/kimchi.webp" width="44" height="44" alt=""><div><span class="card__name">kimchi</span><span class="muted">Video editing with generation in the cut</span></div><span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- include:foot -->
+</body>
+</html>

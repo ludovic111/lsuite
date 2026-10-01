@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>kimchi — the open-source video editor where generation is part of the cut · lsuite</title>
+  <meta name="description" content="kimchi is a free, open-source desktop video editor with a Rust core and a built-in harness for image and video models: generate at the playhead, animate a frame, extend a shot, bridge two clips. Bring your own keys, or run everything locally.">
+  <meta name="theme-color" content="#0c0c0b">
+  <link rel="canonical" href="%ORIGIN%/kimchi">
+  <link rel="icon" href="/assets/img/icons/kimchi.webp" type="image/webp">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="lsuite">
+  <meta property="og:title" content="kimchi — the video editor where generation is part of the cut">
+  <meta property="og:description" content="A real multi-track editor with image and video models woven in. Rust core, 15 providers, your keys or fully local. Free and MIT licensed.">
+  <meta property="og:url" content="%ORIGIN%/kimchi">
+  <meta property="og:image" content="%ORIGIN%/assets/img/og/kimchi.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"kimchi","url":"%ORIGIN%/kimchi","description":"A free, open-source video editor where generative models are part of the cut.","applicationCategory":"MultimediaApplication","applicationSubCategory":"Video editor","operatingSystem":"macOS, Windows, Linux","softwareVersion":"0.1.0","downloadUrl":"https://github.com/ludovic111/kimchi/releases/latest","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isPartOf":{"@type":"WebSite","name":"lsuite","url":"%ORIGIN%/"}}</script>
+  <link rel="preload" href="/assets/fonts/manrope-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/assets/styles.css?v=1">
+  <script src="/assets/main.js?v=1"></script>
+</head>
+<body class="app-kimchi">
+<!-- include:nav -->
+
+<main id="content">
+  <section class="hero">
+    <div class="hero__glow"></div>
+    <div class="hero__grid"></div>
+    <div class="wrap hero__in">
+      <div class="appid reveal">
+        <img class="appid__mark" src="/assets/img/icons/kimchi.webp" width="56" height="56" alt="">
+        <div><div class="appid__name">kimchi</div><div class="appid__kind">lsuite · video</div></div>
+      </div>
+      <h1 class="display reveal" style="--d:1">Cut it, or <span class="accent">prompt it</span><br>onto the timeline.</h1>
+      <p class="lede reveal" style="--d:2">kimchi is a desktop video editor with a built-in harness for image and video models. Prompt a shot straight onto the timeline, animate a frame you like, extend a clip from its last frame or bridge two shots with a generated transition, then cut, trim and export it like any other footage.</p>
+      <div class="hero__actions reveal" style="--d:3">
+        <a class="btn btn--primary" href="#downloads" data-download="kimchi" data-href-macos="/kimchi/download/macos-arm64" data-href-windows="/kimchi/download/windows-x86_64" data-href-linux="/kimchi/download/linux-appimage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span data-os>Download kimchi</span></a>
+        <a class="btn" href="#downloads">All platforms</a>
+        <a class="btn" href="https://github.com/ludovic111/kimchi">Source on GitHub</a>
+      </div>
+      <p class="fine hero__fine reveal" style="--d:4">Version 0.1 · free and MIT licensed · macOS, Windows, Linux · Rust core · bring your own keys, or run everything locally</p>
+    </div>
+    <div class="wrap">
+      <figure class="shot shot--hero reveal" style="--d:3">
+        <img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor: the generate panel, a shot rendering in the preview, provenance for a generated clip and a multi-track timeline" fetchpriority="high">
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0; border-top: 0;">
+    <div class="wrap">
+      <div class="stats reveal">
+        <div><b>15</b><span>model providers, cloud and local</span></div>
+        <div><b>6</b><span>export formats, one ffmpeg graph</span></div>
+        <div><b>3</b><span>operating systems</span></div>
+        <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="generate" aria-labelledby="generate-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Generation, woven into the edit</span>
+        <h2 class="h2 reveal" id="generate-title">Not a separate tab. Part of the cut.</h2>
+        <p class="lede reveal" style="--d:1">Every generation starts from where you are on the timeline, and lands there as a clip you can trim like footage.</p>
+      </div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">At the playhead</span><h3>Generate where the shot goes</h3><p>A placeholder clip appears where the shot will go and turns into the result when it's done.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">In a gap</span><h3>Fill the hole</h3><p>Right-click empty space on a track; the shot is sized to fill it.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Image to video</span><h3>Animate this frame</h3><p>Turn the frame under the playhead into a moving shot.</p></div>
+        <div class="cell reveal"><span class="cell__k">Continue</span><h3>Extend shot</h3><p>Continue a clip from its last frame, landing right after it.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Transition</span><h3>Bridge two shots</h3><p>First frame and last frame, taken from the clips on either side.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Provenance</span><h3>Every asset remembers</h3><p>Prompt, model, seed and inputs are kept with each generated asset: regenerate or make variations in one click.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="edit" aria-labelledby="edit-title">
+    <div class="wrap split">
+      <div class="stack">
+        <span class="eyebrow">Editing</span>
+        <h2 class="h2 reveal" id="edit-title">A real editor underneath.</h2>
+        <p class="lede reveal" style="--d:1">kimchi started as a fork of OpenCut and was rewritten from the ground up in Rust. The interface is thin: every edit is plain data applied by the Rust core, and the window renders what Rust returns.</p>
+      </div>
+      <ul class="bullets reveal" style="--d:1">
+        <li><span><b>Multi-track timeline</b> with video, image, text, solid and audio clips.</span></li>
+        <li><span><b>Split, trim, ripple delete, duplicate,</b> cross-track moves, snapping and markers.</span></li>
+        <li><span><b>Per-clip transform</b> (position, scale, rotation, opacity, fit), speed, fades and volume.</span></li>
+        <li><span><b>Live preview compositor</b> with on-canvas move and scale handles.</span></li>
+        <li><span><b>Snapshot undo and redo</b> for every edit, and autosave.</span></li>
+        <li><span><b>Export to MP4 (H.264), HEVC, ProRes, WebM, GIF</b> or audio only, through one ffmpeg filter graph. ffmpeg is bundled.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="models" aria-labelledby="models-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Models</span>
+        <h2 class="h2 reveal" id="models-title">Your keys, or nothing leaves your machine.</h2>
+        <p class="lede reveal" style="--d:1">Keys live in your OS keychain and are only sent to the provider they belong to. Model lists are fetched live, and every model declares what it can do, so the generate panel only shows controls that apply.</p>
+      </div>
+      <div class="table-wrap reveal">
+        <table class="matrix">
+          <caption class="sr">Supported model providers</caption>
+          <thead><tr><th scope="col">Provider</th><th scope="col">Runs</th><th scope="col">Images</th><th scope="col">Video</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">OpenRouter · fal · Replicate · Together AI</th><td>cloud</td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td></tr>
+            <tr><th scope="row">Google Gemini · xAI · Runway · Luma AI</th><td>cloud</td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td></tr>
+            <tr><th scope="row">OpenAI · Black Forest Labs · Stability AI</th><td>cloud</td><td><span class="yes">Yes</span></td><td>—</td></tr>
+            <tr><th scope="row">ComfyUI, with your own workflows</th><td>local</td><td><span class="yes">Yes</span></td><td><span class="yes">Yes</span></td></tr>
+            <tr><th scope="row">Stable Diffusion WebUI (A1111, Forge, SD.Next, Draw Things) · Ollama · any OpenAI-compatible images server</th><td>local</td><td><span class="yes">Yes</span></td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="split split--top" style="margin-top: clamp(40px, 6vw, 72px);">
+        <div class="stack">
+          <h3 class="h3 reveal" style="font-size:1.5rem">Your own ComfyUI workflows become models.</h3>
+          <p class="muted reveal">Export a workflow in API format into <code>~/Documents/kimchi/comfyui-workflows</code>. Each file becomes a model. Put placeholders in any string input and kimchi fills them in; a workflow with a video save node is treated as a video model.</p>
+        </div>
+        <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># placeholders kimchi fills in</span></span>
+<span class="line">{{prompt}} {{negative_prompt}} {{seed}}</span>
+<span class="line">{{width}} {{height}} {{steps}} {{cfg}} {{denoise}}</span>
+<span class="line">{{duration}} {{fps}} {{frames}}</span>
+<span class="line">{{image}} {{start_image}} {{end_image}}   <span class="c"># uploaded for you</span></span></pre></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="agent" aria-labelledby="agent-title">
+    <div class="wrap split split--top">
+      <div class="stack">
+        <span class="eyebrow">Agents and scripts</span>
+        <h2 class="h2 reveal" id="agent-title">The engine, without the window.</h2>
+        <p class="lede reveal" style="--d:1">The <code>kimchi</code> command runs the same Rust harness and renderer as the app: list providers and models, generate with any of them, and render a project headless. Projects are plain JSON and every edit is plain data, so an agent can read and write them directly.</p>
+        <p class="muted reveal" style="--d:2">An MCP server, so Claude Code, Codex and any MCP client can drive the open project live, is the next step on the way to the lsuite standard.</p>
+      </div>
+      <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># what is ready, and what each provider offers</span></span>
+<span class="line">kimchi providers</span>
+<span class="line">kimchi models fal</span>
+<span class="line"></span>
+<span class="line"><span class="c"># generate: images, or video with --video</span></span>
+<span class="line">kimchi generate fal fal-ai/flux-2-pro "Night market, rain, neon" --aspect 16:9 --count 2</span>
+<span class="line">kimchi generate fal fal-ai/kling-video/v3/pro/image-to-video "Slow push in" \</span>
+<span class="line">    --video --image frame.png --duration 5</span>
+<span class="line"></span>
+<span class="line"><span class="c"># render a project, no window needed</span></span>
+<span class="line">kimchi render night-market.json night-market.mp4 --format mp4 --quality high</span></pre></div>
+    </div>
+  </section>
+
+  <section class="section" id="downloads" aria-labelledby="downloads-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Download</span>
+        <h2 class="h2 reveal" id="downloads-title">Download kimchi</h2>
+        <p class="lede reveal" style="--d:1">ffmpeg is bundled. kimchi checks for updates on launch and installs them in one click; updates are signed.</p>
+      </div>
+      <div class="dl reveal">
+        <a href="/kimchi/download/macos-arm64" data-os-match="macos"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Apple silicon</b><span>.dmg</span></a>
+        <a href="/kimchi/download/macos-x86_64"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Intel</b><span>.dmg</span></a>
+        <a href="/kimchi/download/windows-x86_64" data-os-match="windows"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z"/></svg>Windows · 64-bit</b><span>.exe installer</span></a>
+        <a href="/kimchi/download/linux-appimage" data-os-match="linux"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10l3 2-3 2M13 15h3" stroke-linecap="round" stroke-linejoin="round"/></svg>Linux · AppImage</b><span>.AppImage · x86-64</span></a>
+      </div>
+      <p class="fine reveal" style="margin-top: 18px;">Also: <a href="/kimchi/download/windows-msi">Windows .msi</a> · <a href="/kimchi/download/linux-deb">Linux .deb</a> · <a href="/kimchi/download/linux-rpm">Linux .rpm</a> · <a href="https://github.com/ludovic111/kimchi/releases">All releases</a>. The macOS build isn't notarized yet: the first time, right-click the app, then Open.</p>
+    </div>
+  </section>
+
+  <section class="section" id="support" aria-labelledby="support-title">
+    <div class="wrap">
+      <div class="band reveal">
+        <span class="eyebrow">Support</span>
+        <h2 class="h2" id="support-title">Free, open source, yours to fork.</h2>
+        <p class="lede" style="margin-inline:auto">kimchi is MIT licensed with every feature included. Model providers bill you directly for what you generate; kimchi takes nothing in between. Donations keep it moving.</p>
+        <div class="hero__actions" style="justify-content:center">
+          <a class="btn btn--primary" href="/kimchi/support">Sponsor</a>
+          <a class="btn" href="https://github.com/ludovic111/kimchi">Star on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="more-title">
+    <div class="wrap">
+      <div class="section__head"><span class="eyebrow eyebrow--plain">Also in lsuite</span><h2 class="h3" id="more-title" style="font-size:1.5rem">Same idea, other crafts.</h2></div>
+      <div class="others">
+        <a class="card app-ryolune" href="/ryolune"><img src="/assets/img/icons/ryolune.webp" width="44" height="44" alt=""><div><span class="card__name">ryolune</span><span class="muted">The open-source DAW your AI can drive</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-zenith" href="/zenith"><img src="/assets/img/icons/zenith.webp" width="44" height="44" alt=""><div><span class="card__name">zenith</span><span class="muted">Your projects, your day and your agents</span></div><span class="arrow" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- include:foot -->
+</body>
+</html>
