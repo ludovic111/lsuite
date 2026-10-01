@@ -96,7 +96,7 @@ The apps are separate programs but must be usable as one suite, by a person and 
 | MCP | ✅ `ryolune-mcp --live` | ❌ | partly: read + a few actions |
 | Built-in agent | ✅ | partly: generation only | ✅ |
 | Signed auto-update | ✅ | ✅ (Tauri updater) | partly: updates from GitHub, no signed binary release |
-| Release binaries, all platforms | ✅ notarized macOS | ✅ (macOS not notarized) | ❌ runs from source |
+| Release binaries, all platforms | ✅ notarized macOS | ✅ notarized macOS (since 0.1.1) | ❌ runs from source |
 | Rust core | ✅ | ✅ | ❌ (Next.js; Rust port started on a branch) |
 | Discovery (`~/.lsuite/apps`) | ❌ | ❌ | ❌ |
 | Hand-offs | ❌ | ❌ | ❌ |
