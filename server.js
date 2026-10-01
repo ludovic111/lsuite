@@ -31,7 +31,10 @@ const TYPES = {
 };
 
 /** The pages, by path. Each app page is `<app>/index.html`. */
-export const PAGES = { '/': 'index.html', '/ryolune': 'ryolune/index.html', '/kimchi': 'kimchi/index.html', '/zenith': 'zenith/index.html' };
+export const PAGES = { '/': 'index.html', '/ryolune': 'ryolune/index.html', '/kimchi': 'kimchi/index.html', '/zenith': 'zenith/index.html', '/design': 'design/index.html' };
+
+/** The design system's files, served as they are (design/DESIGN.md explains them). */
+const DESIGN_FILES = new Set(['/design/tokens.css', '/design/tokens.json', '/design/preview.js']);
 
 /**
  * Hosts that used to be an app's own site and now point here: every path keeps working under
@@ -227,7 +230,7 @@ export async function renderPage(file, origin, versions) {
   }
   const app = file.split('/').length > 1 ? file.split('/')[0] : null;
   if (app) html = html.replaceAll(`data-app="${app}"`, `data-app="${app}" aria-current="page"`);
-  for (const [whole, quote, path] of [...html.matchAll(/(["'])(\/assets\/[\w./-]+\.(?:js|css))\?v=[\w.-]*\1/g)]) {
+  for (const [whole, quote, path] of [...html.matchAll(/(["'])(\/(?:assets|design)\/[\w./-]+\.(?:js|css))\?v=[\w.-]*\1/g)]) {
     const stamp = await stampOf(path);
     if (stamp) html = html.replaceAll(whole, `${quote}${path}?v=${stamp}${quote}`);
   }
@@ -334,6 +337,12 @@ export async function handle(req, res) {
     );
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`;
     return send(res, 200, xml, TYPES['.xml'], 'public, max-age=3600', req);
+  }
+
+  if (DESIGN_FILES.has(pathname)) {
+    const file = join(ROOT, pathname);
+    const cache = url.searchParams.has('v') ? 'public, max-age=31536000, immutable' : 'public, max-age=300';
+    return send(res, 200, await readFile(file), TYPES[extname(file)], cache, req);
   }
 
   // Static files: only under /assets/, never dotfiles, never outside ROOT.

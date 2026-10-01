@@ -88,6 +88,20 @@ The apps are separate programs but must be usable as one suite, by a person and 
 - Offline first; network only for what the person turned on (model providers, updates).
 - Secrets in the OS keychain or a 0600 file, never in logs or documents.
 
+## 7. One look: the lsuite design system
+
+Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, source
+`design/tokens.json`, generated `design/tokens.css`, live preview at lsuite.xyz/design):
+
+- **One signature color per app**, same OKLCH lightness and chroma, only the hue changes:
+  ryolune teal (185°), kimchi chili coral (32°), zenith blue (262°); violet, green, amber and pink
+  are reserved for the next apps. The accent means "yours or active"; state colors keep their meaning.
+- **Frosted glass for the chrome** (three tiers over a backdrop tinted with the app color), solid
+  surfaces for the work, native window vibrancy where the OS has it, opaque fallbacks when
+  transparency is reduced.
+- Manrope + IBM Plex Mono, shared radii, spacing and motion, dark and light, tested contrast.
+- One app icon template (squircle in the app's gradient, white glyph, glass sheen).
+
 ## Status (2026-10-01)
 
 | | ryolune | kimchi | zenith |
@@ -102,3 +116,4 @@ The apps are separate programs but must be usable as one suite, by a person and 
 | Discovery (`~/.lsuite/apps`) | ❌ | ❌ | ❌ |
 | Hand-offs | ❌ | ❌ | ❌ |
 | README / site / support links | ✅ | ✅ | ✅ |
+| lsuite design system (`design/`) | ❌ (gold accent, own theme) | ❌ (own Svelte theme) | ❌ (shadcn theme) |
