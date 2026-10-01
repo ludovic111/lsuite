@@ -38,7 +38,12 @@ export const PAGES = { '/': 'index.html', '/ryolune': 'ryolune/index.html', '/ki
  * the app's page (ryolune.com/support → lsuite.xyz/ryolune/support, and the hash, which the
  * browser keeps across a redirect, still lands on the same section).
  */
-export const MOVED_HOSTS = { 'ryolune.com': 'ryolune', 'www.ryolune.com': 'ryolune' };
+export const MOVED_HOSTS = {
+  'ryolune.com': 'ryolune',
+  'www.ryolune.com': 'ryolune',
+  // The ryolune-site service's own Railway domain, which the ryolune 0.11 app links to.
+  'site-production-7751.up.railway.app': 'ryolune',
+};
 
 /** The one public address, `LSUITE_CANONICAL_HOST` on the host (lsuite.xyz). Unset: no redirect. */
 const canonicalHost = () => String(process.env.LSUITE_CANONICAL_HOST ?? '').trim().toLowerCase();
