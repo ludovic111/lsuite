@@ -1,14 +1,14 @@
 # The lsuite standard
 
 lsuite (always lowercase) is a free, open-source creative suite: **ryolune** (music),
-**kimchi** (video), **zenith** (code: a Mac app for coding with agents). Like a creative suite you pay for,
+**kimchi** (video), **zenith** (code: a Mac app for coding with agents, coming soon). Like a creative suite you pay for,
 but MIT licensed, written in Rust, and **every app can be driven end to end by an AI agent**.
 
 | App | Repository | Local folder (next to this repo) |
 | --- | --- | --- |
 | ryolune · music · the reference implementation | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) | `../ryolune` |
 | kimchi · video | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) | `../kimchi` |
-| zenith · code | [ludovic111/zenith](https://github.com/ludovic111/zenith) | `../zenith` |
+| zenith · code · coming soon | [ludovic111/zenith](https://github.com/ludovic111/zenith) | `../zenith` |
 
 This file is the contract every app meets. Each app's `CLAUDE.md` has an "lsuite" section with
 the gaps that app still has against it. When an app closes a gap, update its section and the
@@ -107,16 +107,16 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 
 ## Status (2026-10-02)
 
-| | ryolune | kimchi | zenith |
+| | ryolune | kimchi | zenith (coming soon) |
 | --- | --- | --- | --- |
 | Command registry, one undo | ✅ | ✅ 84 commands, one undo history | ✅ 52 `family.verb` commands (`zenith-commands`) shared by the window, CLI and MCP, git, pull requests and terminals included; undo is per turn (`thread.revert`) |
 | CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | ✅ `zenith-cli` |
 | MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live`, and `/mcp` handed to each thread's agent |
 | Built-in agent | ✅ | ✅ Agent panel (Claude Code, Codex, API keys, Ollama) | ✅ Claude Code and Codex threads |
-| Signed auto-update | ✅ | ✅ own updater (same key and `latest.json` as the Tauri builds) | ✅ 0.2.0: in-app updater, Ed25519-signed `SHA256SUMS` |
-| Release binaries, all platforms | ✅ notarized macOS | ✅ 0.4.0: notarized macOS (Apple Silicon, Intel), Windows, Linux | ✅ 0.2.0: notarized macOS (Apple silicon, Intel), Linux |
+| Signed auto-update | ✅ | ✅ own updater (same key and `latest.json` as the Tauri builds) | Coming soon: in-app updater, Ed25519-signed `SHA256SUMS`, built in the repo; nothing offered until zenith is ready |
+| Release binaries, all platforms | ✅ notarized macOS | ✅ 0.4.0: notarized macOS (Apple Silicon, Intel), Windows, Linux | Coming soon: no download on the site (taken down 2026-10-02) until zenith is ready |
 | Rust core | ✅ native window (GPUI) | ✅ native window (GPUI), no web UI | ✅ server (`crates/zenith-code`) and native window (GPUI, `crates/zenith-app`); React interface kept for the browser |
 | Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ✅ writes `zenith.json`, reads the others (format 1) |
 | Hand-offs | ✅ to and from kimchi (`export.toKimchi`, `session.scoreCut`, `handoff.inbox`) | ✅ to and from ryolune (`handoff.*`, through ryolune's bridge) | partly: hands the other apps' MCP servers to its agents |
-| README / site / support links (site on the design system) | ✅ | ✅ | ✅ |
+| README / site / support links (site on the design system) | ✅ | ✅ | ✅ page marked Coming soon, no download |
 | lsuite design system (`design/`) | ✅ GPUI on the tokens (glass over the window blur, teal, dark/light, contrast test, icon) | ✅ GPUI on the tokens: glass over the macOS window blur, Manrope/Plex, dark and light, contrast test, icon | ✅ native window (tokens, glass over vibrancy, Manrope/Plex, icon) and web interface (default theme on the tokens and glass tiers) |

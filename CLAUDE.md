@@ -4,7 +4,7 @@ The suite's site; see README.md (layout, routes, domains) and STANDARD.md (the c
 lsuite app meets, with a status table). Each app repo (`../ryolune`, `../kimchi`, `../zenith`)
 has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 
-## Next session (2026-10-01)
+## Next session (2026-10-02)
 
 - [x] ryolune 0.12 page (2026-10-01): New in 0.12, one theme dark/light gallery, 35 plugins,
       199 commands, new agents. Versions on pages are `%VERSION:<app>%`, filled by `server.js`
@@ -15,6 +15,13 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
       (Claude Code and Codex threads, Rust server, Tauri app); `zmock` now illustrates a thread.
       The old dashboard, Ask zenith, the agent team and the `zenith_*` MCP tools are gone: don't
       advertise them. `assets/img/og/zenith.png` retaken from the new page (2026-10-01).
+- [x] zenith marked Coming soon (2026-10-02): zenith is not ready, so the site no longer offers
+      it. Its page is a preview (badge, future tense, no download, "Follow it on GitHub"), "What's
+      new in 0.2" is gone, the home card, lede and agent-readiness column say Coming soon, nav and
+      footer carry a "soon" marker, and `/zenith/download[/…]` redirects to `/zenith`. T3 Code is
+      used instead for now. When zenith ships: put back the download section, `%VERSION:zenith%`,
+      the `ZENITH` assets in `server.js` and the table cells, and retake `assets/img/og/zenith.png`
+      (its hero has no Coming soon badge).
 - [ ] Keep the agent-readiness table on the home page and `STANDARD.md`'s status table in step
       as kimchi and zenith close their gaps.
 - [x] **Design system on the site itself** (2026-10-01): pages load `/design/tokens.css` before

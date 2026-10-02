@@ -35,11 +35,16 @@ test('ryolune downloads map to fixed asset names', async () => {
   assert.equal(await downloadTarget('ryolune', undefined, 'Macintosh'), `${base}/download/ryolune-macos-arm64.zip`);
   assert.equal(await downloadTarget('ryolune', 'nope'), base);
   assert.equal(await downloadTarget('kimchi', 'nope'), 'https://github.com/ludovic111/kimchi/releases/latest');
-  const zenith = 'https://github.com/ludovic111/zenith/releases/latest';
-  assert.equal(await downloadTarget('zenith', 'macos-x86_64'), `${zenith}/download/zenith-macos-x86_64.zip`);
-  assert.equal(await downloadTarget('zenith', undefined, 'Macintosh'), `${zenith}/download/zenith-macos-arm64.zip`);
-  assert.equal(await downloadTarget('zenith', undefined, 'X11; Linux x86_64'), `${zenith}/download/zenith-linux-x86_64.tar.gz`);
-  assert.equal(await downloadTarget('zenith', 'windows-x86_64'), zenith);
+});
+
+test('zenith is coming soon: download links land on its page, which offers none', async () => {
+  assert.equal(await downloadTarget('zenith', 'macos-arm64'), '/zenith');
+  assert.equal(await downloadTarget('zenith', undefined, 'Macintosh'), '/zenith');
+  const html = await renderPage('zenith/index.html', 'https://lsuite.xyz', {});
+  assert.ok(html.includes('Coming soon'));
+  assert.ok(!/zenith\/download|data-download|Download zenith/.test(html));
+  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8' });
+  assert.ok(!home.includes('/zenith/download'));
 });
 
 test('donations only go to https', () => {

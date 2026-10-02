@@ -7,7 +7,7 @@ open-source creative suite whose apps can be driven end to end by an AI agent.
 | --- | --- | --- |
 | ryolune · music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) |
 | kimchi · video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) |
-| zenith · code | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) |
+| zenith · code · coming soon | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) |
 
 Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
 
@@ -46,6 +46,7 @@ are under `/design/`.
 | --- | --- |
 | `/ryolune/download[/<platform>]` | 302 to the latest ryolune release asset (`macos-arm64`, `macos-x86_64`, `windows-x86_64`, `linux-x86_64`; by User-Agent without one). Keep in step with `update::asset_name` in ryolune. |
 | `/kimchi/download[/<platform>]` | 302 to the matching asset of kimchi's latest release, looked up on the GitHub API (cached 10 min): `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm`. |
+| `/zenith/download[/<platform>]` | 302 to `/zenith`: zenith is coming soon, nothing to download yet. |
 | `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
 | `/health` | `ok`, for Railway's health check. |
 | `/robots.txt`, `/sitemap.xml` | Generated for the request's origin. |

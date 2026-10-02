@@ -150,6 +150,7 @@ p { margin: 0; text-wrap: pretty; }
   .nav__in { gap: 12px; }
   .nav__apps a { padding: 6px 8px; font-size: 13px; }
   .nav__apps .dot { display: none; }
+  .nav__apps .badge { display: none; }
   .brand span { display: none; }
   .nav__end .nav__get { display: none; }
   .btn--sponsor { padding: 0 11px; }
@@ -243,6 +244,17 @@ p { margin: 0; text-wrap: pretty; }
   font: 500 12.5px/1 var(--mono); color: var(--text-2); letter-spacing: 0.01em;
 }
 .pill svg { width: 14px; height: 14px; }
+
+/* "Coming soon": an app not released yet. A state, not the accent: neutral text and the same
+   hollow ring as .soon in the tables. --sm (nav, footer, cards) drops the ring. */
+.badge {
+  display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px;
+  border: 1px solid var(--line-2); background: var(--surface-2);
+  font: 500 11.5px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); white-space: nowrap;
+}
+.badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--text-3); }
+.badge--sm { height: auto; padding: 3px 6px; gap: 0; font-size: 9.5px; letter-spacing: 0.06em; color: var(--text-3); background: none; }
+.badge--sm::before { display: none; }
 
 /* App identity in a hero */
 .appid { display: flex; align-items: center; gap: 14px; }

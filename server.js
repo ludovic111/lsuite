@@ -85,18 +85,6 @@ const RYOLUNE = {
   byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
 };
 
-// zenith ships fixed asset names too; keep in step with `update::asset_name` in the zenith repo
-// (crates/zenith-commands/src/update.rs).
-const ZENITH = {
-  releases: 'https://github.com/ludovic111/zenith/releases/latest',
-  assets: {
-    'macos-arm64': 'zenith-macos-arm64.zip',
-    'macos-x86_64': 'zenith-macos-x86_64.zip',
-    'linux-x86_64': 'zenith-linux-x86_64.tar.gz',
-  },
-  byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
-};
-
 // kimchi's file names carry the version (Tauri bundles), so the latest release is looked up.
 const KIMCHI = {
   repo: 'ludovic111/kimchi',
@@ -135,8 +123,9 @@ async function latestRelease(repo) {
 
 // Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
 // latest published release, so the page never announces a version you cannot download yet.
-const FALLBACK_VERSIONS = { ryolune: '0.11.1', kimchi: '0.1.0', zenith: '0.2.0' };
-const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith' };
+// zenith is coming soon: no page asks for its version.
+const FALLBACK_VERSIONS = { ryolune: '0.11.1', kimchi: '0.1.0' };
+const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi' };
 
 /** `{ app: version }` for every app whose version a page asks for. */
 export async function appVersions(apps) {
@@ -157,11 +146,8 @@ export async function downloadTarget(app, wanted, userAgent) {
     const asset = RYOLUNE.assets[platform];
     return asset ? `${RYOLUNE.releases}/download/${asset}` : RYOLUNE.releases;
   }
-  if (app === 'zenith') {
-    const platform = wanted || ZENITH.byOs[osFor(userAgent)];
-    const asset = ZENITH.assets[platform];
-    return asset ? `${ZENITH.releases}/download/${asset}` : ZENITH.releases;
-  }
+  // zenith is coming soon: nothing to download, old links land on its page.
+  if (app === 'zenith') return '/zenith';
   if (app === 'kimchi') {
     const platform = wanted || KIMCHI.byOs[osFor(userAgent)];
     const pattern = KIMCHI.patterns[platform];
