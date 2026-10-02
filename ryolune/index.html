@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ryolune — the open-source DAW your AI can drive · lsuite</title>
-  <meta name="description" content="ryolune is a free, open-source digital audio workstation for macOS, Windows and Linux, with an audio engine in Rust and a built-in agent. Every action is a command you, a script or any MCP client can run.">
+  <meta name="description" content="ryolune is a free, open-source digital audio workstation for macOS, Windows and Linux, written in Rust from the audio engine to the window, with a built-in agent. Every action is a command you, a script or any MCP client can run.">
   <meta name="theme-color" content="#0b0c0f" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/ryolune">
@@ -45,7 +45,7 @@
     </div>
     <div class="wrap">
       <figure class="shot shot--hero reveal" style="--d:3">
-        <img src="/assets/img/ryolune/arrangement.webp" width="2000" height="1250" alt="ryolune's arrangement in the dark theme: section markers, regions with fades, a piano roll with a controller lane, the channel strip and the agent panel" fetchpriority="high">
+        <img src="/assets/img/ryolune/arrangement.webp" width="1600" height="1000" alt="ryolune's window in dark mode: frosted glass chrome around the arrangement, regions with waveforms, a piano roll with a controller lane, the channel strip and the agent panel" fetchpriority="high">
       </figure>
     </div>
   </section>
@@ -54,7 +54,7 @@
     <div class="wrap">
       <div class="stats reveal">
         <div><b>35</b><span>stock instruments and effects</span></div>
-        <div><b>199</b><span>commands for window, CLI, MCP and agent</span></div>
+        <div><b>203</b><span>commands for window, CLI, MCP and agent</span></div>
         <div><b>3</b><span>operating systems</span></div>
         <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
       </div>
@@ -64,19 +64,19 @@
   <section class="section" id="new" aria-labelledby="new-title">
     <div class="wrap">
       <div class="section__head">
-        <span class="eyebrow">New in 0.12</span>
-        <h2 class="h2 reveal" id="new-title">One window, drawn with care. Sounds on demand.</h2>
-        <p class="lede reveal" style="--d:1">0.12 redraws the whole window around one theme instead of six: graphite by night, porcelain by day, a single gold accent and controls that look like studio hardware without pretending to be it. Nothing moved and nothing was taken away. The agent now runs on many more services, connects to the agents you already use, and makes loops, sounds and instruments from a description.</p>
+        <span class="eyebrow">New in 0.13</span>
+        <h2 class="h2 reveal" id="new-title">Rust to the last pixel. Part of one suite.</h2>
+        <p class="lede reveal" style="--d:1">0.13 draws the window natively on the GPU with GPUI, the framework behind the Zed editor: no web view and no JavaScript left. It wears the lsuite look shared with kimchi and zenith, frosted glass around solid work surfaces with ryolune teal for what is yours, and it starts working with the other apps of the suite. Every panel, shortcut and command is still there.</p>
       </div>
       <div class="grid grid--3">
-        <div class="cell reveal"><span class="cell__k">Design</span><h3>One theme, dark or light</h3><p>A calm lightness ladder, crisp one-pixel edges and one soft light from above. Dark is deep graphite with sunk displays and white fader caps; light is the same window in porcelain. Or let it follow your system.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Generate</span><h3>Loops, sounds and instruments</h3><p>Describe it and ryolune asks ElevenLabs, Stable Audio, fal.ai or your own endpoint, then fits it to your bars and key. An instrument lands in Sample Keys, ready to play. Each placement is one undo step.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">AI control</span><h3>Every agent you use</h3><p>Gemini, OpenRouter, Mistral, Groq, DeepSeek, xAI, Ollama and LM Studio join the built-in agent, and Claude Code, Codex, Cursor, VS Code or any MCP app connect to the open window in one step.</p></div>
-        <div class="cell reveal"><span class="cell__k">Instrument</span><h3>Sample Keys</h3><p>The twelfth stock instrument plays any sound across the keyboard from its root note, with tune, attack, release, gate or one-shot, sustain pedal and pitch bend. The sound is saved inside the song.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Transport and mixer</span><h3>Easier to read at a glance</h3><p>A centred display with the transport keys in one tray, knobs that wear a ring filled with their value, and mute, solo and arm lit blue, yellow and red.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Support</span><h3>A heart in the title bar</h3><p>ryolune stays free with nothing locked. The heart at the top right opens its GitHub Sponsors page, if you want to give once or monthly.</p></div>
+        <div class="cell reveal"><span class="cell__k">Native</span><h3>A window drawn on the GPU</h3><p>The arrangement, editors, mixer, plugin faces and agent panel are now Rust, rendered with GPUI. One program from the audio callback to the screen, with the macOS menu bar and its shortcuts.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Design</span><h3>The lsuite look</h3><p>Glass for the chrome over a window that blurs your desktop, solid surfaces for the music, and ryolune teal for the playhead, focus and what the agent touched. Dark and light, contrast tested on every glass tier.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">With kimchi</span><h3>Score a cut, send the mix</h3><p>kimchi's cut arrives with its audio and markers on the ruler, ready to score. Send the mix or stems back onto the video project, into kimchi's own undo history.</p></div>
+        <div class="cell reveal"><span class="cell__k">Suite</span><h3>The apps find each other</h3><p>Each lsuite app says where it is and how to drive it in <code>~/.lsuite</code>. An agent in one app can drive the others through their own commands.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">AI control</span><h3>Same commands everywhere</h3><p>Every button and drag of the new window runs a registry command, so the agent, the CLI and MCP clients still do everything you can, with one undo history. Shared names such as <code>app.version</code> work across the suite.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Icon</span><h3>A new mark</h3><p>The ring and the dot on a teal squircle, drawn from the lsuite template like kimchi and zenith.</p></div>
       </div>
-      <p class="fine reveal" style="margin-top:18px"><a href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.12.0.md">Full 0.12 release notes</a></p>
+      <p class="fine reveal" style="margin-top:18px"><a href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.13.0.md">Full 0.13 release notes</a></p>
     </div>
   </section>
 
@@ -155,7 +155,7 @@
         <figcaption><b>22 seconds, with sound.</b> Recorded from the window itself: the agent answers a request and writes its notes, ⌘Z takes them back, then the mixer and a stock plugin. Filmed in 0.10, before the redesign.</figcaption>
       </figure>
       <figure class="reveal" style="margin-top: 48px;">
-        <div class="shot"><img src="/assets/img/ryolune/mixer.webp" width="2000" height="1250" alt="ryolune's mixer in the dark theme: every channel side by side with live meters" loading="lazy"></div>
+        <div class="shot"><img src="/assets/img/ryolune/mixer.webp" width="1600" height="1000" alt="ryolune's mixer in the dark theme: every channel side by side with live meters" loading="lazy"></div>
         <figcaption><b>Mix.</b> Press <kbd>X</kbd> for every channel side by side with live meters. Shown in dark; <a href="#themes">see it in light</a>.</figcaption>
       </figure>
     </div>
@@ -164,19 +164,19 @@
   <section class="section" id="themes" aria-labelledby="themes-title">
     <div class="wrap" data-gallery data-theme="ryolune">
       <div class="section__head">
-        <span class="eyebrow">One theme, in the app</span>
-        <h2 class="h2 reveal" id="themes-title">Graphite by night. Porcelain by day.</h2>
-        <p class="lede reveal" style="--d:1">ryolune has one look, drawn with restraint: a calm lightness ladder, crisp one-pixel edges, a single soft light from above and one accent, lunar gold, for the playhead, what is lit and what the agent touched. Choose dark or light in Settings › Interface, or let it follow your system. Text contrast is tested on every surface in both modes.</p>
+        <span class="eyebrow">One look, in the app</span>
+        <h2 class="h2 reveal" id="themes-title">Glass around the work. Dark or light.</h2>
+        <p class="lede reveal" style="--d:1">ryolune wears the lsuite design system: frosted glass for the chrome over a window that blurs what is behind it, solid surfaces for the arrangement, editors and mixer, and one accent, ryolune teal, for the playhead, what is lit and what the agent touched. Choose dark or light in Settings › Interface, or let it follow your system. Text contrast is tested on every surface and glass tier in both modes; with Reduce transparency on, the glass turns opaque.</p>
       </div>
       <div class="gallery__bar reveal">
         <div class="tabs" role="tablist" aria-label="Mode" data-key="mode">
-          <button role="tab" type="button" aria-selected="true" tabindex="0" data-mode="dark" data-desc="&lt;b&gt;Dark.&lt;/b&gt; Deep graphite with displays sunk into it, white fader caps and a gold playhead. Made for long sessions in a dim room.">Dark</button>
-          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-mode="light" data-desc="&lt;b&gt;Light.&lt;/b&gt; The same ladder in porcelain: white controls standing proud of a pale desk, shade at a third of the strength, an amber accent.">Light</button>
+          <button role="tab" type="button" aria-selected="true" tabindex="0" data-mode="dark" data-desc="&lt;b&gt;Dark.&lt;/b&gt; Near-black glass around graphite lanes, sunk displays and a teal playhead. Made for long sessions in a dim room.">Dark</button>
+          <button role="tab" type="button" aria-selected="false" tabindex="-1" data-mode="light" data-desc="&lt;b&gt;Light.&lt;/b&gt; Pale glass and white controls over bright lanes, with a deeper teal so text on it stays readable.">Light</button>
         </div>
       </div>
       <figure class="reveal">
-        <div class="shot gallery__shot"><img src="/assets/img/ryolune/theme-ryolune-dark.webp" width="2000" height="1250" alt="ryolune in dark mode" loading="lazy"></div>
-        <p class="gallery__desc" aria-live="polite"><b>Dark.</b> Deep graphite with displays sunk into it, white fader caps and a gold playhead. Made for long sessions in a dim room.</p>
+        <div class="shot gallery__shot"><img src="/assets/img/ryolune/theme-ryolune-dark.webp" width="1600" height="1000" alt="ryolune in dark mode" loading="lazy"></div>
+        <p class="gallery__desc" aria-live="polite"><b>Dark.</b> Near-black glass around graphite lanes, sunk displays and a teal playhead. Made for long sessions in a dim room.</p>
       </figure>
     </div>
   </section>
