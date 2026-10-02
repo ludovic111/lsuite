@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>kimchi — the open-source video editor where generation is part of the cut · lsuite</title>
-  <meta name="description" content="kimchi is a free, open-source desktop video editor with a Rust core and a built-in harness for image and video models: generate at the playhead, animate a frame, extend a shot, bridge two clips. Bring your own keys, or run everything locally.">
+  <meta name="description" content="kimchi is a free, open-source desktop video editor, native and written in Rust, with a built-in harness for image and video models: generate at the playhead, animate a frame, extend a shot, bridge two clips. Your AI can drive all of it through MCP, a CLI or the built-in agent.">
   <meta name="theme-color" content="#0b0c0f" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/kimchi">
@@ -41,11 +41,14 @@
         <a class="btn" href="#downloads">All platforms</a>
         <a class="btn" href="https://github.com/ludovic111/kimchi">Source on GitHub</a>
       </div>
-      <p class="fine hero__fine reveal" style="--d:4">Version %VERSION:kimchi% · free and MIT licensed · macOS, Windows, Linux · Rust core · bring your own keys, or run everything locally</p>
+      <p class="fine hero__fine reveal" style="--d:4">Version %VERSION:kimchi% · free and MIT licensed · macOS, Windows, Linux · native Rust app · drivable by your AI · bring your own keys, or run everything locally</p>
     </div>
     <div class="wrap">
       <figure class="shot shot--hero reveal" style="--d:3">
-        <img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor: the generate panel, a shot rendering in the preview, provenance for a generated clip and a multi-track timeline" fetchpriority="high">
+        <picture>
+          <source srcset="/assets/img/kimchi/editor-light.webp" media="(prefers-color-scheme: light)">
+          <img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor: media, the preview with a title being placed, the inspector's text style and a timeline with video, a still, a title and music" fetchpriority="high">
+        </picture>
       </figure>
     </div>
   </section>
@@ -55,7 +58,7 @@
       <div class="stats reveal">
         <div><b>15</b><span>model providers, cloud and local</span></div>
         <div><b>6</b><span>export formats, one ffmpeg graph</span></div>
-        <div><b>3</b><span>operating systems</span></div>
+        <div><b>84</b><span>commands, for you and your AI alike</span></div>
         <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
       </div>
     </div>
@@ -135,21 +138,21 @@
     <div class="wrap split split--top">
       <div class="stack">
         <span class="eyebrow">Agents and scripts</span>
-        <h2 class="h2 reveal" id="agent-title">The engine, without the window.</h2>
-        <p class="lede reveal" style="--d:1">The <code>kimchi</code> command runs the same Rust harness and renderer as the app: list providers and models, generate with any of them, and render a project headless. Projects are plain JSON and every edit is plain data, so an agent can read and write them directly.</p>
-        <p class="muted reveal" style="--d:2">An MCP server, so Claude Code, Codex and any MCP client can drive the open project live, is the next step on the way to the lsuite standard.</p>
+        <h2 class="h2 reveal" id="agent-title">Your AI can cut too.</h2>
+        <p class="lede reveal" style="--d:1">Everything you can do in the window is a named command, and the window, the built-in agent, <code>kimchi-cli</code> and <code>kimchi-mcp</code> all use the same ones, with one undo history. Claude Code, Codex or any MCP client can drive the open project live; scripts can work on a project file without the app.</p>
+        <p class="muted reveal" style="--d:2">The Agent panel runs the model you already have (Claude Code, Codex, an Anthropic or OpenAI key, or a local Ollama model), shows one card per command and reverts a whole run in one click. You decide what agents may touch: files, projects, generation, settings. And kimchi hands a cut to <a href="/ryolune">ryolune</a> to score it, then takes the music back.</p>
       </div>
-      <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># what is ready, and what each provider offers</span></span>
-<span class="line">kimchi providers</span>
-<span class="line">kimchi models fal</span>
+      <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># Claude Code drives the running app</span></span>
+<span class="line">claude mcp add kimchi -- /Applications/kimchi.app/Contents/MacOS/kimchi-mcp --live</span>
 <span class="line"></span>
-<span class="line"><span class="c"># generate: images, or video with --video</span></span>
-<span class="line">kimchi generate fal fal-ai/flux-2-pro "Night market, rain, neon" --aspect 16:9 --count 2</span>
-<span class="line">kimchi generate fal fal-ai/kling-video/v3/pro/image-to-video "Slow push in" \</span>
-<span class="line">    --video --image frame.png --duration 5</span>
+<span class="line"><span class="c"># or any script, on the app or a project file</span></span>
+<span class="line">kimchi-cli project.overview</span>
+<span class="line">kimchi-cli generate.extendClip --clipId "Night market" --prompt "slow push in"</span>
+<span class="line">kimchi-cli --file cut.json clip.addText text="Opening title" start=0</span>
+<span class="line">kimchi-cli export.start path=cut.mp4 quality=high wait=true</span>
 <span class="line"></span>
-<span class="line"><span class="c"># render a project, no window needed</span></span>
-<span class="line">kimchi render night-market.json night-market.mp4 --format mp4 --quality high</span></pre></div>
+<span class="line"><span class="c"># send the cut to ryolune to score it</span></span>
+<span class="line">kimchi-cli handoff.toRyolune</span></pre></div>
     </div>
   </section>
 
@@ -158,15 +161,15 @@
       <div class="section__head">
         <span class="eyebrow">Download</span>
         <h2 class="h2 reveal" id="downloads-title">Download kimchi</h2>
-        <p class="lede reveal" style="--d:1">ffmpeg is bundled. kimchi checks for updates on launch and installs them in one click; updates are signed.</p>
+        <p class="lede reveal" style="--d:1">ffmpeg, <code>kimchi-cli</code> and <code>kimchi-mcp</code> are bundled. kimchi checks for updates on launch and installs them in one click; updates are signed and verified before anything is replaced.</p>
       </div>
       <div class="dl reveal">
         <a href="/kimchi/download/macos-arm64" data-os-match="macos"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Apple silicon</b><span>.dmg · signed and notarized</span></a>
         <a href="/kimchi/download/macos-x86_64"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Intel</b><span>.dmg · signed and notarized</span></a>
-        <a href="/kimchi/download/windows-x86_64" data-os-match="windows"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z"/></svg>Windows · 64-bit</b><span>.exe installer</span></a>
+        <a href="/kimchi/download/windows-x86_64" data-os-match="windows"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z"/></svg>Windows · 64-bit</b><span>.exe installer · or portable .zip</span></a>
         <a href="/kimchi/download/linux-appimage" data-os-match="linux"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10l3 2-3 2M13 15h3" stroke-linecap="round" stroke-linejoin="round"/></svg>Linux · AppImage</b><span>.AppImage · x86-64</span></a>
       </div>
-      <p class="fine reveal" style="margin-top: 18px;">Also: <a href="/kimchi/download/windows-msi">Windows .msi</a> · <a href="/kimchi/download/linux-deb">Linux .deb</a> · <a href="/kimchi/download/linux-rpm">Linux .rpm</a> · <a href="https://github.com/ludovic111/kimchi/releases">All releases</a>. The macOS build is signed and notarized by Apple.</p>
+      <p class="fine reveal" style="margin-top: 18px;">Also: <a href="/kimchi/download/linux-deb">Linux .deb</a> · <a href="https://github.com/ludovic111/kimchi/releases">All releases</a>. The macOS build is signed and notarized by Apple.</p>
     </div>
   </section>
 
@@ -177,7 +180,7 @@
         <h2 class="h2" id="support-title">Free, open source, yours to fork.</h2>
         <p class="lede" style="margin-inline:auto">kimchi is MIT licensed with every feature included. Model providers bill you directly for what you generate; kimchi takes nothing in between. Donations keep it moving.</p>
         <div class="hero__actions" style="justify-content:center">
-          <a class="btn btn--primary btn--heart" href="https://github.com/sponsors/ludovic111"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 14.25s-5.75-3.4-5.75-7.6A3.15 3.15 0 015.4 3.5c1.1 0 2 .55 2.6 1.4.6-.85 1.5-1.4 2.6-1.4a3.15 3.15 0 013.15 3.15c0 4.2-5.75 7.6-5.75 7.6z"/></svg>Sponsor on GitHub</a>
+          <a class="btn btn--primary btn--heart" href="/kimchi/support"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 14.25s-5.75-3.4-5.75-7.6A3.15 3.15 0 015.4 3.5c1.1 0 2 .55 2.6 1.4.6-.85 1.5-1.4 2.6-1.4a3.15 3.15 0 013.15 3.15c0 4.2-5.75 7.6-5.75 7.6z"/></svg>Sponsor on GitHub</a>
           <a class="btn" href="https://github.com/ludovic111/kimchi">Star on GitHub</a>
         </div>
       </div>
