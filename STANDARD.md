@@ -102,18 +102,18 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 - Manrope + IBM Plex Mono, shared radii, spacing and motion, dark and light, tested contrast.
 - One app icon template (squircle in the app's gradient, white glyph, glass sheen).
 
-## Status (2026-10-01)
+## Status (2026-10-02)
 
 | | ryolune | kimchi | zenith |
 | --- | --- | --- | --- |
-| Command registry, one undo | ✅ | partly: edits are plain data in Rust, no named registry | partly: typed WebSocket RPC methods, no `family.verb` registry |
-| CLI | ✅ `ryolune-cli` | partly: `kimchi generate / render` only | partly: `zenith-code auth / project` only |
-| MCP | ✅ `ryolune-mcp --live` | ❌ | partly: `/mcp` handed to each thread's agent (links its pull requests) |
-| Built-in agent | ✅ | partly: generation only | ✅ Claude Code and Codex threads |
-| Signed auto-update | ✅ | ✅ (Tauri updater) | ❌ rebuilt from source (`npm run mac:install`) |
-| Release binaries, all platforms | ✅ notarized macOS | ✅ notarized macOS (since 0.1.1) | ❌ built from source, macOS only |
-| Rust core | ✅ | ✅ | ✅ server (`crates/zenith-code`) and Tauri app (`crates/zenith-app`); React interface |
-| Discovery (`~/.lsuite/apps`) | ❌ | ❌ | ❌ |
-| Hand-offs | ❌ | ❌ | ❌ |
+| Command registry, one undo | ✅ | ✅ 84 commands, one undo history | partly: typed WebSocket RPC methods, no `family.verb` registry |
+| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | partly: `zenith-code auth / project` only |
+| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | partly: `/mcp` handed to each thread's agent (links its pull requests) |
+| Built-in agent | ✅ | ✅ Agent panel (Claude Code, Codex, API keys, Ollama) | ✅ Claude Code and Codex threads |
+| Signed auto-update | ✅ | ✅ own updater (same key and `latest.json` as the Tauri builds) | ❌ rebuilt from source (`npm run mac:install`) |
+| Release binaries, all platforms | ✅ notarized macOS | ✅ 0.4.0: notarized macOS (Apple Silicon, Intel), Windows, Linux | ❌ built from source, macOS only |
+| Rust core | ✅ native window (GPUI) | ✅ native window (GPUI), no web UI | ✅ server (`crates/zenith-code`) and Tauri app (`crates/zenith-app`); React interface |
+| Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ❌ |
+| Hand-offs | ✅ to and from kimchi (`export.toKimchi`, `session.scoreCut`, `handoff.inbox`) | ✅ to and from ryolune (`handoff.*`, through ryolune's bridge) | ❌ |
 | README / site / support links (site on the design system) | ✅ | ✅ | ✅ |
-| lsuite design system (`design/`) | ❌ (gold accent, own theme) | ❌ (own Svelte theme) | ❌ (own theme in `code/apps/web`) |
+| lsuite design system (`design/`) | ✅ GPUI on the tokens (glass over the window blur, teal, dark/light, contrast test, icon) | ✅ GPUI on the tokens: glass over the macOS window blur, Manrope/Plex, dark and light, contrast test, icon | ❌ (own theme in `code/apps/web`) |
