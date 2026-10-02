@@ -85,6 +85,18 @@ const RYOLUNE = {
   byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
 };
 
+// zenith ships fixed asset names too; keep in step with `update::asset_name` in the zenith repo
+// (crates/zenith-commands/src/update.rs).
+const ZENITH = {
+  releases: 'https://github.com/ludovic111/zenith/releases/latest',
+  assets: {
+    'macos-arm64': 'zenith-macos-arm64.zip',
+    'macos-x86_64': 'zenith-macos-x86_64.zip',
+    'linux-x86_64': 'zenith-linux-x86_64.tar.gz',
+  },
+  byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
+};
+
 // kimchi's file names carry the version (Tauri bundles), so the latest release is looked up.
 const KIMCHI = {
   repo: 'ludovic111/kimchi',
@@ -123,7 +135,7 @@ async function latestRelease(repo) {
 
 // Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
 // latest published release, so the page never announces a version you cannot download yet.
-const FALLBACK_VERSIONS = { ryolune: '0.11.1', kimchi: '0.1.0', zenith: '0.1.0' };
+const FALLBACK_VERSIONS = { ryolune: '0.11.1', kimchi: '0.1.0', zenith: '0.2.0' };
 const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith' };
 
 /** `{ app: version }` for every app whose version a page asks for. */
@@ -144,6 +156,11 @@ export async function downloadTarget(app, wanted, userAgent) {
     const platform = wanted || RYOLUNE.byOs[osFor(userAgent)];
     const asset = RYOLUNE.assets[platform];
     return asset ? `${RYOLUNE.releases}/download/${asset}` : RYOLUNE.releases;
+  }
+  if (app === 'zenith') {
+    const platform = wanted || ZENITH.byOs[osFor(userAgent)];
+    const asset = ZENITH.assets[platform];
+    return asset ? `${ZENITH.releases}/download/${asset}` : ZENITH.releases;
   }
   if (app === 'kimchi') {
     const platform = wanted || KIMCHI.byOs[osFor(userAgent)];
@@ -318,7 +335,7 @@ export async function handle(req, res) {
     return send(res, 200, html, TYPES['.html'], 'no-cache', req);
   }
 
-  const download = /^\/(ryolune|kimchi)\/download(?:\/([\w-]+))?$/.exec(pathname);
+  const download = /^\/(ryolune|kimchi|zenith)\/download(?:\/([\w-]+))?$/.exec(pathname);
   if (download) return redirect(res, 302, await downloadTarget(download[1], download[2], req.headers['user-agent']));
   if (/^\/(?:(?:ryolune|kimchi|zenith)\/)?support$/.test(pathname)) {
     return redirect(res, 302, supportTarget());

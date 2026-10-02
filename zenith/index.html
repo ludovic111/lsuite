@@ -36,10 +36,10 @@
       <h1 class="display reveal" style="--d:1">Code with agents.<br><span class="accent">Stay in the loop.</span></h1>
       <p class="lede reveal" style="--d:2">zenith is a Mac app for coding with agents. It runs Claude Code and Codex in your projects: threads you follow and steer, approvals, plans, diffs, terminals, worktrees, git and pull requests, and what it all costs. On your machine, with your own subscriptions.</p>
       <div class="hero__actions reveal" style="--d:3">
-        <a class="btn btn--primary" href="#start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17l6-6-6-6M12 19h8"/></svg>Get started</a>
-        <a class="btn" href="https://github.com/ludovic111/zenith">Source on GitHub</a>
+        <a class="btn btn--primary" href="#start" data-download="zenith" data-href-macos="/zenith/download/macos-arm64" data-href-linux="/zenith/download/linux-x86_64"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span data-os>Download zenith</span></a>
+        <a class="btn" href="#start">All platforms</a>
       </div>
-      <p class="fine hero__fine reveal" style="--d:4">Version 0.1 · free and MIT licensed · macOS · Claude Code and Codex · answers only on 127.0.0.1</p>
+      <p class="fine hero__fine reveal" style="--d:4">Version %VERSION:zenith% · free and MIT licensed · macOS and Linux · native Rust app · drivable by your AI · answers only on 127.0.0.1</p>
     </div>
     <div class="wrap">
       <figure class="shot shot--hero reveal" style="--d:3" aria-label="Illustration of a zenith thread: projects and threads in the sidebar, an agent's answer and work, a diff summary, an approval, and the composer">
@@ -102,6 +102,24 @@
     </div>
   </section>
 
+  <section class="section" id="new" aria-labelledby="new-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">New in 0.2</span>
+        <h2 class="h2 reveal" id="new-title">A native window, and a download that updates itself.</h2>
+        <p class="lede reveal" style="--d:1">0.2 rewrites zenith's window in Rust with GPUI: no web view, on the lsuite design system. Everything it does is now a command your agents can call, and it comes as a signed app that keeps itself up to date.</p>
+      </div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">Window</span><h3>Native, in Rust</h3><p>Written with GPUI: the sidebar on the macOS material, threads by status, the agent's work grouped into one line per turn, approvals and questions answered in place, plans to implement in one click, diffs, a command palette (⌘K), light and dark.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Git and terminals</span><h3>Where the thread works</h3><p>A git bar in each thread (changes, ahead and behind, its pull request) with commit, push and open-a-pull-request in one step, terminals in a panel (⌘J), and the project's scripts one click away.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">AI control</span><h3>52 commands, three ways in</h3><p>Every action is a named command shared by the window, <code>zenith-cli</code> and <code>zenith-mcp</code>: start threads, approve, answer, commit, run tests in a terminal and read the output. Settings › Agents decides how much an agent may do.</p></div>
+        <div class="cell reveal"><span class="cell__k">Updates</span><h3>Signed, in one click</h3><p>Notarized for macOS (Apple silicon and Intel), with a Linux build. zenith checks GitHub for a new release, verifies its signature and swaps itself in place; the app sets up its own server.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">lsuite</span><h3>Your other apps, for your agents</h3><p>zenith lists the lsuite apps you have installed and hands their MCP servers to the agents of its threads, so an agent coding in zenith can drive your music and video apps too.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Messages</span><h3>Images in your messages</h3><p>Paste a screenshot or attach images with the paperclip: they go to the agent with your message.</p></div>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="features" aria-labelledby="features-title">
     <div class="wrap">
       <div class="section__head">
@@ -115,7 +133,7 @@
         <div class="cell reveal" style="--d:2"><span class="cell__k">Worktrees</span><h3>Tasks side by side</h3><p>A git worktree per thread, so agents work in parallel without stepping on each other, and integrated terminals in each one.</p></div>
         <div class="cell reveal"><span class="cell__k">Git &amp; PRs</span><h3>Ship in one step</h3><p>Commit, push and open a pull request at once, with messages written for you. Review pull requests from GitHub, GitLab, Azure DevOps, Forgejo or Bitbucket.</p></div>
         <div class="cell reveal" style="--d:1"><span class="cell__k">Sessions &amp; costs</span><h3>Know what it costs</h3><p>Every Claude Code and Codex session, in zenith or in your terminal: cost and tokens, spending by day and by model, your plan limits.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Mac app</span><h3>A real Mac window</h3><p>A translucent sidebar, traffic lights in the title bar, light and dark appearance, native menus and notifications.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Native window</span><h3>Rust, all the way</h3><p>A native window written in Rust with GPUI: the sidebar on the macOS material, a command palette, light and dark, on the lsuite design system. The web interface stays one click away, in your browser.</p></div>
       </div>
     </div>
   </section>
@@ -124,35 +142,43 @@
     <div class="wrap split split--top">
       <div class="stack">
         <span class="eyebrow">For your agents</span>
-        <h2 class="h2 reveal" id="agents-title">Each thread hands its agent zenith.</h2>
-        <p class="lede reveal" style="--d:1">Every thread gives its agent zenith's MCP server at <code>/mcp</code>, with a credential that only stands for that thread. Nothing to install or configure.</p>
+        <h2 class="h2 reveal" id="agents-title">Every action is a command your agents can call.</h2>
+        <p class="lede reveal" style="--d:1">Starting a thread, answering an approval, reading a diff: each is a named command, the same in the window, in <code>zenith-cli</code> and in <code>zenith-mcp</code>. Every thread also hands its agent zenith's own MCP server, and those of the other lsuite apps you have installed.</p>
         <ul class="bullets reveal" style="--d:2">
-          <li><span><b>Pull requests:</b> the agent links each pull request it opens to its thread, so you find them, and their state, where the work happened.</span></li>
+          <li><span><b>Drive zenith:</b> <code>claude mcp add zenith -- …/zenith-mcp --live</code> lets any agent start threads, wait for them and answer them. Settings › Agents decides how much it may do.</span></li>
+          <li><span><b>Pull requests:</b> the agent in a thread links each pull request it opens to its thread, so you find them, and their state, where the work happened.</span></li>
           <li><span><b>Your own CLIs:</b> agents run with the <code>claude</code> and <code>codex</code> you already have, on your Claude and ChatGPT subscriptions.</span></li>
           <li><span><b>You approve:</b> commands and edits wait for you unless you allow them, and plan mode lets an agent propose before it touches anything.</span></li>
         </ul>
       </div>
-      <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># What an agent in a zenith thread can call</span></span>
-<span class="line">link_pull_request           <span class="c"># right after it opens one</span></span>
-<span class="line">list_thread_pull_requests   <span class="c"># what this thread opened, and its state</span></span>
-<span class="line">unlink_pull_request         <span class="c"># after closing one by mistake</span></span></pre></div>
+      <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># zenith-cli, or the same tools through zenith-mcp</span></span>
+<span class="line">zenith-cli project.overview</span>
+<span class="line">zenith-cli thread.new --projectId … \</span>
+<span class="line">  --prompt "Add a dark mode" --wait</span>
+<span class="line">zenith-cli thread.approve --threadId … --decision accept</span>
+<span class="line">zenith-cli thread.diff --threadId …</span></pre></div>
     </div>
   </section>
 
   <section class="section" id="start" aria-labelledby="start-title">
     <div class="wrap split split--top">
       <div class="stack">
-        <span class="eyebrow">Quick start</span>
-        <h2 class="h2 reveal" id="start-title">Built on your Mac, in a few minutes.</h2>
-        <p class="lede reveal" style="--d:1">You need macOS, <a href="https://rustup.rs">Rust</a>, Node.js 22.16+ (to build the interface) and git. Optional: the GitHub CLI logged in, Claude Code and/or Codex.</p>
-        <p class="muted reveal" style="--d:2"><code>npm run mac:install</code> builds zenith, installs zenith.app and keeps its server running in the background on <code>127.0.0.1:4747</code>, so agents keep working when the window is closed. Run it again after pulling changes. Your threads and settings live in <code>~/.zenith/code</code>; <code>npm run mac:uninstall</code> removes the app.</p>
+        <span class="eyebrow">Download</span>
+        <h2 class="h2 reveal" id="start-title">Download zenith</h2>
+        <p class="lede reveal" style="--d:1">Unzip it, move zenith.app to Applications and open it: it sets up its server (in the background on <code>127.0.0.1:4747</code>, so agents keep working when the window is closed) and keeps itself up to date. <code>zenith-cli</code> and <code>zenith-mcp</code> are inside the app.</p>
+        <div class="dl reveal" style="--d:2">
+          <a href="/zenith/download/macos-arm64" data-os-match="macos"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Apple silicon</b><span>.zip · signed and notarized</span></a>
+          <a href="/zenith/download/macos-x86_64"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Intel</b><span>.zip · signed and notarized</span></a>
+          <a href="/zenith/download/linux-x86_64" data-os-match="linux"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10l3 2-3 2M13 15h3" stroke-linecap="round" stroke-linejoin="round"/></svg>Linux · x86-64</b><span>.tar.gz</span></a>
+        </div>
+        <p class="fine reveal"><a href="https://github.com/ludovic111/zenith/releases">All releases</a>. You need Claude Code and/or Codex signed in; the GitHub CLI logged in for pull requests. Your threads and settings live in <code>~/.zenith/code</code>.</p>
       </div>
       <div class="stack">
+        <p class="muted reveal" style="--d:1">Or build it from source on a Mac with <a href="https://rustup.rs">Rust</a>, Xcode's command line tools and git (Node.js 22.16+ for the web interface, optional):</p>
         <div class="code reveal" style="--d:1"><pre><span class="line">git clone https://github.com/ludovic111/zenith.git</span>
 <span class="line">cd zenith</span>
-<span class="line">npm install</span>
 <span class="line">npm run mac:install</span></pre></div>
-        <p class="fine reveal">No release to download yet: zenith 0.1 is built from source.</p>
+        <p class="fine reveal"><code>npm run mac:install</code> installs zenith.app, links <code>zenith-cli</code> and <code>zenith-mcp</code> into <code>~/.local/bin</code>; <code>npm run mac:uninstall</code> removes it.</p>
       </div>
     </div>
   </section>
@@ -161,8 +187,8 @@
     <div class="wrap">
       <div class="section__head">
         <span class="eyebrow">How it is built</span>
-        <h2 class="h2 reveal" id="built-title">A Rust server, a Tauri window.</h2>
-        <p class="lede reveal" style="--d:1">zenith's interface is zenith code, a fork of T3 Code (MIT). Its server has been ported to Rust and is checked against the original TypeScript one by golden tests.</p>
+        <h2 class="h2 reveal" id="built-title">A Rust server, a native window.</h2>
+        <p class="lede reveal" style="--d:1">zenith grew out of zenith code, a fork of T3 Code (MIT). Its server has been ported to Rust and is checked against the original TypeScript one by golden tests; its window is native Rust too.</p>
       </div>
       <div class="table-wrap reveal">
         <table class="matrix">
@@ -170,8 +196,9 @@
           <thead><tr><th scope="col">Part</th><th scope="col">What it is</th></tr></thead>
           <tbody>
             <tr><th scope="row">Server</th><td><code>crates/zenith-code</code>, in Rust: the API the interface talks to, an event-sourced SQLite store, the Claude Code and Codex drivers, git, worktrees, checkpoints, terminals, pull requests, usage and MCP.</td></tr>
-            <tr><th scope="row">Mac app</th><td><code>crates/zenith-app</code>: zenith.app, a <a href="https://tauri.app">Tauri</a> window around the interface.</td></tr>
-            <tr><th scope="row">Interface</th><td><code>code/apps/web</code>: the React web app from zenith code.</td></tr>
+            <tr><th scope="row">Window</th><td><code>crates/zenith-app</code>: zenith.app, written in Rust with <a href="https://gpui.rs">GPUI</a>, on the lsuite design system.</td></tr>
+            <tr><th scope="row">Commands</th><td><code>crates/zenith-commands</code>: every action as a named command, shared by the window, <code>zenith-cli</code> and <code>zenith-mcp</code>, with signed updates and lsuite discovery.</td></tr>
+            <tr><th scope="row">Web interface</th><td><code>code/apps/web</code>: the React web app from zenith code, for zenith in a browser.</td></tr>
           </tbody>
         </table>
       </div>
@@ -185,7 +212,7 @@
         <h2 class="h2 reveal" id="privacy-title">Your code stays on your Mac.</h2>
       </div>
       <div class="grid grid--3">
-        <div class="cell reveal"><span class="cell__k">Local only</span><h3>127.0.0.1, nothing else</h3><p>The server answers on your machine only, and the interface signs in with a one-time pairing token that the app mints itself.</p></div>
+        <div class="cell reveal"><span class="cell__k">Local only</span><h3>127.0.0.1, nothing else</h3><p>The server answers on your machine only. The app, its CLI and its MCP server sign in with a session kept private on your Mac; the browser gets a one-time pairing token.</p></div>
         <div class="cell reveal" style="--d:1"><span class="cell__k">Your subscriptions</span><h3>Your agents, your account</h3><p>Agents run with your own <code>claude</code> and <code>codex</code> CLIs and subscriptions. zenith sends your code nowhere else.</p></div>
         <div class="cell reveal" style="--d:2"><span class="cell__k">Contributing</span><h3>Checked before you push</h3><p><code>npm run privacy</code> scans every tracked file for secrets, and can check each push before it leaves.</p></div>
       </div>

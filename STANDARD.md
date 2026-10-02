@@ -55,19 +55,22 @@ Ship `docs/AI_CONTROL.md` (how to drive the app) and the generated `docs/COMMAND
 
 The apps are separate programs but must be usable as one suite, by a person and by an agent.
 
-- **Discovery.** Each app writes `~/.lsuite/apps/<app>.json` when it starts (version, path of
-  the app, of `<app>-cli` and `<app>-mcp`, bridge port when running, data folder). zenith and the
-  other apps read that folder to know what is installed and how to drive it. (To be designed in
-  detail by the first app that implements it; keep the format small and versioned.)
+- **Discovery.** Each app writes `~/.lsuite/apps/<app>.json` when it starts, and the others read
+  that folder to know what is installed and how to drive it (`LSUITE_HOME` replaces `~/.lsuite`).
+  Format 1 (kimchi's `kimchi-control/src/discovery.rs`, zenith's `zenith-commands/src/lsuite.rs`):
+  `format` (1), `app`, `version`, `kind` (`music`, `video`, `code`), absolute paths `appPath`,
+  `executable`, `cli`, `mcp` (the MCP server's program, run with `--live`), `dataDir`, optional
+  `documents` (`{extensions, description}`), `running` (`{pid, port?, controlFile?, since}` while
+  the app runs, else `null`; check the pid is alive) and `updatedAt`. Readers ignore unknown
+  fields (zenith adds `bridge: {url, tokenFile}`) and files with another `format`.
 - **Open formats, real files.** Documents are files on disk in a documented format (ryolune: one
   `.ryolune` JSON file with audio inside; kimchi: project JSON). Media goes between apps as plain
   files (WAV/FLAC/MP4…), never through a cloud.
 - **Hand-offs** (first targets):
   - ryolune → kimchi: export a mix or stems straight onto a kimchi project's audio track.
   - kimchi → ryolune: send a cut's audio, length and markers to ryolune to score it.
-  - zenith (undecided since it became a coding app on 2026-10-01): could show each installed
-    lsuite app (version, update available, open documents when running) and delegate work to it
-    through its MCP server.
+  - zenith (decided 2026-10-02): lists the installed lsuite apps in its settings and hands their
+    MCP servers to the agents of its threads, so an agent working in zenith can drive them.
 - Shared vocabulary in command names where the concept is the same (`history.undo`,
   `history.redo`, `app.version`, `app.checkUpdates`, `session.overview` / `project.overview`,
   `export.*`).
@@ -106,14 +109,14 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 
 | | ryolune | kimchi | zenith |
 | --- | --- | --- | --- |
-| Command registry, one undo | ✅ | ✅ 84 commands, one undo history | partly: typed WebSocket RPC methods, no `family.verb` registry |
-| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | partly: `zenith-code auth / project` only |
-| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | partly: `/mcp` handed to each thread's agent (links its pull requests) |
+| Command registry, one undo | ✅ | ✅ 84 commands, one undo history | ✅ 52 `family.verb` commands (`zenith-commands`) shared by the window, CLI and MCP, git, pull requests and terminals included; undo is per turn (`thread.revert`) |
+| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | ✅ `zenith-cli` |
+| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live`, and `/mcp` handed to each thread's agent |
 | Built-in agent | ✅ | ✅ Agent panel (Claude Code, Codex, API keys, Ollama) | ✅ Claude Code and Codex threads |
-| Signed auto-update | ✅ | ✅ own updater (same key and `latest.json` as the Tauri builds) | ❌ rebuilt from source (`npm run mac:install`) |
-| Release binaries, all platforms | ✅ notarized macOS | ✅ 0.4.0: notarized macOS (Apple Silicon, Intel), Windows, Linux | ❌ built from source, macOS only |
-| Rust core | ✅ native window (GPUI) | ✅ native window (GPUI), no web UI | ✅ server (`crates/zenith-code`) and Tauri app (`crates/zenith-app`); React interface |
-| Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ❌ |
-| Hand-offs | ✅ to and from kimchi (`export.toKimchi`, `session.scoreCut`, `handoff.inbox`) | ✅ to and from ryolune (`handoff.*`, through ryolune's bridge) | ❌ |
+| Signed auto-update | ✅ | ✅ own updater (same key and `latest.json` as the Tauri builds) | ✅ 0.2.0: in-app updater, Ed25519-signed `SHA256SUMS` |
+| Release binaries, all platforms | ✅ notarized macOS | ✅ 0.4.0: notarized macOS (Apple Silicon, Intel), Windows, Linux | ✅ 0.2.0: notarized macOS (Apple silicon, Intel), Linux |
+| Rust core | ✅ native window (GPUI) | ✅ native window (GPUI), no web UI | ✅ server (`crates/zenith-code`) and native window (GPUI, `crates/zenith-app`); React interface kept for the browser |
+| Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ✅ writes `zenith.json`, reads the others (format 1) |
+| Hand-offs | ✅ to and from kimchi (`export.toKimchi`, `session.scoreCut`, `handoff.inbox`) | ✅ to and from ryolune (`handoff.*`, through ryolune's bridge) | partly: hands the other apps' MCP servers to its agents |
 | README / site / support links (site on the design system) | ✅ | ✅ | ✅ |
-| lsuite design system (`design/`) | ✅ GPUI on the tokens (glass over the window blur, teal, dark/light, contrast test, icon) | ✅ GPUI on the tokens: glass over the macOS window blur, Manrope/Plex, dark and light, contrast test, icon | ❌ (own theme in `code/apps/web`) |
+| lsuite design system (`design/`) | ✅ GPUI on the tokens (glass over the window blur, teal, dark/light, contrast test, icon) | ✅ GPUI on the tokens: glass over the macOS window blur, Manrope/Plex, dark and light, contrast test, icon | ✅ native window (tokens, glass over vibrancy, Manrope/Plex, icon) and web interface (default theme on the tokens and glass tiers) |
