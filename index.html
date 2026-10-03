@@ -52,8 +52,8 @@
           <p><span class="tag c-ryolune">ryolune</span> clip.create --trackId Keys --lengthBars 8 --notes […]  <span class="ok">✓</span> <span class="dim">32 notes</span></p>
           <p><span class="tag c-ryolune">ryolune</span> session.exportAudio --path bed.flac                 <span class="ok">✓</span> <span class="dim">FLAC · 24-bit</span></p>
           <p class="gap"></p>
-          <p><span class="tag c-kimchi">kimchi</span>  generate fal fal-ai/kling-video/v3/pro/text-to-video "Rain on neon asphalt" --video <span class="ok">✓</span></p>
-          <p><span class="tag c-kimchi">kimchi</span>  render night-market.json night-market.mp4 --quality high <span class="ok">✓</span> <span class="dim">H.264</span></p>
+          <p><span class="tag c-kimchi">kimchi</span>  generate.submit --prompt "Rain on neon asphalt" --video   <span class="ok">✓</span></p>
+          <p><span class="tag c-kimchi">kimchi</span>  export.start --path night-market.mp4 --quality high    <span class="ok">✓</span> <span class="dim">H.264</span></p>
           <p class="say">Done. The bed is one undo away in ryolune if you want another take. <span class="cursor"></span></p>
         </div>
       </div>
@@ -88,8 +88,8 @@
             <span class="card__kind">Video</span>
           </div>
           <p class="card__say">A video editor where generation is part of the cut.</p>
-          <p class="card__text">A real multi-track timeline with image and video models woven in: generate at the playhead, animate a frame, extend a shot, bridge two clips. Your keys, or fully local.</p>
-          <div class="card__shot"><img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor with a shot generating on the timeline" loading="lazy"></div>
+          <p class="card__text">A real multi-track timeline with image and video models woven in: generate at the playhead, animate a frame, extend a shot, bridge two clips. Motion graphics, 3D and local captions. Your keys, or fully local.</p>
+          <div class="card__shot"><img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor with a 3D title, captions and transitions on the timeline" loading="lazy"></div>
           <div class="card__foot"><span>v%VERSION:kimchi% · macOS · Windows · Linux</span><span class="link">Open <span class="arrow" aria-hidden="true">→</span></span></div>
         </a>
 
@@ -164,19 +164,19 @@
             <tr>
               <th scope="row">Built-in agent</th>
               <td><span class="yes">Yes</span><small>Agent panel with Changes and Revert</small></td>
-              <td><span class="yes">Generation</span><small>Prompt shots onto the timeline, ⌘K</small></td>
+              <td><span class="yes">Yes</span><small>Agent panel with one card per command and Revert</small></td>
               <td><span class="soon">Coming soon</span></td>
             </tr>
             <tr>
               <th scope="row">Command line</th>
               <td><span class="yes">Yes</span><small><code>ryolune-cli</code>, 199 commands</small></td>
-              <td><span class="yes">Yes</span><small><code>kimchi generate</code>, <code>kimchi render</code></small></td>
+              <td><span class="yes">Yes</span><small><code>kimchi-cli</code>, 122 commands</small></td>
               <td><span class="soon">Coming soon</span></td>
             </tr>
             <tr>
               <th scope="row">MCP server</th>
               <td><span class="yes">Yes</span><small><code>ryolune-mcp --live</code></small></td>
-              <td><span class="soon">Next</span><small>The CLI covers headless work today</small></td>
+              <td><span class="yes">Yes</span><small><code>kimchi-mcp --live</code></small></td>
               <td><span class="soon">Coming soon</span></td>
             </tr>
             <tr>
@@ -193,13 +193,13 @@
         <div class="stack">
           <span class="eyebrow eyebrow--plain">Plug in your agent</span>
           <h3 class="h2 reveal" style="font-size: clamp(1.6rem, 3vw, 2.2rem);">One line per app, in Claude Code, Codex or any MCP client.</h3>
-          <p class="muted reveal">The agent you already use gets the whole app as tools. ryolune connects to the open song with <code>--live</code>, so you see every edit happen in the window.</p>
+          <p class="muted reveal">The agent you already use gets the whole app as tools. ryolune and kimchi connect to the open song or project with <code>--live</code>, so you see every edit happen in the window.</p>
         </div>
         <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># ryolune: the open song, live</span></span>
 <span class="line">claude mcp add ryolune -- /Applications/ryolune.app/Contents/MacOS/ryolune-mcp --live</span>
 <span class="line"></span>
-<span class="line"><span class="c"># kimchi: headless generation and rendering</span></span>
-<span class="line">kimchi generate fal fal-ai/flux-2-pro "Night market, rain, neon"</span>
+<span class="line"><span class="c"># kimchi: the open project, live</span></span>
+<span class="line">claude mcp add kimchi -- /Applications/kimchi.app/Contents/MacOS/kimchi-mcp --live</span>
 <span class="line"></span>
 <span class="line"><span class="c"># zenith, coming soon: each thread will hand its agent /mcp</span></span></pre></div>
       </div>

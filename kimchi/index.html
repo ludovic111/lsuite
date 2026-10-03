@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>kimchi — the open-source video editor where generation is part of the cut · lsuite</title>
-  <meta name="description" content="kimchi is a free, open-source desktop video editor, native and written in Rust, with a built-in harness for image and video models: generate at the playhead, animate a frame, extend a shot, bridge two clips. Your AI can drive all of it through MCP, a CLI or the built-in agent.">
+  <meta name="description" content="kimchi is a free, open-source desktop video editor, native and written in Rust, with a built-in harness for image and video models: generate at the playhead, animate a frame, extend a shot, bridge two clips. Keyframes, motion graphics and 3D, transitions, colour and local captions. Your AI can drive all of it through MCP, a CLI or the built-in agent.">
   <meta name="theme-color" content="#0b0c0f" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/kimchi">
@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="lsuite">
   <meta property="og:title" content="kimchi — the video editor where generation is part of the cut">
-  <meta property="og:description" content="A real multi-track editor with image and video models woven in. Rust core, 15 providers, your keys or fully local. Free and MIT licensed.">
+  <meta property="og:description" content="A real multi-track editor with image and video models woven in, motion graphics and 3D drawn in. Rust core, 15 providers, your keys or fully local. Free and MIT licensed.">
   <meta property="og:url" content="%ORIGIN%/kimchi">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/kimchi.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -35,7 +35,7 @@
         <div><div class="appid__name">kimchi</div><div class="appid__kind">lsuite · video</div></div>
       </div>
       <h1 class="display reveal" style="--d:1">Cut it, or <span class="accent">prompt it</span><br>onto the timeline.</h1>
-      <p class="lede reveal" style="--d:2">kimchi is a desktop video editor with a built-in harness for image and video models. Prompt a shot straight onto the timeline, animate a frame you like, extend a clip from its last frame or bridge two shots with a generated transition, then cut, trim and export it like any other footage.</p>
+      <p class="lede reveal" style="--d:2">kimchi is a desktop video editor with a built-in harness for image and video models. Prompt a shot straight onto the timeline, animate a frame you like, extend a clip from its last frame or bridge two shots with a generated transition, then cut, trim and export it like any other footage. Titles, motion graphics and 3D are drawn by kimchi itself, and captions are transcribed on your computer.</p>
       <div class="hero__actions reveal" style="--d:3">
         <a class="btn btn--primary" href="#downloads" data-download="kimchi" data-href-macos="/kimchi/download/macos-arm64" data-href-windows="/kimchi/download/windows-x86_64" data-href-linux="/kimchi/download/linux-appimage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span data-os>Download kimchi</span></a>
         <a class="btn" href="#downloads">All platforms</a>
@@ -47,7 +47,7 @@
       <figure class="shot shot--hero reveal" style="--d:3">
         <picture>
           <source srcset="/assets/img/kimchi/editor-light.webp" media="(prefers-color-scheme: light)">
-          <img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor: media, the preview with a title being placed, the inspector's text style and a timeline with video, a still, a title and music" fetchpriority="high">
+          <img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor: the Motion tab's templates, a 3D title over the preview with a caption under it, the inspector's template, scene and animation controls, and a timeline with captions, motion clips, video joined by transitions and music" fetchpriority="high">
         </picture>
       </figure>
     </div>
@@ -57,10 +57,32 @@
     <div class="wrap">
       <div class="stats reveal">
         <div><b>15</b><span>model providers, cloud and local</span></div>
-        <div><b>6</b><span>export formats, one ffmpeg graph</span></div>
-        <div><b>84</b><span>commands, for you and your AI alike</span></div>
+        <div><b>15</b><span>motion templates, 2D and 3D</span></div>
+        <div><b>122</b><span>commands, for you and your AI alike</span></div>
         <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="new" aria-labelledby="new-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">New in 0.5</span>
+        <h2 class="h2 reveal" id="new-title">Make it move.</h2>
+        <p class="lede reveal" style="--d:1">0.5 adds keyframes, motion graphics and 3D, drawn by kimchi and the same in the preview and the export, along with transitions on cuts, colour, reverse and freeze frames, captions transcribed on your computer, and export on the GPU. Every one of them is a command, so your AI can do it too.</p>
+      </div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">Animation</span><h3>Keyframes on any clip</h3><p>Position, scale, rotation, opacity, blur, volume, text size and colour, with easings from ease to elastic, bounce and spring. Or a preset: fade, rise, pop, Ken Burns, pan, pulse, shake.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Motion graphics</span><h3>2D scenes</h3><p>Shapes, paths that draw themselves on, text revealed by letter, word or line, counters, images, masks, gradients, glows and blend modes, all on the timeline as a clip.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">3D</span><h3>Cameras, lights, extruded type</h3><p>Boxes, spheres, tori, 3D text, glTF models and picture cards under lights with soft shadows. On the GPU (Metal, Vulkan or DirectX 12), on the CPU otherwise.</p></div>
+        <div class="cell reveal"><span class="cell__k">Templates</span><h3>Fifteen to start from</h3><p>Lower third, title card, kinetic type, counter, bar chart, logo reveal, quote, a 3D title, a turntable and more. Change their words and colours in the inspector, or edit the scene layer by layer.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Transitions</span><h3>On the cut, sound included</h3><p>Click the + on a cut: dissolve, dips, wipes, slides, pushes, zoom, iris or blur, centred on the cut with the sound crossfading. Drag the badge's edges for the length.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Colour</span><h3>Looks, keying, LUTs</h3><p>Nine looks, from punchy to noir and teal &amp; orange, then brightness, contrast, saturation, warmth, tint, vignette and sharpen, all keyframable. A green-screen key and <code>.cube</code> LUTs.</p></div>
+        <div class="cell reveal"><span class="cell__k">Captions</span><h3>Transcribed on your computer</h3><p>Whisper runs locally, nothing is sent anywhere. Edit the captions as titles, style them all at once, import and export SRT or WebVTT, burn them in or write an <code>.srt</code> beside the export.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Time</span><h3>Reverse and freeze</h3><p>Play a clip backwards or hold a frame, next to speed with pitch kept. And the shortcuts editors expect: J, K, L, trim to the playhead with Q and W, copy and paste, rubber-band selection.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Export</span><h3>On the GPU</h3><p>VideoToolbox, NVENC, AMF, Quick Sync or VA-API when the computer has it, checked with a test encode and redone on the CPU if it fails. 4K, HEVC and ProRes sources decode in hardware.</p></div>
+      </div>
+      <p class="fine reveal" style="margin-top:18px"><a href="https://github.com/ludovic111/kimchi/releases/tag/v0.5.0">kimchi 0.5.0 on GitHub</a></p>
     </div>
   </section>
 
@@ -87,15 +109,16 @@
       <div class="stack">
         <span class="eyebrow">Editing</span>
         <h2 class="h2 reveal" id="edit-title">A real editor underneath.</h2>
-        <p class="lede reveal" style="--d:1">kimchi started as a fork of OpenCut and was rewritten from the ground up in Rust. The interface is thin: every edit is plain data applied by the Rust core, and the window renders what Rust returns.</p>
+        <p class="lede reveal" style="--d:1">kimchi started as a fork of OpenCut and was rewritten from the ground up in Rust. The interface is thin: every edit is plain data applied by the Rust core, and the window renders what Rust returns. One compositor draws the preview and the export, so what you see is what you get.</p>
       </div>
       <ul class="bullets reveal" style="--d:1">
         <li><span><b>Multi-track timeline</b> with video, image, text, solid and audio clips.</span></li>
-        <li><span><b>Split, trim, ripple delete, duplicate,</b> cross-track moves, snapping and markers.</span></li>
-        <li><span><b>Per-clip transform</b> (position, scale, rotation, opacity, fit), speed, fades and volume.</span></li>
-        <li><span><b>Live preview compositor</b> with on-canvas move and scale handles.</span></li>
+        <li><span><b>Split, trim, ripple delete, duplicate, copy and paste,</b> cross-track moves, snapping and markers.</span></li>
+        <li><span><b>Per-clip transform</b> (position, scale, rotation, opacity, blur, fit), keyframed or not, speed, reverse, freeze frames, fades and volume.</span></li>
+        <li><span><b>Transitions, colour and captions</b> on the timeline, with the sound crossfading under every transition.</span></li>
+        <li><span><b>Live preview</b> with on-canvas move and scale handles; press <kbd>?</kbd> for every shortcut.</span></li>
         <li><span><b>Snapshot undo and redo</b> for every edit, and autosave.</span></li>
-        <li><span><b>Export to MP4 (H.264), HEVC, ProRes, WebM, GIF</b> or audio only, through one ffmpeg filter graph. ffmpeg is bundled.</span></li>
+        <li><span><b>Export to MP4 (H.264), HEVC, ProRes, WebM, GIF</b> or audio only, on the GPU where the computer can. ffmpeg is bundled.</span></li>
       </ul>
     </div>
   </section>
@@ -140,7 +163,7 @@
         <span class="eyebrow">Agents and scripts</span>
         <h2 class="h2 reveal" id="agent-title">Your AI can cut too.</h2>
         <p class="lede reveal" style="--d:1">Everything you can do in the window is a named command, and the window, the built-in agent, <code>kimchi-cli</code> and <code>kimchi-mcp</code> all use the same ones, with one undo history. Claude Code, Codex or any MCP client can drive the open project live; scripts can work on a project file without the app.</p>
-        <p class="muted reveal" style="--d:2">The Agent panel runs the model you already have (Claude Code, Codex, an Anthropic or OpenAI key, or a local Ollama model), shows one card per command and reverts a whole run in one click. You decide what agents may touch: files, projects, generation, settings. And kimchi hands a cut to <a href="/ryolune">ryolune</a> to score it, then takes the music back.</p>
+        <p class="muted reveal" style="--d:2">The Agent panel runs the model you already have (Claude Code, Codex, an Anthropic or OpenAI key, or a local Ollama model), shows one card per command and reverts a whole run in one click. Ask it for a title sequence and it writes the motion scene, then looks at the frames it made. You decide what agents may touch: files, projects, generation, settings. And kimchi hands a cut to <a href="/ryolune">ryolune</a> to score it, then takes the music back.</p>
       </div>
       <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># Claude Code drives the running app</span></span>
 <span class="line">claude mcp add kimchi -- /Applications/kimchi.app/Contents/MacOS/kimchi-mcp --live</span>
@@ -149,6 +172,8 @@
 <span class="line">kimchi-cli project.overview</span>
 <span class="line">kimchi-cli generate.extendClip --clipId "Night market" --prompt "slow push in"</span>
 <span class="line">kimchi-cli --file cut.json clip.addText text="Opening title" start=0</span>
+<span class="line">kimchi-cli motion.addTemplate template=title3d values='{"text":"NIGHT MARKET"}'</span>
+<span class="line">kimchi-cli captions.transcribe</span>
 <span class="line">kimchi-cli export.start path=cut.mp4 quality=high wait=true</span>
 <span class="line"></span>
 <span class="line"><span class="c"># send the cut to ryolune to score it</span></span>
