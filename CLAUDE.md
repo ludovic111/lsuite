@@ -33,6 +33,12 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
       `styles.css` (tier-1 glass, tokens only). Each kimchi release: add its card on top with
       `release--now` (move the class off the previous one), from `../kimchi/CHANGELOG.md`. The
       captures are still 0.5's (the window barely changed).
+- [x] kimchi 0.7 page (2026-10-04): New in 0.7 (Blender-like 3D: modelling, modifiers, path tracer;
+      After Effects-like 2D; expressions; render ahead or live), 24 templates, 164 commands (home table
+      and STANDARD.md too), changelog card. New captures from the release build on vscreen: the hero is the
+      Studio on a 3D product shot (`studio[-light].webp`), the New section shows the 2D Studio
+      (`studio-2d[-light].webp`), `editor[-light].webp` (also the home card) is the editor with the
+      path-traced product shot. The demo project is built by `kimchi-cli` in `~/.cache/kimchi-shots/`.
 - [ ] Keep the agent-readiness table on the home page and `STANDARD.md`'s status table in step
       as kimchi and zenith close their gaps.
 - [x] **Design system on the site itself** (2026-10-01): pages load `/design/tokens.css` before

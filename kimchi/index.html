@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>kimchi — the open-source video editor where generation is part of the cut · lsuite</title>
-  <meta name="description" content="kimchi is a free, open-source desktop video editor, native and written in Rust, with a built-in harness for image and video models: generate at the playhead, animate a frame, extend a shot, bridge two clips. Keyframes, motion graphics and 3D, transitions, colour and local captions. Your AI can drive all of it through MCP, a CLI or the built-in agent.">
+  <meta name="description" content="kimchi is a free, open-source desktop video editor, native and written in Rust, with a built-in harness for image and video models: generate at the playhead, animate a frame, extend a shot, bridge two clips. Blender-like 3D with modelling and a path tracer, After Effects-like 2D motion design, keyframes and expressions, transitions, colour and local captions. Your AI can drive all of it through MCP, a CLI or the built-in agent.">
   <meta name="theme-color" content="#0b0c0f" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/kimchi">
@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="lsuite">
   <meta property="og:title" content="kimchi — the video editor where generation is part of the cut">
-  <meta property="og:description" content="A real multi-track editor with image and video models woven in, motion graphics and 3D drawn in. Rust core, 15 providers, your keys or fully local. Free and MIT licensed.">
+  <meta property="og:description" content="A real multi-track editor with image and video models woven in, 2D motion design and 3D modelling drawn in. Rust core, 15 providers, your keys or fully local. Free and MIT licensed.">
   <meta property="og:url" content="%ORIGIN%/kimchi">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/kimchi.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -35,7 +35,7 @@
         <div><div class="appid__name">kimchi</div><div class="appid__kind">lsuite · video</div></div>
       </div>
       <h1 class="display reveal" style="--d:1">Cut it, or <span class="accent">prompt it</span><br>onto the timeline.</h1>
-      <p class="lede reveal" style="--d:2">kimchi is a desktop video editor with a built-in harness for image and video models. Prompt a shot straight onto the timeline, animate a frame you like, extend a clip from its last frame or bridge two shots with a generated transition, then cut, trim and export it like any other footage. Titles, motion graphics and 3D are drawn by kimchi itself, and captions are transcribed on your computer.</p>
+      <p class="lede reveal" style="--d:2">kimchi is a desktop video editor with a built-in harness for image and video models. Prompt a shot straight onto the timeline, animate a frame you like, extend a clip from its last frame or bridge two shots with a generated transition, then cut, trim and export it like any other footage. Motion design like After Effects and 3D like Blender are built in, and captions are transcribed on your computer.</p>
       <div class="hero__actions reveal" style="--d:3">
         <a class="btn btn--primary" href="#downloads" data-download="kimchi" data-href-macos="/kimchi/download/macos-arm64" data-href-windows="/kimchi/download/windows-x86_64" data-href-linux="/kimchi/download/linux-appimage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span data-os>Download kimchi</span></a>
         <a class="btn" href="#downloads">All platforms</a>
@@ -46,8 +46,8 @@
     <div class="wrap">
       <figure class="shot shot--hero reveal" style="--d:3">
         <picture>
-          <source srcset="/assets/img/kimchi/editor-light.webp" media="(prefers-color-scheme: light)">
-          <img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor: the Motion tab's templates, a 3D title over the preview with a caption under it, the inspector's template, scene and animation controls, and a timeline with captions, motion clips, video joined by transitions and music" fetchpriority="high">
+          <source srcset="/assets/img/kimchi/studio-light.webp" media="(prefers-color-scheme: light)">
+          <img src="/assets/img/kimchi/studio.webp" width="2000" height="1250" alt="kimchi's Studio editing a 3D product shot: an outliner with cameras, lights, objects and shared materials, a viewport with a glass bottle on a marble pedestal, its selection outline and move handles, the lathe profile in the properties, and a dope sheet" fetchpriority="high">
         </picture>
       </figure>
     </div>
@@ -57,8 +57,8 @@
     <div class="wrap">
       <div class="stats reveal">
         <div><b>15</b><span>model providers, cloud and local</span></div>
-        <div><b>15</b><span>motion templates, 2D and 3D</span></div>
-        <div><b>128</b><span>commands, for you and your AI alike</span></div>
+        <div><b>24</b><span>motion templates, 2D and 3D</span></div>
+        <div><b>164</b><span>commands, for you and your AI alike</span></div>
         <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
       </div>
     </div>
@@ -67,22 +67,25 @@
   <section class="section" id="new" aria-labelledby="new-title">
     <div class="wrap">
       <div class="section__head">
-        <span class="eyebrow">New in 0.6</span>
-        <h2 class="h2 reveal" id="new-title">Steadier, and always up to date.</h2>
-        <p class="lede reveal" style="--d:1">0.6 is a stability release. Every part of kimchi went through a bug hunt, from the timeline to the media engine and the agent, and about seventy problems were fixed. kimchi now keeps a log, writes a crash report when something goes wrong, tells you what changed after an update, and updates itself on Windows too.</p>
+        <span class="eyebrow">New in 0.7</span>
+        <h2 class="h2 reveal" id="new-title">Blender and After Effects, inside the editor.</h2>
+        <p class="lede reveal" style="--d:1">0.7 turns motion clips into a full studio. Model in 3D, light it, give it glass, metal or marble and render it with a path tracer; build motion design with compositions, masks, mattes, effects and text animators. Open any motion clip in the Studio, then render it ahead for smooth playback, or leave it live until you export.</p>
       </div>
       <div class="grid grid--3">
-        <div class="cell reveal"><span class="cell__k">Stability</span><h3>Seventy fixes</h3><p>An edit that fails halfway leaves nothing half-done, a duplicated project keeps its generated media, and an agent stopped mid-batch can't leave changes hanging or undo yours.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Diagnostics</span><h3>Logs and crash reports</h3><p>Each run keeps a log, and a problem leaves a report, even when kimchi didn't quit properly. Settings › Diagnostics shows them; Help › Report a Problem fills in your version and system. Nothing is sent anywhere.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">What's new</span><h3>Release notes in the app</h3><p>After an update kimchi shows what changed, once. Open them again from the Help menu, the command palette or Settings, along with every earlier version.</p></div>
-        <div class="cell reveal"><span class="cell__k">Updates</span><h3>Everywhere, by themselves</h3><p>kimchi checks every few hours, can install updates on its own, and restarts into them in one click. On Windows the signed installer runs when you restart or quit.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Phone media</span><h3>Upright, bright, transparent</h3><p>Portrait photos stay upright, HDR video from recent phones is tone-mapped, and transparent WebM overlays keep their transparency.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Long recordings</span><h3>Hundreds of cuts</h3><p>A podcast cut into hundreds of pieces exports on every system, sound cut from AAC lands exactly where it should, and 29.97 and 59.94 fps are exact.</p></div>
-        <div class="cell reveal"><span class="cell__k">Captions</span><h3>From any tool</h3><p>SRT and WebVTT files saved in other encodings, with odd spacing or no blank lines, import correctly, and text like “I &lt;3 you” stays whole.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Your tools</span><h3>Found where they are</h3><p>ffmpeg, Claude Code and Codex installed with Homebrew, npm, nvm, Snap, Scoop, Chocolatey or WinGet are found, also when kimchi opens from the Dock. Generations ride out a short network drop.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Windows and Linux</span><h3>At home on every system</h3><p>Window buttons where the system doesn't draw them, Ctrl instead of ⌘, Ctrl+Enter to send, and shortcuts that never fire while you type.</p></div>
+        <div class="cell reveal"><span class="cell__k">3D modelling</span><h3>Shapes you make</h3><p>Turn any object into a mesh and extrude, inset, bevel, loop cut, subdivide, bridge or spin it. Extrude logos from SVG paths, lathe profiles, draw tubes along curves, import OBJ, STL and glTF.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Modifiers</span><h3>A stack that stays editable</h3><p>Subdivision, mirror, array, bevel, solidify, boolean, displace, twist, bend, wave, wireframe, explode and build, every value animatable, applied whenever you like.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Light and render</span><h3>A path tracer</h3><p>Spot and area lights with soft shadows, skies and 360° panoramas, glass, clear coat and procedural marble, wood or cells. Depth of field, bloom and motion blur; true refraction with the path tracer.</p></div>
+        <div class="cell reveal"><span class="cell__k">Motion design</span><h3>Like After Effects</h3><p>Nested compositions with time remapping, parenting and nulls, feathered masks, track mattes, adjustment layers, 34 effects, repeaters and other shape operators, text animators, text on a path, particles.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Expressions</span><h3>Formulas on anything</h3><p><code>wiggle(2, 30)</code>, <code>loopOut("pingpong")</code>, <code>time&nbsp;*&nbsp;90</code> or another layer's value, on any property, in 2D and 3D.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Render or live</span><h3>Your choice per clip</h3><p>A motion clip is drawn live: quickly while you edit, at full quality in the export. Or render it ahead into a file the timeline plays smoothly; change the scene and it goes live again.</p></div>
       </div>
-      <p class="fine reveal" style="margin-top:18px"><a href="#changelog">Every version</a> · <a href="https://github.com/ludovic111/kimchi/releases/tag/v0.6.0">kimchi 0.6.0 on GitHub</a></p>
+      <figure class="shot reveal" style="margin-top:28px">
+        <picture>
+          <source srcset="/assets/img/kimchi/studio-2d-light.webp" media="(prefers-color-scheme: light)">
+          <img src="/assets/img/kimchi/studio-2d.webp" width="2000" height="1250" alt="The Studio on a 2D motion clip: a glowing word with a burst of sparks and a shockwave ring on the canvas, its layers in the outliner, its text settings in the properties and its keyframes in the dope sheet" loading="lazy">
+        </picture>
+      </figure>
+      <p class="fine reveal" style="margin-top:18px"><a href="#changelog">Every version</a> · <a href="https://github.com/ludovic111/kimchi/releases/tag/v0.7.0">kimchi 0.7.0 on GitHub</a></p>
     </div>
   </section>
 
@@ -190,6 +193,21 @@
       </div>
       <ol class="releases reveal">
         <li class="release release--now">
+          <div class="release__meta"><span class="release__v">0.7</span><time class="release__date" datetime="2026-10-04">4 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>3D like Blender, motion design like After Effects</h3>
+            <ul>
+              <li><b>3D modelling</b>: editable meshes, a modifier stack, extruded logos, lathes, curve tubes, OBJ and STL models.</li>
+              <li><b>Lights, cameras and materials</b>: spot and area lights, worlds and panoramas, glass, clear coat and procedural surfaces, depth of field, several cameras, constraints, 3D particles, and a <b>path tracer</b>.</li>
+              <li><b>2D motion design</b>: compositions, parenting, masks, mattes, adjustment layers, 34 effects, shape operators, text animators, particles and motion blur.</li>
+              <li><b>Expressions</b> on every property, and the <b>Studio</b>, a workspace with an outliner, a viewport, properties, a dope sheet and a graph editor.</li>
+              <li><b>Render now or at export</b>: motion clips render ahead into a file the timeline plays, or stay live until you export.</li>
+              <li>Nine new templates; the Agent panel, timeline options and every shortcut are commands too (164 in all); Codex as the agent can delete and replace things.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/kimchi/releases/tag/v0.7.0">Full notes for 0.7.0 →</a></div>
+          </div>
+        </li>
+        <li class="release">
           <div class="release__meta"><span class="release__v">0.6</span><time class="release__date" datetime="2026-10-03">3 Oct 2026</time></div>
           <div class="release__body">
             <h3>Steadier, with logs, crash reports and what's new</h3>

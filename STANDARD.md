@@ -109,7 +109,7 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 
 | | ryolune | kimchi | zenith (coming soon) |
 | --- | --- | --- | --- |
-| Command registry, one undo | ✅ | ✅ 128 commands, one undo history | ✅ 52 `family.verb` commands (`zenith-commands`) shared by the window, CLI and MCP, git, pull requests and terminals included; undo is per turn (`thread.revert`) |
+| Command registry, one undo | ✅ | ✅ 164 commands, one undo history | ✅ 52 `family.verb` commands (`zenith-commands`) shared by the window, CLI and MCP, git, pull requests and terminals included; undo is per turn (`thread.revert`) |
 | CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | ✅ `zenith-cli` |
 | MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live`, and `/mcp` handed to each thread's agent |
 | Built-in agent | ✅ | ✅ Agent panel (Claude Code, Codex, API keys, Ollama) | ✅ Claude Code and Codex threads |
