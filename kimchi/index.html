@@ -58,7 +58,7 @@
       <div class="stats reveal">
         <div><b>15</b><span>model providers, cloud and local</span></div>
         <div><b>15</b><span>motion templates, 2D and 3D</span></div>
-        <div><b>122</b><span>commands, for you and your AI alike</span></div>
+        <div><b>128</b><span>commands, for you and your AI alike</span></div>
         <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
       </div>
     </div>
@@ -67,22 +67,22 @@
   <section class="section" id="new" aria-labelledby="new-title">
     <div class="wrap">
       <div class="section__head">
-        <span class="eyebrow">New in 0.5</span>
-        <h2 class="h2 reveal" id="new-title">Make it move.</h2>
-        <p class="lede reveal" style="--d:1">0.5 adds keyframes, motion graphics and 3D, drawn by kimchi and the same in the preview and the export, along with transitions on cuts, colour, reverse and freeze frames, captions transcribed on your computer, and export on the GPU. Every one of them is a command, so your AI can do it too.</p>
+        <span class="eyebrow">New in 0.6</span>
+        <h2 class="h2 reveal" id="new-title">Steadier, and always up to date.</h2>
+        <p class="lede reveal" style="--d:1">0.6 is a stability release. Every part of kimchi went through a bug hunt, from the timeline to the media engine and the agent, and about seventy problems were fixed. kimchi now keeps a log, writes a crash report when something goes wrong, tells you what changed after an update, and updates itself on Windows too.</p>
       </div>
       <div class="grid grid--3">
-        <div class="cell reveal"><span class="cell__k">Animation</span><h3>Keyframes on any clip</h3><p>Position, scale, rotation, opacity, blur, volume, text size and colour, with easings from ease to elastic, bounce and spring. Or a preset: fade, rise, pop, Ken Burns, pan, pulse, shake.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Motion graphics</span><h3>2D scenes</h3><p>Shapes, paths that draw themselves on, text revealed by letter, word or line, counters, images, masks, gradients, glows and blend modes, all on the timeline as a clip.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">3D</span><h3>Cameras, lights, extruded type</h3><p>Boxes, spheres, tori, 3D text, glTF models and picture cards under lights with soft shadows. On the GPU (Metal, Vulkan or DirectX 12), on the CPU otherwise.</p></div>
-        <div class="cell reveal"><span class="cell__k">Templates</span><h3>Fifteen to start from</h3><p>Lower third, title card, kinetic type, counter, bar chart, logo reveal, quote, a 3D title, a turntable and more. Change their words and colours in the inspector, or edit the scene layer by layer.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Transitions</span><h3>On the cut, sound included</h3><p>Click the + on a cut: dissolve, dips, wipes, slides, pushes, zoom, iris or blur, centred on the cut with the sound crossfading. Drag the badge's edges for the length.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Colour</span><h3>Looks, keying, LUTs</h3><p>Nine looks, from punchy to noir and teal &amp; orange, then brightness, contrast, saturation, warmth, tint, vignette and sharpen, all keyframable. A green-screen key and <code>.cube</code> LUTs.</p></div>
-        <div class="cell reveal"><span class="cell__k">Captions</span><h3>Transcribed on your computer</h3><p>Whisper runs locally, nothing is sent anywhere. Edit the captions as titles, style them all at once, import and export SRT or WebVTT, burn them in or write an <code>.srt</code> beside the export.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Time</span><h3>Reverse and freeze</h3><p>Play a clip backwards or hold a frame, next to speed with pitch kept. And the shortcuts editors expect: J, K, L, trim to the playhead with Q and W, copy and paste, rubber-band selection.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Export</span><h3>On the GPU</h3><p>VideoToolbox, NVENC, AMF, Quick Sync or VA-API when the computer has it, checked with a test encode and redone on the CPU if it fails. 4K, HEVC and ProRes sources decode in hardware.</p></div>
+        <div class="cell reveal"><span class="cell__k">Stability</span><h3>Seventy fixes</h3><p>An edit that fails halfway leaves nothing half-done, a duplicated project keeps its generated media, and an agent stopped mid-batch can't leave changes hanging or undo yours.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Diagnostics</span><h3>Logs and crash reports</h3><p>Each run keeps a log, and a problem leaves a report, even when kimchi didn't quit properly. Settings › Diagnostics shows them; Help › Report a Problem fills in your version and system. Nothing is sent anywhere.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">What's new</span><h3>Release notes in the app</h3><p>After an update kimchi shows what changed, once. Open them again from the Help menu, the command palette or Settings, along with every earlier version.</p></div>
+        <div class="cell reveal"><span class="cell__k">Updates</span><h3>Everywhere, by themselves</h3><p>kimchi checks every few hours, can install updates on its own, and restarts into them in one click. On Windows the signed installer runs when you restart or quit.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Phone media</span><h3>Upright, bright, transparent</h3><p>Portrait photos stay upright, HDR video from recent phones is tone-mapped, and transparent WebM overlays keep their transparency.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Long recordings</span><h3>Hundreds of cuts</h3><p>A podcast cut into hundreds of pieces exports on every system, sound cut from AAC lands exactly where it should, and 29.97 and 59.94 fps are exact.</p></div>
+        <div class="cell reveal"><span class="cell__k">Captions</span><h3>From any tool</h3><p>SRT and WebVTT files saved in other encodings, with odd spacing or no blank lines, import correctly, and text like “I &lt;3 you” stays whole.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Your tools</span><h3>Found where they are</h3><p>ffmpeg, Claude Code and Codex installed with Homebrew, npm, nvm, Snap, Scoop, Chocolatey or WinGet are found, also when kimchi opens from the Dock. Generations ride out a short network drop.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Windows and Linux</span><h3>At home on every system</h3><p>Window buttons where the system doesn't draw them, Ctrl instead of ⌘, Ctrl+Enter to send, and shortcuts that never fire while you type.</p></div>
       </div>
-      <p class="fine reveal" style="margin-top:18px"><a href="https://github.com/ludovic111/kimchi/releases/tag/v0.5.0">kimchi 0.5.0 on GitHub</a></p>
+      <p class="fine reveal" style="margin-top:18px"><a href="#changelog">Every version</a> · <a href="https://github.com/ludovic111/kimchi/releases/tag/v0.6.0">kimchi 0.6.0 on GitHub</a></p>
     </div>
   </section>
 
@@ -178,6 +178,85 @@
 <span class="line"></span>
 <span class="line"><span class="c"># send the cut to ryolune to score it</span></span>
 <span class="line">kimchi-cli handoff.toRyolune</span></pre></div>
+    </div>
+  </section>
+
+  <section class="section" id="changelog" aria-labelledby="changelog-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Changelog</span>
+        <h2 class="h2 reveal" id="changelog-title">Every version, in plain words.</h2>
+        <p class="lede reveal" style="--d:1">What each release of kimchi added and changed. kimchi shows the same notes after it updates; the full notes and checksums are on <a href="https://github.com/ludovic111/kimchi/releases">GitHub releases</a>, and the history is in <a href="https://github.com/ludovic111/kimchi/blob/main/CHANGELOG.md">CHANGELOG.md</a>.</p>
+      </div>
+      <ol class="releases reveal">
+        <li class="release release--now">
+          <div class="release__meta"><span class="release__v">0.6</span><time class="release__date" datetime="2026-10-03">3 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>Steadier, with logs, crash reports and what's new</h3>
+            <ul>
+              <li><b>About seventy fixes</b> from a bug hunt over every part of kimchi: failed edits leave nothing half-done, duplicates keep their media, an agent's stopped batch can't hang or undo your edits, and shortcuts never fire while you type.</li>
+              <li><b>Logs and crash reports</b> in Settings › Diagnostics, including runs that didn't quit properly, and Help › Report a Problem. Nothing is sent anywhere.</li>
+              <li><b>What's new</b> after each update, and from the Help menu any time.</li>
+              <li><b>Updates</b> every few hours, installed by themselves if you like, and on Windows through the signed installer.</li>
+              <li><b>Media from phones and long recordings:</b> upright portrait photos, HDR tone-mapped, transparent WebM, hundreds of cuts from one file, exact NTSC rates, captions in any encoding.</li>
+              <li>Window buttons on Windows and Linux, Ctrl instead of ⌘ there, and ffmpeg, Claude Code and Codex found wherever they are installed.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/kimchi/releases/tag/v0.6.0">Full notes for 0.6.0 →</a></div>
+          </div>
+        </li>
+        <li class="release">
+          <div class="release__meta"><span class="release__v">0.5</span><time class="release__date" datetime="2026-10-03">3 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>Make it move: motion, 3D, transitions, colour, captions</h3>
+            <ul>
+              <li><b>Keyframes</b> with easings on every clip, and presets from fade to Ken Burns.</li>
+              <li><b>Motion graphics and 3D</b> drawn by kimchi: 2D scenes, cameras, lights and extruded type, fifteen templates and a scene editor.</li>
+              <li><b>Transitions</b> on cuts with the sound crossfading; <b>colour</b> looks, grading, green-screen keying and LUTs.</li>
+              <li><b>Reverse and freeze frames</b>, J/K/L, trim to the playhead, copy and paste, rubber-band selection.</li>
+              <li><b>Captions</b> transcribed on your computer with Whisper, SRT and WebVTT in and out.</li>
+              <li><b>Export on the GPU</b> with a CPU fallback, and hardware decoding of 4K, HEVC and ProRes.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/kimchi/releases/tag/v0.5.0">Full notes for 0.5.0 →</a></div>
+          </div>
+        </li>
+        <li class="release">
+          <div class="release__meta"><span class="release__v">0.4</span><time class="release__date" datetime="2026-10-02">2 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>A native app, drivable by your AI</h3>
+            <ul>
+              <li>kimchi becomes a <b>native Rust app</b> (GPUI) instead of a web view: faster, smaller and the same on macOS, Windows and Linux.</li>
+              <li><b>One command registry</b> for the window, the built-in agent, <code>kimchi-cli</code> and MCP, with one undo history.</li>
+              <li>A <b>built-in agent</b> on Claude Code, Codex, Anthropic, OpenAI or Ollama, with “Revert this run” and permissions.</li>
+              <li>The lsuite look, dark and light, and hand-offs with ryolune.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/kimchi/releases/tag/v0.4.0">Full notes for 0.4.0 →</a></div>
+          </div>
+        </li>
+      </ol>
+      <details class="releases__older reveal">
+        <summary>Earlier releases, 0.1</summary>
+        <ol class="releases">
+          <li class="release">
+            <div class="release__meta"><span class="release__v">0.1.1</span><time class="release__date" datetime="2026-10-01">1 Oct 2026</time></div>
+            <div class="release__body">
+              <h3>Opens on a Mac without a warning</h3>
+              <ul><li>macOS builds are signed with a Developer ID and notarized by Apple.</li></ul>
+              <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/kimchi/releases/tag/v0.1.1">Full notes for 0.1.1 →</a></div>
+            </div>
+          </li>
+          <li class="release">
+            <div class="release__meta"><span class="release__v">0.1</span><time class="release__date" datetime="2026-10-01">1 Oct 2026</time></div>
+            <div class="release__body">
+              <h3>The first kimchi</h3>
+              <ul>
+                <li>A multi-track timeline editor with image and video generation from cloud and local models woven in.</li>
+                <li>Bundled ffmpeg, automatic updates, builds for macOS, Windows and Linux.</li>
+              </ul>
+              <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/kimchi/releases/tag/v0.1.0">Full notes for 0.1.0 →</a></div>
+            </div>
+          </li>
+        </ol>
+      </details>
     </div>
   </section>
 

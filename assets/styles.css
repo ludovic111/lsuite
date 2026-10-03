@@ -63,7 +63,7 @@
 
 /* Frosted glass, from the design system's tiers. Chrome and cards are tier 1, floating and code
    tier 2; work (screenshots, the illustration's canvas) stays solid. */
-.nav, .card, .cell, .table-wrap, .versus > div, .stats > div, .dl a, .band, .tabs, .pill, .faq details, .foot {
+.nav, .card, .cell, .table-wrap, .versus > div, .stats > div, .dl a, .band, .tabs, .pill, .faq details, .foot, .release, .releases__older summary {
   background: var(--ls-glass-1-bg);
   -webkit-backdrop-filter: var(--ls-glass-1-filter);
   backdrop-filter: var(--ls-glass-1-filter);
@@ -74,7 +74,7 @@
   backdrop-filter: var(--ls-glass-2-filter);
 }
 @media (prefers-reduced-transparency: reduce) {
-  .nav, .card, .cell, .table-wrap, .versus > div, .stats > div, .dl a, .band, .tabs, .pill, .faq details, .foot, .term, .code, .code__copy {
+  .nav, .card, .cell, .table-wrap, .versus > div, .stats > div, .dl a, .band, .tabs, .pill, .faq details, .foot, .release, .releases__older summary, .term, .code, .code__copy {
     background: var(--ls-glass-opaque); -webkit-backdrop-filter: none; backdrop-filter: none;
   }
 }
@@ -443,6 +443,43 @@ figcaption b { color: var(--text-2); font-weight: 600; }
 .faq summary::after { content: "+"; font: 400 22px/1 var(--mono); color: var(--text-3); transition: transform 0.25s var(--ease); }
 .faq details[open] summary::after { transform: rotate(45deg); }
 .faq details p { padding: 0 0 20px; color: var(--text-2); max-width: 70ch; }
+
+/* Release history: a timeline of versions, newest first and lit in the app's colour, older ones
+   folded under a summary. Each card is tier-1 glass like the cells. */
+.releases { list-style: none; margin: 0; padding: 0 0 0 28px; display: flex; flex-direction: column; gap: 10px; max-width: 900px; position: relative; }
+.releases::before { content: ""; position: absolute; left: 6px; top: 26px; bottom: 26px; width: 1px; background: linear-gradient(var(--accent-fill), var(--line-2) 30%, var(--line)); }
+.release { position: relative; display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 22px 24px; border-radius: var(--radius); border: 1px solid var(--ls-glass-edge); box-shadow: var(--ls-glass-highlight); }
+.release::before { content: ""; position: absolute; left: -26px; top: 28px; width: 9px; height: 9px; border-radius: 50%; background: var(--bg); box-shadow: inset 0 0 0 1px var(--line-2); }
+.release--now { border-color: var(--ls-accent-ring); box-shadow: var(--ls-glass-highlight), 0 0 40px var(--ls-accent-soft); }
+.release--now::before { background: var(--accent-fill); box-shadow: 0 0 0 4px var(--ls-accent-soft); }
+.release__meta { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.release__v { font: 600 13px/1 var(--mono); padding: 6px 9px; border-radius: var(--ls-radius-full); background: var(--surface-2); border: 1px solid var(--line-2); color: var(--text); }
+.release--now .release__v { background: var(--accent-fill); border-color: transparent; color: var(--accent-ink); }
+.release__date { font: 400 12.5px/1.2 var(--mono); color: var(--text-3); }
+.release__body h3 { font-size: 16.5px; line-height: 1.3; letter-spacing: -0.015em; }
+.release__body ul { margin: 10px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.release__body li { font-size: 14.5px; line-height: 1.55; color: var(--text-2); }
+.release__body li::marker { color: var(--text-3); }
+.release__body li b { color: var(--text); font-weight: 600; }
+.release__links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; }
+.release__link { font-size: 13.5px; color: var(--text-2); }
+.release__link:hover { color: var(--accent); }
+.releases__older { margin-top: 10px; max-width: 900px; padding-left: 28px; }
+.releases__older summary { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: var(--ls-radius-full); border: 1px solid var(--ls-glass-edge); cursor: pointer; list-style: none; font-size: 14px; color: var(--text-2); }
+.releases__older summary::-webkit-details-marker { display: none; }
+.releases__older summary::after { content: "+"; font: 400 16px/1 var(--mono); color: var(--text-3); transition: transform 0.25s var(--ease); }
+.releases__older[open] summary::after { transform: rotate(45deg); }
+.releases__older summary:hover { color: var(--text); border-color: var(--line-2); }
+.releases__older .releases { padding-left: 0; margin-top: 10px; }
+.releases__older .releases::before, .releases__older .release::before { display: none; }
+@media (max-width: 720px) {
+  .releases { padding-left: 20px; }
+  .releases::before { left: 3px; }
+  .release { grid-template-columns: 1fr; gap: 10px; padding: 18px; }
+  .release::before { left: -21px; }
+  .release__meta { flex-direction: row; align-items: center; gap: 10px; }
+  .releases__older { padding-left: 20px; }
+}
 
 /* ---------- Other apps ---------- */
 .others { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }

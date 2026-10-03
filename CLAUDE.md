@@ -27,6 +27,12 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
       real app (README, "Updating an app's page"), og image retaken. Home: kimchi's card, its
       agent-readiness column (`kimchi-cli`, `kimchi-mcp --live`, Agent panel) and the plug-in
       example; `STANDARD.md` count. Not yet checked by anyone: 3D on Metal, Windows builds.
+- [x] kimchi 0.6 page (2026-10-03): New in 0.6 (stability pass, logs and crash reports, what's new,
+      updates everywhere, phone media), 128 commands, and a **Changelog** section (`#changelog`): a
+      timeline of every release like ryolune's, `.releases` / `.release` / `.releases__older` in
+      `styles.css` (tier-1 glass, tokens only). Each kimchi release: add its card on top with
+      `release--now` (move the class off the previous one), from `../kimchi/CHANGELOG.md`. The
+      captures are still 0.5's (the window barely changed).
 - [ ] Keep the agent-readiness table on the home page and `STANDARD.md`'s status table in step
       as kimchi and zenith close their gaps.
 - [x] **Design system on the site itself** (2026-10-01): pages load `/design/tokens.css` before
