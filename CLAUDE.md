@@ -4,7 +4,7 @@ The suite's site; see README.md (layout, routes, domains) and STANDARD.md (the c
 lsuite app meets, with a status table). Each app repo (`../ryolune`, `../kimchi`, `../zenith`)
 has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 
-## Next session (2026-10-02)
+## Next session (2026-10-03)
 
 - [x] ryolune 0.12 page (2026-10-01): New in 0.12, one theme dark/light gallery, 35 plugins,
       199 commands, new agents. Versions on pages are `%VERSION:<app>%`, filled by `server.js`
@@ -22,6 +22,11 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
       used instead for now. When zenith ships: put back the download section, `%VERSION:zenith%`,
       the `ZENITH` assets in `server.js` and the table cells, and retake `assets/img/og/zenith.png`
       (its hero has no Coming soon badge).
+- [x] kimchi 0.5 page (2026-10-03): New in 0.5 (keyframes, 2D motion, 3D, templates, transitions,
+      colour, local captions, reverse/freeze, GPU export), 122 commands, new captures from the
+      real app (README, "Updating an app's page"), og image retaken. Home: kimchi's card, its
+      agent-readiness column (`kimchi-cli`, `kimchi-mcp --live`, Agent panel) and the plug-in
+      example; `STANDARD.md` count. Not yet checked by anyone: 3D on Metal, Windows builds.
 - [ ] Keep the agent-readiness table on the home page and `STANDARD.md`'s status table in step
       as kimchi and zenith close their gaps.
 - [x] **Design system on the site itself** (2026-10-01): pages load `/design/tokens.css` before

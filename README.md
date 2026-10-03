@@ -69,7 +69,12 @@ are under `/design/`.
 ## Updating an app's page
 
 The copy is written from each app's README and release notes. When an app ships: versions update by themselves;
-update what's new, features and screenshots. Screenshots live in `assets/img/<app>/` (2000x1250 WebP; kimchi's comes from its
-demo UI: `npm run ui:dev`, `/?editor&t=13&sel=c2&tab=generate&mode=video&prompt=…`, 1600x1000 at
-1.25x, `cwebp -q 76`). Open Graph images are 1200x630 captures of each page's hero in
-`assets/img/og/`.
+update what's new, features and screenshots. Screenshots live in `assets/img/<app>/` (2000x1250 WebP,
+dark and `-light`, `magick shot.png -quality 76 shot.webp`). kimchi's come from the real app on a
+virtual screen: `vscreen size 2000x1250`, then `vscreen start target/debug/kimchi` with
+`KIMCHI_WINDOW_SIZE=2000x1250` and scratch `KIMCHI_DATA_DIR`, `KIMCHI_CONFIG_DIR`, `LSUITE_HOME`,
+`KIMCHI_NO_UPDATE=1` (plus `KIMCHI_FFMPEG`/`KIMCHI_FFPROBE` if no ffmpeg is installed); build the
+project with `kimchi-cli` (`media.import`, `motion.addTemplate`, `captions.add`, `ui.select`,
+`ui.zoom fit=true`), switch with `app.setSetting key=appearance.mode value=dark|light`, and take
+`vscreen shot`. Open Graph images are 1200x630 captures of each page's hero in `assets/img/og/`.
+Pages reveal sections on scroll: full-page captures need `.reveal` forced visible.

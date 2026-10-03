@@ -6,7 +6,7 @@
 import { createServer } from 'node:http';
 import { createReadStream } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
-import { dirname, extname, join, normalize, sep } from 'node:path';
+import { dirname, extname, join, normalize, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
@@ -351,7 +351,7 @@ export async function handle(req, res) {
   // Static files: only under /assets/, never dotfiles, never outside ROOT.
   if (!pathname.startsWith('/assets/')) return notFound(req, res);
   const file = normalize(join(ROOT, pathname));
-  if (!file.startsWith(join(ROOT, 'assets') + sep) || file.split(sep).some((part) => part.startsWith('.'))) return notFound(req, res);
+  if (!file.startsWith(join(ROOT, 'assets') + sep) || relative(ROOT, file).split(sep).some((part) => part.startsWith('.'))) return notFound(req, res);
   try {
     const info = await stat(file);
     if (!info.isFile()) return notFound(req, res);

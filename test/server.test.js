@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { hostRedirect, osFor, supportTarget, downloadTarget, renderPage } from '../server.js';
+import { createServer } from 'node:http';
+import { hostRedirect, osFor, supportTarget, downloadTarget, renderPage, handle } from '../server.js';
 
 test('ryolune.com lands on the ryolune page, path and query kept', () => {
   assert.equal(hostRedirect('ryolune.com', '/', 'lsuite.xyz'), 'https://lsuite.xyz/ryolune');
@@ -64,4 +65,18 @@ test('pages are rendered with the nav, the footer and the current app', async ()
   }
   const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
   assert.ok(!home.includes('aria-current'));
+});
+
+test('assets are served wherever the site lives, dotfiles inside it never', async () => {
+  // A checkout under a dot folder (~/.t3/worktrees/…) still serves its assets.
+  const server = createServer((req, res) => handle(req, res));
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const base = `http://127.0.0.1:${server.address().port}`;
+  try {
+    assert.equal((await fetch(`${base}/assets/styles.css`)).status, 200);
+    assert.equal((await fetch(`${base}/assets/.hidden`)).status, 404);
+    assert.equal((await fetch(`${base}/assets/fonts/.LICENSE.txt`)).status, 404);
+  } finally {
+    server.close();
+  }
 });
