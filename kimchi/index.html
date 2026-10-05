@@ -58,7 +58,7 @@
       <div class="stats reveal">
         <div><b>15</b><span>model providers, cloud and local</span></div>
         <div><b>24</b><span>motion templates, 2D and 3D</span></div>
-        <div><b>164</b><span>commands, for you and your AI alike</span></div>
+        <div><b>200</b><span>commands, for you and your AI alike</span></div>
         <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
       </div>
     </div>
@@ -67,25 +67,25 @@
   <section class="section" id="new" aria-labelledby="new-title">
     <div class="wrap">
       <div class="section__head">
-        <span class="eyebrow">New in 0.7</span>
-        <h2 class="h2 reveal" id="new-title">Blender and After Effects, inside the editor.</h2>
-        <p class="lede reveal" style="--d:1">0.7 turns motion clips into a full studio. Model in 3D, light it, give it glass, metal or marble and render it with a path tracer; build motion design with compositions, masks, mattes, effects and text animators. Open any motion clip in the Studio, then render it ahead for smooth playback, or leave it live until you export.</p>
+        <span class="eyebrow">New in 0.8</span>
+        <h2 class="h2 reveal" id="new-title">Give the cut its sound.</h2>
+        <p class="lede reveal" style="--d:1">Mix, record and finish audio alongside the picture, with Ryolune's engine inside kimchi. The window adapts to your screen, the Studio puts camera controls within reach, and the renderer does more with the same computer.</p>
       </div>
       <div class="grid grid--3">
-        <div class="cell reveal"><span class="cell__k">3D modelling</span><h3>Shapes you make</h3><p>Turn any object into a mesh and extrude, inset, bevel, loop cut, subdivide, bridge or spin it. Extrude logos from SVG paths, lathe profiles, draw tubes along curves, import OBJ, STL and glTF.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Modifiers</span><h3>A stack that stays editable</h3><p>Subdivision, mirror, array, bevel, solidify, boolean, displace, twist, bend, wave, wireframe, explode and build, every value animatable, applied whenever you like.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Light and render</span><h3>A path tracer</h3><p>Spot and area lights with soft shadows, skies and 360° panoramas, glass, clear coat and procedural marble, wood or cells. Depth of field, bloom and motion blur; true refraction with the path tracer.</p></div>
-        <div class="cell reveal"><span class="cell__k">Motion design</span><h3>Like After Effects</h3><p>Nested compositions with time remapping, parenting and nulls, feathered masks, track mattes, adjustment layers, 34 effects, repeaters and other shape operators, text animators, text on a path, particles.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Expressions</span><h3>Formulas on anything</h3><p><code>wiggle(2, 30)</code>, <code>loopOut("pingpong")</code>, <code>time&nbsp;*&nbsp;90</code> or another layer's value, on any property, in 2D and 3D.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Render or live</span><h3>Your choice per clip</h3><p>A motion clip is drawn live: quickly while you edit, at full quality in the export. Or render it ahead into a file the timeline plays smoothly; change the scene and it goes live again.</p></div>
+        <div class="cell reveal"><span class="cell__k">The mixer</span><h3>Shape every track</h3><p>Faders, pan, buses, sends, automation, ducking, meters and a master true-peak limiter. Playback and exports use the same Rust mixer.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Ryolune</span><h3>Music and picture together</h3><p>Use Ryolune's effects, import songs as mixes or stems, refresh them after changes, and send an editable multitrack session back to your DAW.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Record and deliver</span><h3>A voice for the timeline</h3><p>Record a voice-over after a count-in, then place the take with one-step undo. Export WAV, AIFF, FLAC, MP3, AAC, Opus or Ogg with sample-rate and loudness controls.</p></div>
+        <div class="cell reveal"><span class="cell__k">Your workspace</span><h3>Room for the edit</h3><p>Panels become drawers and toolbars adapt when the window gets smaller. Both themes use authentic provider logos, bundled with the app.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">The Studio</span><h3>Move around the scene</h3><p>Visible orbit, pan, zoom and fly controls, a Camera menu, camera-to-view locking and editable camera moves. Zoom and pan directly in the 2D canvas too.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">The renderer</span><h3>Less waiting</h3><p>Faster compositing and large blurs, cached procedural calculations, reusable GPU buffers and improved path tracing. Point lights cast shadows in the standard engine.</p></div>
       </div>
       <figure class="shot reveal" style="margin-top:28px">
         <picture>
-          <source srcset="/assets/img/kimchi/studio-2d-light.webp" media="(prefers-color-scheme: light)">
-          <img src="/assets/img/kimchi/studio-2d.webp" width="2000" height="1250" alt="The Studio on a 2D motion clip: a glowing word with a burst of sparks and a shockwave ring on the canvas, its layers in the outliner, its text settings in the properties and its keyframes in the dope sheet" loading="lazy">
+          <source srcset="/assets/img/kimchi/mixer-light.webp" media="(prefers-color-scheme: light)">
+          <img src="/assets/img/kimchi/mixer.webp" width="2000" height="1250" alt="kimchi 0.8 with the timeline and audio mixer side by side, track effects, buses and the master output" loading="lazy">
         </picture>
       </figure>
-      <p class="fine reveal" style="margin-top:18px"><a href="#changelog">Every version</a> · <a href="https://github.com/ludovic111/kimchi/releases/tag/v0.7.0">kimchi 0.7.0 on GitHub</a></p>
+      <p class="fine reveal" style="margin-top:18px"><a href="#changelog">Every version</a> · <a href="https://github.com/ludovic111/kimchi/releases/tag/v0.8.0">kimchi 0.8.0 on GitHub</a></p>
     </div>
   </section>
 
@@ -193,6 +193,21 @@
       </div>
       <ol class="releases reveal">
         <li class="release release--now">
+          <div class="release__meta"><span class="release__v">0.8</span><time class="release__date" datetime="2026-10-05">5 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>Ryolune audio, a flexible workspace and clearer camera controls</h3>
+            <ul>
+              <li><b>A shared Rust mixer</b> for playback and export: gain, pan, fade curves, buses, sends, automation, ducking, meters and a true-peak limiter.</li>
+              <li><b>Ryolune effects and sessions</b>: import songs or stems, refresh changed songs, and hand off an editable multitrack session.</li>
+              <li><b>Voice-over recording</b> with count-in and undo; more audio export formats, sample-rate and loudness options, and beat markers.</li>
+              <li><b>Responsive editor and Studio</b>: compact drawers and toolbars, authentic provider logos, orbit/pan/zoom/fly buttons and editable camera moves.</li>
+              <li><b>Renderer improvements</b> across compositing, large blurs, procedural noise, GPU buffers and path tracing, plus point-light shadows.</li>
+              <li>Audio recovers after underruns and supports integer-format devices. <b>200 commands</b> expose the editor to scripts and agents.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/kimchi/releases/tag/v0.8.0">Full notes for 0.8.0 →</a></div>
+          </div>
+        </li>
+        <li class="release">
           <div class="release__meta"><span class="release__v">0.7</span><time class="release__date" datetime="2026-10-04">4 Oct 2026</time></div>
           <div class="release__body">
             <h3>3D like Blender, motion design like After Effects</h3>

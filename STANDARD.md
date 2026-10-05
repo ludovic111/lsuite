@@ -109,14 +109,14 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 
 | | ryolune | kimchi | zenith (coming soon) |
 | --- | --- | --- | --- |
-| Command registry, one undo | ✅ | ✅ 164 commands, one undo history | ✅ 52 `family.verb` commands (`zenith-commands`) shared by the window, CLI and MCP, git, pull requests and terminals included; undo is per turn (`thread.revert`) |
+| Command registry, one undo | ✅ | ✅ 200 commands, one undo history | ✅ 52 `family.verb` commands (`zenith-commands`) shared by the window, CLI and MCP, git, pull requests and terminals included; undo is per turn (`thread.revert`) |
 | CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | ✅ `zenith-cli` |
 | MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live`, and `/mcp` handed to each thread's agent |
 | Built-in agent | ✅ | ✅ Agent panel (Claude Code, Codex, API keys, Ollama) | ✅ Claude Code and Codex threads |
 | Signed auto-update | ✅ | ✅ own updater (same key and `latest.json` as the Tauri builds) | Coming soon: in-app updater, Ed25519-signed `SHA256SUMS`, built in the repo; nothing offered until zenith is ready |
-| Release binaries, all platforms | ✅ notarized macOS | ✅ 0.4.0: notarized macOS (Apple Silicon, Intel), Windows, Linux | Coming soon: no download on the site (taken down 2026-10-02) until zenith is ready |
+| Release binaries, all platforms | ✅ notarized macOS | ✅ notarized macOS (Apple Silicon, Intel), Windows, Linux | Coming soon: no download on the site (taken down 2026-10-02) until zenith is ready |
 | Rust core | ✅ native window (GPUI) | ✅ native window (GPUI), no web UI | ✅ server (`crates/zenith-code`) and native window (GPUI, `crates/zenith-app`); React interface kept for the browser |
 | Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ✅ writes `zenith.json`, reads the others (format 1) |
-| Hand-offs | ✅ to and from kimchi (`export.toKimchi`, `session.scoreCut`, `handoff.inbox`) | ✅ to and from ryolune (`handoff.*`, through ryolune's bridge) | partly: hands the other apps' MCP servers to its agents |
+| Hand-offs | ✅ to and from kimchi (`export.toKimchi`, `session.scoreCut`, `handoff.inbox`) | ✅ Ryolune songs/stems, editable audio sessions and `handoff.*` through the bridge | partly: hands the other apps' MCP servers to its agents |
 | README / site / support links (site on the design system) | ✅ | ✅ | ✅ page marked Coming soon, no download |
 | lsuite design system (`design/`) | ✅ GPUI on the tokens (glass over the window blur, teal, dark/light, contrast test, icon) | ✅ GPUI on the tokens: glass over the macOS window blur, Manrope/Plex, dark and light, contrast test, icon | ✅ native window (tokens, glass over vibrancy, Manrope/Plex, icon) and web interface (default theme on the tokens and glass tiers) |
