@@ -68,25 +68,25 @@
   <section class="section" id="new" aria-labelledby="new-title">
     <div class="wrap">
       <div class="section__head">
-        <span class="eyebrow">New in 0.8</span>
-        <h2 class="h2 reveal" id="new-title">Give the cut its sound.</h2>
-        <p class="lede reveal" style="--d:1">Mix, record and finish audio alongside the picture, with Ryolune's engine inside kimchi. The window adapts to your screen, the Studio puts camera controls within reach, and the renderer does more with the same computer.</p>
+        <span class="eyebrow">New in 0.9</span>
+        <h2 class="h2 reveal" id="new-title">An agent that looks before it says it's done.</h2>
+        <p class="lede reveal" style="--d:1">kimchi takes on lsuite's new black-and-white look with a calmer, organised editor. The agent now sees the frames it makes and knows what you've selected, keeps its conversations with each project, and takes a new direction while it works. Sound joins generation, and the Studio gets a real modelling workbench.</p>
       </div>
       <div class="grid grid--3">
-        <div class="cell reveal"><span class="cell__k">The mixer</span><h3>Shape every track</h3><p>Faders, pan, buses, sends, automation, ducking, meters and a master true-peak limiter. Playback and exports use the same Rust mixer.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Ryolune</span><h3>Music and picture together</h3><p>Use Ryolune's effects, import songs as mixes or stems, refresh them after changes, and send an editable multitrack session back to your DAW.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Record and deliver</span><h3>A voice for the timeline</h3><p>Record a voice-over after a count-in, then place the take with one-step undo. Export WAV, AIFF, FLAC, MP3, AAC, Opus or Ogg with sample-rate and loudness controls.</p></div>
-        <div class="cell reveal"><span class="cell__k">Your workspace</span><h3>Room for the edit</h3><p>Panels become drawers and toolbars adapt when the window gets smaller. Both themes use authentic provider logos, bundled with the app.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">The Studio</span><h3>Move around the scene</h3><p>Visible orbit, pan, zoom and fly controls, a Camera menu, camera-to-view locking and editable camera moves. Zoom and pan directly in the 2D canvas too.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">The renderer</span><h3>Less waiting</h3><p>Faster compositing and large blurs, cached procedural calculations, reusable GPU buffers and improved path tracing. Point lights cast shadows in the standard engine.</p></div>
+        <div class="cell reveal"><span class="cell__k">The agent</span><h3>It can see</h3><p>After making a title, an animation or a 3D scene, it looks at the frame and fixes what looks wrong. Every picture it looks at appears in the Agent panel, so you see what it saw.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">The agent</span><h3>It knows what "this" is</h3><p>Your selection, the playhead and the clip open in the Studio go along with each request, so "make this shorter" just works. Pick the model in the panel, Zenith's included.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Conversations</span><h3>Kept with the project</h3><p>Several named conversations per project, project memory every request shares, and history that survives a restart. Steer an agent while it works without losing its edits.</p></div>
+        <div class="cell reveal"><span class="cell__k">Generate</span><h3>Sound, too</h3><p>Voices, sound effects and music from ElevenLabs, and Stable Audio from Stability AI. Sound lands on audio tracks and can be regenerated like a shot.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">The Studio</span><h3>A modelling workbench</h3><p>Tools grouped by task, selection tools, edge loops and rings, pivots, align and distribute, and G, R, S on mesh parts. Animation gets box select, retiming from the keyboard and exact values.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Your workspace</span><h3>Black, white and organised</h3><p>Square, grain behind the chrome, titled areas and grouped toolbars. One sidebar on the left for everything, one on the right for agents.</p></div>
       </div>
       <figure class="shot reveal" style="margin-top:28px">
         <picture>
-          <source srcset="/assets/img/kimchi/mixer-light.webp" media="(prefers-color-scheme: light)">
-          <img src="/assets/img/kimchi/mixer.webp" width="2000" height="1250" alt="kimchi 0.8 with the timeline and audio mixer side by side, track effects, buses and the master output" loading="lazy">
+          <source srcset="/assets/img/kimchi/agent-light.webp" media="(prefers-color-scheme: light)">
+          <img src="/assets/img/kimchi/agent.webp" width="2000" height="1250" alt="kimchi 0.9 in black and white, with the editor's organised toolbars and the Agent panel open on the right" loading="lazy">
         </picture>
       </figure>
-      <p class="fine reveal" style="margin-top:18px"><a href="#changelog">Every version</a> · <a href="https://github.com/ludovic111/kimchi/releases/tag/v0.8.0">kimchi 0.8.0 on GitHub</a></p>
+      <p class="fine reveal" style="margin-top:18px"><a href="#changelog">Every version</a> · <a href="https://github.com/ludovic111/kimchi/releases/tag/v0.9.0">kimchi 0.9.0 on GitHub</a></p>
     </div>
   </section>
 
@@ -167,7 +167,7 @@
         <span class="eyebrow">Agents and scripts</span>
         <h2 class="h2 reveal" id="agent-title">Your AI can cut too.</h2>
         <p class="lede reveal" style="--d:1">Everything you can do in the window is a named command, and the window, the built-in agent, <code>kimchi-cli</code> and <code>kimchi-mcp</code> all use the same ones, with one undo history. Claude Code, Codex or any MCP client can drive the open project live; scripts can work on a project file without the app.</p>
-        <p class="muted reveal" style="--d:2">The Agent panel runs the model you already have (Claude Code, Codex, an Anthropic or OpenAI key, or a local Ollama model), shows one card per command and reverts a whole run in one click. Ask it for a title sequence and it writes the motion scene, then looks at the frames it made. You decide what agents may touch: files, projects, generation, settings. Scoring a cut in <a href="/ryolune">ryolune</a> and bringing the music back is coming soon.</p>
+        <p class="muted reveal" style="--d:2">The Agent panel runs the model you already have (Claude Code, Codex, an Anthropic or OpenAI key, or a local Ollama model), shows one card per command and reverts a whole run in one click. Ask it for a title sequence and it writes the motion scene, looks at the frames it made and fixes what's off; it knows what you've selected, keeps its conversations with each project, and you can steer it while it works. You decide what agents may touch: files, projects, generation, settings. Scoring a cut in <a href="/ryolune">ryolune</a> and bringing the music back is coming soon.</p>
       </div>
       <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># Claude Code drives the running app</span></span>
 <span class="line">claude mcp add kimchi -- /Applications/kimchi.app/Contents/MacOS/kimchi-mcp --live</span>
@@ -191,6 +191,21 @@
       </div>
       <ol class="releases reveal">
         <li class="release release--now">
+          <div class="release__meta"><span class="release__v">0.9</span><time class="release__date" datetime="2026-10-06">6 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>A new look, an agent that sees, and sound generation</h3>
+            <ul>
+              <li><b>Design system v2</b>: black and white, square, grain behind the chrome, an organised editor with one sidebar for everything and one for agents.</li>
+              <li><b>The agent can see</b> the frames it makes and your media, and fixes what looks wrong; every picture shows up in the Agent panel.</li>
+              <li><b>It knows what you mean</b>: your selection, the playhead and the open Studio clip go with each request.</li>
+              <li><b>Conversations per project</b> with memory, <b>steering</b> while it works, a model picker, and Zenith agents.</li>
+              <li><b>Sound generation</b> with ElevenLabs (voices, effects, music) and Stable Audio.</li>
+              <li><b>A Studio modelling workbench</b> and faster animation tools. <b>215 commands</b> expose the editor to scripts and agents.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/kimchi/releases/tag/v0.9.0">Full notes for 0.9.0 →</a></div>
+          </div>
+        </li>
+        <li class="release">
           <div class="release__meta"><span class="release__v">0.8</span><time class="release__date" datetime="2026-10-05">5 Oct 2026</time></div>
           <div class="release__body">
             <h3>Ryolune audio, a flexible workspace and clearer camera controls</h3>

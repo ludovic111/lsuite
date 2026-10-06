@@ -129,7 +129,7 @@ export async function appVersions(apps) {
 
 /** Where `/<app>/download[/<platform>]` sends the visitor. */
 export async function downloadTarget(app, wanted, userAgent) {
-  // Coming-soon apps have private repositories: old download links land on their pages.
+  // Coming-soon apps aren't offered for download yet: old download links land on their pages.
   if (app === 'ryolune' || app === 'zenith') return `/${app}`;
   if (app === 'kimchi') {
     const platform = wanted || KIMCHI.byOs[osFor(userAgent)];
