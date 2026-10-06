@@ -1,91 +1,97 @@
-# lsuite design system (v1, 2026-10-01)
+# lsuite design system (v2, 2026-10-06)
 
-One look for every lsuite app: **frosted glass for the chrome, solid surfaces for the work, and
-one signature color per app**, the way a suite's apps are told apart by their color (a blue one,
-an orange one) while sharing everything else. See it live at **lsuite.xyz/design** (`design/index.html`).
+One look for every lsuite app: **black and white, cut square, with grain**. Ink on paper, nothing
+rounded, surfaces that cast hard shadows, and a page of film grain and dithered light behind the
+chrome. The apps are told apart by their names and their work, not by a color. See it live at
+**lsuite.xyz/design** (`design/index.html`).
+
+kimchi wears v2 first (from its next release). ryolune and zenith still wear v1 (frosted glass, one signature color
+per app); their pages on the site stay empty until they move over.
 
 - **Source**: `design/tokens.json`. **Generated**: `design/tokens.css` (`node design/build.mjs`).
-  Web UIs (Tauri/React/Svelte, Next.js) copy `tokens.css` and use the `--ls-*` variables; Rust or
-  native code reads `tokens.json`. Never hard-code a value that lives in the tokens; when an app
-  needs a new one, add it here first and rebuild.
+  Web UIs copy `tokens.css` and use the `--ls-*` variables; Rust or native code reads
+  `tokens.json`. Never hard-code a value that lives in the tokens; when an app needs a new one, add
+  it here first and rebuild.
 - Set the app and the mode on the root element: `<html data-app="kimchi" data-mode="dark">`
-  (`data-mode` absent = follow the system).
+  (`data-mode` absent = follow the system). `data-app` no longer changes any color.
 
-## Signature colors
+## Ink
 
-Same OKLCH lightness and chroma for every app, only the hue changes, so the apps read as one
-family. Each app has an 11-step scale (`--ls-<app>-50 … -950`).
+| | Dark | Light |
+| --- | --- | --- |
+| Page / raised / sunken | `#050505` / `#0e0e0e` / `#000000` | `#f0f0f0` / `#fbfbfb` / `#e3e3e3` |
+| Text / 2 / 3 | `#f2f2f2` / `#a8a8a8` / `#707070` | `#0a0a0a` / `#4d4d4d` / `#7a7a7a` |
+| Ink (`--ls-ink`, the accent) | white | black |
+| Danger | `#ff5b4d` | `#c8291c` |
 
-| App | Hue | Accent dark (400) | Accent light (600) | In the spirit of |
-| --- | --- | --- | --- | --- |
-| ryolune · music | 185° teal | `#00c5b4` | `#009586` | Audition |
-| kimchi · video | 32° chili coral | `#f7806a` | `#c3513d` | PowerPoint |
-| zenith · code | 262° blue | `#72a6ff` | `#4777d2` | Photoshop, Word |
-| *reserved* | violet 300°, green 150°, amber 75°, pink 350° | | | next apps |
-
-`--ls-accent`, `--ls-accent-hover`, `--ls-accent-text` (text and links on the page background),
-`--ls-accent-soft` (selected rows, hovered menu items), `--ls-accent-ring` (focus) follow the app
-and the mode. Text on an accent fill uses `--ls-text-on-accent`.
-
-**The accent means "yours or active"**: selection, focus, the playhead, the primary action, what
-the agent touched, the app's own identity. **States keep their own colors**: record and errors red
-(`--ls-danger`), warnings amber, success green, mute/solo and meters keep their meaning. The accent
-never replaces a state color.
+- **The accent is the ink** of the mode, for every app: selection, focus, the playhead, the primary
+  action. **A chosen thing is inverted** (paper on ink): the selected segment, the open tab, a lit
+  toggle, the menu item under the pointer.
+- **Red only for what destroys or records.** Warnings and success are greys; every state also has
+  an icon or a word, never a hue alone.
+- **Logos of other services keep their own colors** (providers, plugins). Everything else is grey.
+- The work keeps its own colors: footage, 3D scenes, waveforms are what the person made.
+- The `apps.*.scale` steps stay in `tokens.json` for v1 apps and history; v2 interfaces don't use them.
 
 ## Surfaces
 
 | Layer | Token / class | Used for |
 | --- | --- | --- |
-| Window backdrop | `.ls-backdrop` (`--ls-bg` + two soft radial glows of the app color, `--ls-aurora-strength`) | Behind everything; it is what the glass blurs. |
-| Work | `--ls-bg-raised`, `--ls-bg-sunken` (solid) | Timeline, canvas, editors, tables, documents. **Never glass**: what you make is never blurred or tinted. |
-| Glass 1 · chrome | `.ls-glass-1` (blur 24, 55 % dark / 58 % light) | Sidebars, toolbars, title bar, inspectors. |
-| Glass 2 · floating | `.ls-glass-2` (blur 32, 72 % / 74 %) | Popovers, menus, command palette, transport HUD, toasts. |
-| Glass 3 · modal | `.ls-glass-3` (blur 40, 84 % / 86 %) over `--ls-scrim` | Dialogs, sheets. |
+| Page | `.ls-backdrop` (`--ls-bg`, dots of `--ls-dots-image` in two corners at `--ls-dither-strength`, `--ls-grain-image` over all at `--ls-grain-strength`) | Behind everything. Natively, draw the grain and the ordered-dither light at device pixels (kimchi: `ui/grain.rs`). |
+| Work | `--ls-bg-raised`, `--ls-bg-sunken` (solid) | Timeline, canvas, editors, tables. **Never grain or tint on the work.** |
+| Tier 1 · chrome | `.ls-glass-1` (62 % over the page) | Sidebars, toolbars, title bar, inspectors. |
+| Tier 2 · floating | `.ls-glass-2` (92–94 %) | Menus, popovers, the palette, toasts. |
+| Tier 3 · modal | `.ls-glass-3` (96–97 %) over `--ls-scrim` | Dialogs, sheets, inside corner brackets. |
 
-Every glass surface has a 1 px edge (`--ls-glass-edge`), a top inner highlight
-(`--ls-glass-highlight`) and a soft drop (`--ls-glass-shadow`). Edges between docked chrome and
-work are hairlines (`--ls-line`), not shadows.
+Every tier has a 1 px edge (`--ls-glass-edge`) and floating tiers a **hard offset shadow**
+(`--ls-glass-shadow`: 4 px down and right, no blur; in the dark a soft black one under it so the
+surface separates). The primary button stands on a smaller one (`--ls-chip-shadow`). Edges between
+docked areas are hairlines (`--ls-line`). `prefers-reduced-transparency` makes every tier opaque.
 
-**Fallbacks**: `prefers-reduced-transparency: reduce` and browsers without `backdrop-filter` get
-`--ls-glass-opaque` (handled in `tokens.css`). Native apps honour the OS setting the same way.
+## Layout
 
-**Native windows**: on macOS use the real window material (Tauri: the `window-vibrancy` crate with
-`NSVisualEffectMaterial::Sidebar` / `HudWindow`, transparent webview background; AppKit:
-`NSVisualEffectView`) for the window-level glass, and the CSS tiers inside. Windows 11: Mica for the
-window, Acrylic for floating. Linux: CSS tiers over `.ls-backdrop`.
+- **Every area is titled** like a sidebar: a title bar with the area's name (Media, Viewer,
+  Timeline, Agent), what it shows in mono (`1920×1080 · 30 fps`), and its actions on the right.
+- **Tools that belong together are boxed together**: one box, hairlines between the tools
+  (history · AI · panels · app in a title bar; edit · modes · add · sound · zoom in a timeline).
+  A tool shows its icon and its label when there is room, the icon alone (the label in its
+  tooltip) when there isn't.
+- Section headings in caps (mono) run into a hairline, like a drawing.
+- Rows that carry switches show them always, boxed, lit when on; names are never cut to make room
+  for controls (two lines instead).
+- Dialogs and the main composer sit inside **viewfinder brackets**.
 
 ## Type, shape, motion
 
-- **Manrope** (UI, 400–700) and **IBM Plex Mono** (numbers, time, code, labels in caps), both OFL,
-  bundled with the app (no font request at runtime).
-- Sizes: 11 · 12 · **13 (controls)** · 15 (body) · 17 · 22 · 28 · 40. Display sizes use
-  negative tracking (-0.02 to -0.035 em). Numbers that change use tabular figures.
-- Radii: 4 · 6 (controls) · 10 (popovers) · 14 (panels, windows) · 20 (cards) · full (pills).
+- **Chakra Petch** (UI, 400–700; a corner cut off every letter) and **IBM Plex Mono** (numbers,
+  time, code, labels in caps), both OFL, bundled (no font request at runtime).
+- Sizes: 11 · 12 · **13 (controls)** · 15 (body) · 17 · 22 · 28 · 40. Display tracking -0.01 to
+  -0.025 em. A word can be set in negative (ink block) for emphasis, once per screen.
+- Radii: **zero** everywhere (`--ls-radius-*` are `0px`). Only things round in the world stay round
+  (a 3D navigation sphere, a dial).
 - Spacing: 4-point grid (`--ls-space-1…10`).
-- Motion: 120 / 200 / 320 ms with `--ls-motion-ease`; `--ls-motion-spring` only for small pops.
-  Drags, scrubbing and playback are never eased. Everything stops under `prefers-reduced-motion`.
+- Motion: 120 / 200 / 320 ms with `--ls-motion-ease`. Drags, scrubbing and playback are never eased.
+  Everything stops under `prefers-reduced-motion`.
 
 ## App icons
 
-One template for all apps: a macOS squircle (`--ls-radius-icon` on a square, or the system icon
-grid at 1024 px with an 824 px tile), filled with a top-left to bottom-right gradient of the app's
-**300 → 600 → 800** steps, a white glyph at ~58 % of the tile with a 1 px soft shadow, and a glass
-sheen (white, 28 % → 0 over the top half). Glyphs: ryolune the ring and dot, kimchi the stalk and
-two leaves, zenith the circle with the sun at its top. Generate every size from one SVG per app.
+The app's mark, in one ink with one dithered part, white on a near-black tile (the macOS icon grid:
+824 px continuous-corner tile on 1024, the platform's shape), with a corner of dithered light like
+the page. Marks: kimchi's napa stalk cut square, a sharp leaf and a leaf dissolving into dither
+(kimchi `scripts/gen-mark.py`). ryolune and zenith get theirs when they move to v2.
 
 ## Accessibility
 
-- Text contrast ≥ 4.5:1 (≥ 3:1 for large text and icons) on every surface **including each glass
-  tier over the brightest and darkest backdrop**, in both modes. Test it like ryolune's
-  `appearance.test.ts`: fix the tier's opacity or the color step, never the threshold.
+- Text contrast ≥ 4.5:1 (≥ 3:1 for large text and icons) on every surface **including each tier
+  over the densest grain and dither**, in both modes. Fix the tier or the grey, never the threshold.
 - Focus is always visible (`--ls-accent-ring`, 2 px, offset 2).
 - Color is never the only signal (icons or labels with every state).
 
 ## Adopting it in an app
 
 1. Copy `design/tokens.css` (web UI) or read `design/tokens.json` (native) and the two fonts.
-2. Map the app's existing theme tokens onto `--ls-*` (keep app-specific tokens, such as meter
-   colors or track colors, but derive their neutrals from the lsuite ones).
-3. Put chrome on the glass tiers, keep work surfaces solid, set `data-app` and `data-mode`.
-4. Redraw the app icon from the template.
-5. Add the contrast test. Ship dark and light.
+2. Map the app's theme onto `--ls-*`: ink accent, greys, red for danger only.
+3. Square every corner, hard shadows on floating surfaces, grain behind the chrome, solid work.
+4. Title every area, box the tools by kind, invert what is chosen.
+5. Redraw the mark and the icon in one ink.
+6. Add the contrast test. Ship dark and light.

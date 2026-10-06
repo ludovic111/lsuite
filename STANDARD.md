@@ -96,14 +96,14 @@ The apps are separate programs but must be usable as one suite, by a person and 
 Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, source
 `design/tokens.json`, generated `design/tokens.css`, live preview at lsuite.xyz/design):
 
-- **One signature color per app**, same OKLCH lightness and chroma, only the hue changes:
-  ryolune teal (185°), kimchi chili coral (32°), zenith blue (262°); violet, green, amber and pink
-  are reserved for the next apps. The accent means "yours or active"; state colors keep their meaning.
-- **Frosted glass for the chrome** (three tiers over a backdrop tinted with the app color), solid
-  surfaces for the work, native window vibrancy where the OS has it, opaque fallbacks when
-  transparency is reduced.
-- Manrope + IBM Plex Mono, shared radii, spacing and motion, dark and light, tested contrast.
-- One app icon template (squircle in the app's gradient, white glyph, glass sheen).
+- **v2 (2026-10-06): black and white, cut square, with grain.** The accent is the ink of the mode
+  for every app (a chosen thing is inverted), red only for what destroys or records, zero radii,
+  hard offset shadows, film grain and dithered light behind the chrome, solid work surfaces.
+- Every area titled like a sidebar, tools boxed by kind, switches always in view.
+- Chakra Petch + IBM Plex Mono, shared spacing and motion, dark and light, tested contrast.
+- App icons: the mark in one ink, white on a near-black tile with a corner of dithered light.
+- v1 (frosted glass, one signature color per app) is what ryolune and zenith still wear; their
+  site pages stay empty until they move to v2.
 
 ## Status (2026-10-02)
 
@@ -119,4 +119,4 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 | Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ✅ writes `zenith.json`, reads the others (format 1) |
 | Hand-offs | ✅ to and from kimchi (`export.toKimchi`, `session.scoreCut`, `handoff.inbox`) | ✅ Ryolune songs/stems, editable audio sessions and `handoff.*` through the bridge | partly: hands the other apps' MCP servers to its agents |
 | README / site / support links (site on the design system) | ✅ | ✅ | ✅ page marked Coming soon, no download |
-| lsuite design system (`design/`) | ✅ GPUI on the tokens (glass over the window blur, teal, dark/light, contrast test, icon) | ✅ GPUI on the tokens: glass over the macOS window blur, Manrope/Plex, dark and light, contrast test, icon | ✅ native window (tokens, glass over vibrancy, Manrope/Plex, icon) and web interface (default theme on the tokens and glass tiers) |
+| lsuite design system (`design/`) | v1: GPUI on the v1 tokens (glass, teal, dark/light, contrast test, icon); v2 to do | ✅ v2: black and white, square, grain, Chakra Petch/Plex, titled areas and grouped tools, one-ink mark and icon, contrast test (next release) | v1: native window and web interface on the v1 tokens; v2 to do |

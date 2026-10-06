@@ -34,14 +34,16 @@ test('unknown kimchi platforms land on its public releases', async () => {
   assert.equal(await downloadTarget('kimchi', 'nope'), 'https://github.com/ludovic111/kimchi/releases/latest');
 });
 
-test('coming-soon apps send old downloads to their summaries without private repository links', async () => {
+test('coming-soon apps send old downloads to their empty pages without private repository links', async () => {
   for (const app of ['ryolune', 'zenith']) {
     for (const platform of [undefined, 'macos-arm64', 'macos-x86_64', 'windows-x86_64', 'linux-x86_64', 'nope']) {
       assert.equal(await downloadTarget(app, platform, 'Macintosh'), `/${app}`);
     }
     const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', {});
     assert.ok(html.includes('Coming soon'));
-    assert.equal([...html.matchAll(/<p\b/g)].length, 1, `${app}: one summary paragraph`);
+    // Empty until the app wears design v2: its name and status, no summary and no logo.
+    assert.equal([...html.matchAll(/<p\b/g)].length, 0, `${app}: an empty page`);
+    assert.ok(!html.includes('appid__mark'), `${app}: no logo`);
     assert.ok(!/\/download|data-download|softwareVersion|downloadUrl/.test(html));
   }
   for (const page of ['index.html', 'kimchi/index.html', 'ryolune/index.html', 'zenith/index.html']) {

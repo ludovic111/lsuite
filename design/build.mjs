@@ -37,22 +37,25 @@ function mode(name) {
   vars['glass-shadow'] = g.shadow;
   vars['glass-opaque'] = g.opaque;
   vars['scrim'] = g.scrim;
-  vars['aurora-strength'] = g.aurora;
+  vars['chip-shadow'] = g['chip-shadow'];
+  vars['grain-strength'] = g.grain;
+  vars['dither-strength'] = g.dither;
+  // Film grain and the dot grid of the dithered light, in the mode's ink (data: URIs, no request).
+  const ink = name === 'dark' ? '1' : '0';
+  vars['grain-image'] = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 ${ink} 0 0 0 0 ${ink} 0 0 0 0 ${ink} 0 0 0 2.2 -1.15'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
+  vars['dots-image'] = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='3' height='3' fill='%23${name === 'dark' ? 'fff' : '000'}'/%3E%3C/svg%3E")`;
   return vars;
 }
 
-// The app's signature color: `data-app="<app>"` on the root picks it.
-function appVars(app, modeName) {
-  const s = t.apps[app].scale;
-  const dark = modeName === 'dark';
+// v2: every app's interface is black and white, so the accent is the ink of the mode whatever
+// the app (`data-app` still names the app; its scale is identity, not interface).
+function appVars() {
   return {
-    accent: s[t.accentStep[modeName]],
-    'accent-hover': dark ? s['300'] : s['700'],
-    'accent-text': dark ? s['300'] : s['700'],
-    'accent-soft': dark ? `color-mix(in srgb, ${s['400']} 18%, transparent)` : `color-mix(in srgb, ${s['600']} 14%, transparent)`,
-    'accent-ring': dark ? `color-mix(in srgb, ${s['300']} 60%, transparent)` : `color-mix(in srgb, ${s['600']} 50%, transparent)`,
-    'aurora-a': s['400'],
-    'aurora-b': s[dark ? '700' : '200'],
+    accent: 'var(--ls-ink)',
+    'accent-hover': 'color-mix(in srgb, var(--ls-ink) 82%, var(--ls-bg))',
+    'accent-text': 'var(--ls-text)',
+    'accent-soft': 'color-mix(in srgb, var(--ls-ink) 12%, transparent)',
+    'accent-ring': 'color-mix(in srgb, var(--ls-ink) 62%, transparent)',
   };
 }
 
@@ -61,26 +64,27 @@ css += block(':root', shared) + '\n';
 css += block(':root, [data-mode="dark"]', mode('dark')) + '\n';
 css += block('[data-mode="light"]', mode('light')) + '\n';
 css += `@media (prefers-color-scheme: light) {\n${block('  :root:not([data-mode="dark"])', mode('light')).replace(/^/gm, '  ').trimEnd()}\n}\n\n`;
-for (const app of Object.keys(t.apps)) {
-  css += block(`[data-app="${app}"], [data-app="${app}"][data-mode="dark"]`, appVars(app, 'dark'));
-  css += block(`[data-app="${app}"][data-mode="light"]`, appVars(app, 'light'));
-  css += `@media (prefers-color-scheme: light) {\n${block(`  [data-app="${app}"]:not([data-mode="dark"])`, appVars(app, 'light')).replace(/^/gm, '  ').trimEnd()}\n}\n\n`;
-}
+css += block(':root, [data-app]', appVars()) + '\n';
 
-// The three glass tiers as classes, and the window backdrop that gives glass something to blur.
+// The three tiers as classes, and the window backdrop: the page colour, two corners of dithered
+// light and film grain over all of it.
 css += `.ls-glass-1, .ls-glass-2, .ls-glass-3 {
   border: 1px solid var(--ls-glass-edge);
-  box-shadow: var(--ls-glass-highlight), var(--ls-glass-shadow);
+  box-shadow: var(--ls-glass-shadow);
 }
 .ls-glass-1 { background: var(--ls-glass-1-bg); backdrop-filter: var(--ls-glass-1-filter); -webkit-backdrop-filter: var(--ls-glass-1-filter); }
 .ls-glass-2 { background: var(--ls-glass-2-bg); backdrop-filter: var(--ls-glass-2-filter); -webkit-backdrop-filter: var(--ls-glass-2-filter); }
 .ls-glass-3 { background: var(--ls-glass-3-bg); backdrop-filter: var(--ls-glass-3-filter); -webkit-backdrop-filter: var(--ls-glass-3-filter); }
-.ls-backdrop {
-  background-color: var(--ls-bg);
-  background-image:
-    radial-gradient(60% 50% at 12% 0%, color-mix(in srgb, var(--ls-aurora-a, #888) calc(var(--ls-aurora-strength) * 100%), transparent), transparent 70%),
-    radial-gradient(50% 45% at 92% 100%, color-mix(in srgb, var(--ls-aurora-b, #666) calc(var(--ls-aurora-strength) * 100%), transparent), transparent 70%);
+.ls-backdrop { background-color: var(--ls-bg); position: relative; isolation: isolate; }
+.ls-backdrop::before, .ls-backdrop::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.ls-backdrop::before {
+  background-image: var(--ls-dots-image), var(--ls-dots-image);
+  background-size: 4px 4px;
+  opacity: var(--ls-dither-strength);
+  -webkit-mask-image: radial-gradient(60% 55% at 0% 0%, #000, transparent 75%), radial-gradient(55% 50% at 100% 100%, #000, transparent 75%);
+  mask-image: radial-gradient(60% 55% at 0% 0%, #000, transparent 75%), radial-gradient(55% 50% at 100% 100%, #000, transparent 75%);
 }
+.ls-backdrop::after { background-image: var(--ls-grain-image); background-size: 180px 180px; opacity: calc(var(--ls-grain-strength) * 2.2); }
 @media (prefers-reduced-transparency: reduce) {
   .ls-glass-1, .ls-glass-2, .ls-glass-3 { background: var(--ls-glass-opaque); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }

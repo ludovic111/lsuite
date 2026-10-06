@@ -7,8 +7,13 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 ## Current availability (2026-10-06)
 
 - kimchi is in beta. ryolune and zenith are coming soon while development focuses on kimchi.
-- Each coming-soon page contains only its identity, status and one summary paragraph, with the
-  shared navigation. No feature sections, downloads, repository links or marketing footer.
+- The site wears **design system v2** (2026-10-06: black and white, square, grain, Chakra Petch;
+  `design/DESIGN.md`). kimchi's page shows the v2 app and its new one-ink icon.
+- **The ryolune and zenith pages are empty** until those apps wear v2: one line (name, kind,
+  Coming soon) with the shared navigation, no logo, no summary. Their icons, captures, film and
+  Open Graph images were removed (in git history before 2026-10-06); the home cards carry no icon
+  and ryolune's no capture. The lsuite logo is gone from the nav, footer and favicon (a plain grain
+  tile). When an app moves to v2, write its page again in the v2 look with new captures and icon.
 - ryolune and zenith repositories are private. Their old download routes redirect to their
   coming-soon pages, and only kimchi has public source links and release-version lookups.
 - Earlier completed notes below describe the previous pages; keep the current availability

@@ -1,4 +1,4 @@
-// Design preview: switch the app (signature color) and the mode, remembered per viewer.
+// Design preview: switch the mode, remembered per viewer.
 const root = document.documentElement;
 function set(key, value) {
   root.dataset[key] = value;

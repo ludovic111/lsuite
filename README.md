@@ -26,7 +26,7 @@ npm test
 - `assets/` is the only static folder: `styles.css` (every page, built on the design system's
   `/design/tokens.css`, loaded first; `data-app` on `<html>` picks the app's color, light and dark
   follow the system), `main.js` (reveals, "Download for your OS", copy buttons, the ryolune theme
-  gallery), fonts (Manrope, IBM Plex Mono, OFL), images and the ryolune film.
+  gallery), fonts (Chakra Petch, IBM Plex Mono, OFL) and images.
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
 - `%VERSION:<app>%` becomes the version of the app's latest published GitHub release (cached
   10 min, `FALLBACK_VERSIONS` when GitHub cannot be reached), so a page never announces a version
@@ -76,5 +76,6 @@ virtual screen: `vscreen size 2000x1250`, then `vscreen start target/debug/kimch
 `KIMCHI_NO_UPDATE=1` (plus `KIMCHI_FFMPEG`/`KIMCHI_FFPROBE` if no ffmpeg is installed); build the
 project with `kimchi-cli` (`media.import`, `motion.addTemplate`, `captions.add`, `ui.select`,
 `ui.zoom fit=true`), switch with `app.setSetting key=appearance.mode value=dark|light`, and take
-`vscreen shot`. Open Graph images are 1200x630 captures of each page's hero in `assets/img/og/`.
+`vscreen shot`. On the Mac: `KIMCHI_WINDOW_SIZE=1600x1000` and `kimchi-cli ui.screenshot`, scaled
+to 2000x1250. Open Graph images are 1200x630 captures of each page's hero in `assets/img/og/`.
 Pages reveal sections on scroll: full-page captures need `.reveal` forced visible.

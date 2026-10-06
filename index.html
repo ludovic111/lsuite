@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>lsuite — the open-source creative suite your AI can drive</title>
   <meta name="description" content="lsuite is a creative suite written in Rust that you or your AI can drive. kimchi, the free and open-source video editor, is in beta. ryolune for music and zenith for coding with agents are coming soon.">
-  <meta name="theme-color" content="#0b0c0f" media="(prefers-color-scheme: dark)">
-  <meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/">
   <link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml">
   <meta property="og:type" content="website">
@@ -16,7 +16,7 @@
   <meta property="og:url" content="%ORIGIN%/">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="preload" href="/assets/fonts/manrope-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/design/tokens.css?v=1">
   <link rel="stylesheet" href="/assets/styles.css?v=1">
   <script src="/assets/main.js?v=1"></script>
@@ -35,7 +35,7 @@
         <span class="pill">written in Rust</span>
         <span class="pill">agent-native</span>
       </div>
-      <h1 class="display reveal" style="--d:1">The creative suite<br>your AI can drive.</h1>
+      <h1 class="display reveal" style="--d:1">The creative suite<br>your AI can <span class="neg">drive</span>.</h1>
       <p class="lede reveal" style="--d:2">lsuite is a family of apps for making things: <span class="c-kimchi">kimchi</span>, the free and open-source video editor, is in beta. <span class="c-ryolune">ryolune</span> for music and <span class="c-zenith">zenith</span> for coding with agents are coming soon. No account, no subscription. Everything you can click is a command, so you, a script or an AI agent can run the whole thing.</p>
       <div class="hero__actions reveal" style="--d:3">
         <a class="btn btn--primary" href="#apps">Meet the apps <span class="arrow" aria-hidden="true">→</span></a>
@@ -71,13 +71,12 @@
       <div class="apps">
         <a class="card app-ryolune reveal" href="/ryolune">
           <div class="card__top">
-            <img src="/assets/img/icons/ryolune.webp" width="44" height="44" alt="">
             <span class="card__name">ryolune</span>
             <span class="card__kind">Music</span>
           </div>
           <p class="card__say">The DAW your AI can drive.</p>
           <p class="card__text">ryolune will let you record, arrange, edit MIDI, mix and export stems, with built-in instruments and effects, your own plugins and an AI agent whose edits you can undo.</p>
-          <div class="card__shot"><img src="/assets/img/ryolune/arrangement.webp" width="2000" height="1250" alt="ryolune's arrangement window" loading="lazy"></div>
+          <div class="card__shot card__shot--soon" aria-hidden="true"><span>New look on the way</span></div>
           <div class="card__foot"><span class="soon">Coming soon</span><span class="link">Preview <span class="arrow" aria-hidden="true">→</span></span></div>
         </a>
 
@@ -89,13 +88,12 @@
           </div>
           <p class="card__say">A video editor where generation is part of the cut.</p>
           <p class="card__text">A real multi-track timeline with image and video models woven in: generate at the playhead, animate a frame, extend a shot, bridge two clips. Motion graphics, 3D and local captions. Your keys, or fully local.</p>
-          <div class="card__shot"><img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor with a path-traced 3D product shot in the preview and motion clips, video and music on the timeline" loading="lazy"></div>
+          <div class="card__shot"><img src="/assets/img/kimchi/editor.webp" width="2000" height="1250" alt="kimchi's editor: media, the viewer, the inspector and a timeline with video, a title, a 3D clip and music" loading="lazy"></div>
           <div class="card__foot"><span>Beta · v%VERSION:kimchi% · macOS · Windows · Linux</span><span class="link">Open <span class="arrow" aria-hidden="true">→</span></span></div>
         </a>
 
         <a class="card app-zenith reveal" style="--d:2" href="/zenith">
           <div class="card__top">
-            <img src="/assets/img/icons/zenith.webp" width="44" height="44" alt="">
             <span class="card__name">zenith</span>
             <span class="card__kind">Code</span>
           </div>
