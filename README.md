@@ -3,11 +3,19 @@
 The site of **lsuite** (written in lowercase), at [lsuite.xyz](https://lsuite.xyz): a free,
 open-source creative suite whose apps can be driven end to end by an AI agent.
 
-| App | Page | Repository |
-| --- | --- | --- |
-| ryolune · music · coming soon | `/ryolune` | `ludovic111/ryolune` (private) |
-| kimchi · video · beta | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) |
-| zenith · code · coming soon | `/zenith` | `ludovic111/zenith` (private) |
+| App | On the site | Page | Repository and releases |
+| --- | --- | --- | --- |
+| ryolune · music | coming soon | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) (0.14.0) |
+| kimchi · video | beta | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) (0.9.x) |
+| zenith · code | coming soon | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) (0.3.0) |
+
+kimchi is the app the site offers. Its page covers the beta: 0.9.0 brought design system v2, an
+agent that looks at what it renders, conversations and memory per project, steering an agent
+while it works, sound generation and the Studio's modelling workbench; 0.9.1 adds other editors'
+projects, looks, a first-run setup and more agent providers. ryolune and zenith are coming soon on
+the site by choice, while work focuses on kimchi: their pages show one line (name, kind, Coming
+soon), the nav and footer mark them "soon", and the site offers no download for them. Their
+repositories are public and publish releases on GitHub all the same.
 
 Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
 
@@ -25,12 +33,14 @@ npm test
   `aria-current="page"`. `%ORIGIN%` becomes the request's origin (Open Graph, canonical).
 - `assets/` is the only static folder: `styles.css` (every page, built on the design system's
   `/design/tokens.css`, loaded first; `data-app` on `<html>` picks the app's color, light and dark
-  follow the system), `main.js` (reveals, "Download for your OS", copy buttons, the ryolune theme
-  gallery), fonts (Chakra Petch, IBM Plex Mono, OFL) and images.
+  follow the system), `main.js` (reveals, "Download for your OS", copy buttons, and the ryolune
+  theme gallery, unused while ryolune's page is empty), fonts (Chakra Petch, IBM Plex Mono, OFL)
+  and images.
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
 - `%VERSION:<app>%` becomes the version of the app's latest published GitHub release (cached
   10 min, `FALLBACK_VERSIONS` when GitHub cannot be reached), so a page never announces a version
-  that cannot be downloaded yet.
+  that cannot be downloaded yet. Only kimchi is looked up (`REPOS` in `server.js`); the
+  coming-soon pages ask for no version.
 - CSP is `'self'` only: no inline scripts, no third-party requests.
 
 ## Design system
@@ -44,9 +54,9 @@ are under `/design/`.
 
 | Path | Does |
 | --- | --- |
-| `/ryolune/download[/<platform>]` | 302 to `/ryolune`: ryolune is coming soon and its repository is private. |
-| `/kimchi/download[/<platform>]` | 302 to the matching asset of kimchi's latest release, looked up on the GitHub API (cached 10 min): `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm`. |
-| `/zenith/download[/<platform>]` | 302 to `/zenith`: zenith is coming soon, nothing to download yet. |
+| `/ryolune/download[/<platform>]` | 302 to `/ryolune`: ryolune is coming soon on the site (its releases are on GitHub). |
+| `/kimchi/download[/<platform>]` | 302 to the matching asset of kimchi's latest release, looked up on the GitHub API (cached 10 min): `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm`. Without a platform, the visitor's OS picks one. A platform with no matching asset goes to the release page: the native app ships no MSI or RPM, so `windows-msi` and `linux-rpm` land there. |
+| `/zenith/download[/<platform>]` | 302 to `/zenith`: zenith is coming soon on the site (its releases are on GitHub). |
 | `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
 | `/health` | `ok`, for Railway's health check. |
 | `/robots.txt`, `/sitemap.xml` | Generated for the request's origin. |
@@ -69,8 +79,12 @@ are under `/design/`.
 ## Updating an app's page
 
 The copy is written from each app's README and release notes. When an app ships: versions update by themselves;
-update what's new, features and screenshots. Screenshots live in `assets/img/<app>/` (2000x1250 WebP,
-dark and `-light`, `magick shot.png -quality 76 shot.webp`). kimchi's come from the real app on a
+update what's new, features and screenshots. On kimchi's page that is "New in 0.x", the command
+count and a new card on top of the changelog (`#changelog`, from `../kimchi/CHANGELOG.md`, with
+`release--now` moved to it). The ryolune and zenith pages stay one line until those apps wear
+design system v2; then they are written again in the v2 look, with new captures and icons.
+Screenshots live in `assets/img/<app>/` (2000x1250 WebP, dark and `-light`,
+`magick shot.png -quality 76 shot.webp`). kimchi's come from the real app on a
 virtual screen: `vscreen size 2000x1250`, then `vscreen start target/debug/kimchi` with
 `KIMCHI_WINDOW_SIZE=2000x1250` and scratch `KIMCHI_DATA_DIR`, `KIMCHI_CONFIG_DIR`, `LSUITE_HOME`,
 `KIMCHI_NO_UPDATE=1` (plus `KIMCHI_FFMPEG`/`KIMCHI_FFPROBE` if no ffmpeg is installed); build the
