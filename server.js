@@ -10,6 +10,7 @@ import { dirname, extname, join, normalize, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
+import { createAccounts } from './ai.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
@@ -273,7 +274,21 @@ async function notFound(req, res) {
   send(res, 404, html, TYPES['.html'], 'no-store', req);
 }
 
+/**
+ * lsuite accounts and lsuite AI (AI.md, `ai.js`): accounts in `LSUITE_DATA_DIR/accounts.json`
+ * (memory when unset), model requests forwarded with `LSUITE_ANTHROPIC_API_KEY` (a demo answer
+ * without it).
+ */
+export const accounts = createAccounts({
+  dataDir: process.env.LSUITE_DATA_DIR || null,
+  anthropicKey: process.env.LSUITE_ANTHROPIC_API_KEY || '',
+});
+
 export async function handle(req, res) {
+  // The API answers on any host name: an app's POST must not be lost to a redirect.
+  if (String(req.url ?? '').startsWith('/api/')) {
+    if (await accounts.handle(req, res, new URL(req.url, 'http://localhost'))) return;
+  }
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     return send(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', 'no-store');
   }
