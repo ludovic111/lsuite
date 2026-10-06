@@ -4,6 +4,16 @@ The suite's site; see README.md (layout, routes, domains) and STANDARD.md (the c
 lsuite app meets, with a status table). Each app repo (`../ryolune`, `../kimchi`, `../zenith`)
 has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 
+## Current availability (2026-10-06)
+
+- kimchi is in beta. ryolune and zenith are coming soon while development focuses on kimchi.
+- Each coming-soon page contains only its identity, status and one summary paragraph, with the
+  shared navigation. No feature sections, downloads, repository links or marketing footer.
+- ryolune and zenith repositories are private. Their old download routes redirect to their
+  coming-soon pages, and only kimchi has public source links and release-version lookups.
+- Earlier completed notes below describe the previous pages; keep the current availability
+  above unless explicitly asked to change it.
+
 ## Next session (2026-10-03)
 
 - [x] ryolune 0.12 page (2026-10-01): New in 0.12, one theme dark/light gallery, 35 plugins,

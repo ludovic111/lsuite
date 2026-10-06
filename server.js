@@ -73,18 +73,6 @@ export function osFor(userAgent = '') {
   return null;
 }
 
-// ryolune ships fixed asset names; keep in step with `update::asset_name` in the ryolune repo.
-const RYOLUNE = {
-  releases: 'https://github.com/ludovic111/ryolune/releases/latest',
-  assets: {
-    'macos-arm64': 'ryolune-macos-arm64.zip',
-    'macos-x86_64': 'ryolune-macos-x86_64.zip',
-    'windows-x86_64': 'ryolune-windows-x86_64.zip',
-    'linux-x86_64': 'ryolune-linux-x86_64.zip',
-  },
-  byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
-};
-
 // kimchi's file names carry the version (Tauri bundles), so the latest release is looked up.
 const KIMCHI = {
   repo: 'ludovic111/kimchi',
@@ -123,9 +111,9 @@ async function latestRelease(repo) {
 
 // Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
 // latest published release, so the page never announces a version you cannot download yet.
-// zenith is coming soon: no page asks for its version.
-const FALLBACK_VERSIONS = { ryolune: '0.11.1', kimchi: '0.1.0' };
-const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi' };
+// ryolune and zenith are coming soon: no page asks for their versions.
+const FALLBACK_VERSIONS = { kimchi: '0.1.0' };
+const REPOS = { kimchi: 'ludovic111/kimchi' };
 
 /** `{ app: version }` for every app whose version a page asks for. */
 export async function appVersions(apps) {
@@ -141,13 +129,8 @@ export async function appVersions(apps) {
 
 /** Where `/<app>/download[/<platform>]` sends the visitor. */
 export async function downloadTarget(app, wanted, userAgent) {
-  if (app === 'ryolune') {
-    const platform = wanted || RYOLUNE.byOs[osFor(userAgent)];
-    const asset = RYOLUNE.assets[platform];
-    return asset ? `${RYOLUNE.releases}/download/${asset}` : RYOLUNE.releases;
-  }
-  // zenith is coming soon: nothing to download, old links land on its page.
-  if (app === 'zenith') return '/zenith';
+  // Coming-soon apps have private repositories: old download links land on their pages.
+  if (app === 'ryolune' || app === 'zenith') return `/${app}`;
   if (app === 'kimchi') {
     const platform = wanted || KIMCHI.byOs[osFor(userAgent)];
     const pattern = KIMCHI.patterns[platform];

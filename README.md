@@ -5,9 +5,9 @@ open-source creative suite whose apps can be driven end to end by an AI agent.
 
 | App | Page | Repository |
 | --- | --- | --- |
-| ryolune · music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) |
-| kimchi · video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) |
-| zenith · code · coming soon | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) |
+| ryolune · music · coming soon | `/ryolune` | `ludovic111/ryolune` (private) |
+| kimchi · video · beta | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) |
+| zenith · code · coming soon | `/zenith` | `ludovic111/zenith` (private) |
 
 Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
 
@@ -44,7 +44,7 @@ are under `/design/`.
 
 | Path | Does |
 | --- | --- |
-| `/ryolune/download[/<platform>]` | 302 to the latest ryolune release asset (`macos-arm64`, `macos-x86_64`, `windows-x86_64`, `linux-x86_64`; by User-Agent without one). Keep in step with `update::asset_name` in ryolune. |
+| `/ryolune/download[/<platform>]` | 302 to `/ryolune`: ryolune is coming soon and its repository is private. |
 | `/kimchi/download[/<platform>]` | 302 to the matching asset of kimchi's latest release, looked up on the GitHub API (cached 10 min): `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm`. |
 | `/zenith/download[/<platform>]` | 302 to `/zenith`: zenith is coming soon, nothing to download yet. |
 | `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
@@ -58,7 +58,7 @@ are under `/design/`.
 - **ryolune.com** is a Porkbun URL forward (permanent 301, path included, wildcard so www
   follows) to `https://lsuite.xyz/ryolune`: `ryolune.com/support` → `/ryolune/support`,
   `ryolune.com/download/macos-arm64` → `/ryolune/download/macos-arm64`, and the browser keeps
-  `#downloads` and other anchors (the ryolune page keeps the same section ids). Its DNS is
+  URL fragments. The coming-soon page no longer has the old feature or download sections. Its DNS is
   Porkbun's forwarder (ALIAS and `*` CNAME to `uixie.porkbun.com`); no Railway service is involved.
   `MOVED_HOSTS` in `server.js` does the same redirect should those hosts ever point here.
 - `/ondera` and `/ondera/*` redirect to `/ryolune` (its name before 0.11).

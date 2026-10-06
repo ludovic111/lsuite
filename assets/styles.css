@@ -146,13 +146,15 @@ p { margin: 0; text-wrap: pretty; }
 .nav__gh:hover { color: var(--text); background: var(--surface-2); }
 .nav__gh svg { width: 18px; height: 18px; }
 
+@media (max-width: 900px) {
+  .nav__end .nav__get { display: none; }
+}
 @media (max-width: 720px) {
   .nav__in { gap: 12px; }
   .nav__apps a { padding: 6px 8px; font-size: 13px; }
   .nav__apps .dot { display: none; }
   .nav__apps .badge { display: none; }
   .brand span { display: none; }
-  .nav__end .nav__get { display: none; }
   .btn--sponsor { padding: 0 11px; }
 }
 
@@ -232,6 +234,7 @@ p { margin: 0; text-wrap: pretty; }
 .hero__in { display: grid; gap: 26px; justify-items: start; }
 .hero--center .hero__in { justify-items: center; text-align: center; }
 .hero--center .lede { margin-inline: auto; }
+.hero--coming-soon { min-height: calc(100svh - 60px); display: grid; align-items: center; }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
 .hero--center .hero__actions { justify-content: center; }
 .hero__fine { margin-top: 2px; }
@@ -245,7 +248,7 @@ p { margin: 0; text-wrap: pretty; }
 }
 .pill svg { width: 14px; height: 14px; }
 
-/* "Coming soon": an app not released yet. A state, not the accent: neutral text and the same
+/* App status (coming soon or beta). Neutral text and the same
    hollow ring as .soon in the tables. --sm (nav, footer, cards) drops the ring. */
 .badge {
   display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 11px; border-radius: 999px;

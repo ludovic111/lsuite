@@ -30,22 +30,24 @@ test('platform from the user agent', () => {
   assert.equal(osFor('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'), null);
 });
 
-test('ryolune downloads map to fixed asset names', async () => {
-  const base = 'https://github.com/ludovic111/ryolune/releases/latest';
-  assert.equal(await downloadTarget('ryolune', 'linux-x86_64'), `${base}/download/ryolune-linux-x86_64.zip`);
-  assert.equal(await downloadTarget('ryolune', undefined, 'Macintosh'), `${base}/download/ryolune-macos-arm64.zip`);
-  assert.equal(await downloadTarget('ryolune', 'nope'), base);
+test('unknown kimchi platforms land on its public releases', async () => {
   assert.equal(await downloadTarget('kimchi', 'nope'), 'https://github.com/ludovic111/kimchi/releases/latest');
 });
 
-test('zenith is coming soon: download links land on its page, which offers none', async () => {
-  assert.equal(await downloadTarget('zenith', 'macos-arm64'), '/zenith');
-  assert.equal(await downloadTarget('zenith', undefined, 'Macintosh'), '/zenith');
-  const html = await renderPage('zenith/index.html', 'https://lsuite.xyz', {});
-  assert.ok(html.includes('Coming soon'));
-  assert.ok(!/zenith\/download|data-download|Download zenith/.test(html));
-  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8' });
-  assert.ok(!home.includes('/zenith/download'));
+test('coming-soon apps send old downloads to their summaries without private repository links', async () => {
+  for (const app of ['ryolune', 'zenith']) {
+    for (const platform of [undefined, 'macos-arm64', 'macos-x86_64', 'windows-x86_64', 'linux-x86_64', 'nope']) {
+      assert.equal(await downloadTarget(app, platform, 'Macintosh'), `/${app}`);
+    }
+    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', {});
+    assert.ok(html.includes('Coming soon'));
+    assert.equal([...html.matchAll(/<p\b/g)].length, 1, `${app}: one summary paragraph`);
+    assert.ok(!/\/download|data-download|softwareVersion|downloadUrl/.test(html));
+  }
+  for (const page of ['index.html', 'kimchi/index.html', 'ryolune/index.html', 'zenith/index.html']) {
+    const html = await renderPage(page, 'https://lsuite.xyz', { kimchi: '8.8.8' });
+    assert.ok(!/github\.com\/ludovic111\/(ryolune|zenith)|\/(ryolune|zenith)\/download/.test(html), page);
+  }
 });
 
 test('donations only go to https', () => {
@@ -54,7 +56,7 @@ test('donations only go to https', () => {
   assert.equal(supportTarget(undefined), 'https://github.com/sponsors/ludovic111');
 });
 
-test('pages are rendered with the nav, the footer and the current app', async () => {
+test('pages are rendered with their includes and the current app', async () => {
   for (const app of ['ryolune', 'kimchi', 'zenith']) {
     const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
     assert.ok(!/%VERSION:/.test(html), `${app}: versions filled`);
