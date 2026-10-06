@@ -145,19 +145,21 @@ p { margin: 0; text-wrap: pretty; }
 }
 @media (max-width: 560px) {
   .nav__in { gap: 8px; }
-  .nav__apps { overflow-x: auto; scrollbar-width: none; min-width: 0; }
-  .nav nav { min-width: 0; flex: 1; }
   .nav__end .nav__gh, .nav__end .btn--sponsor { display: none; }
   .nav__apps a { padding: 6px 6px; }
   .nav__ai { margin-left: 2px; padding-left: 4px; }
   .nav__end .nav__account { padding: 0 10px; }
 }
-@media (max-width: 720px) {
+/* Five apps and AI: badges go first, then the list scrolls sideways. */
+@media (max-width: 1120px) {
+  .nav__apps .dot, .nav__apps .badge { display: none; }
+}
+@media (max-width: 900px) {
   .nav__in { gap: 12px; }
+  .nav nav { min-width: 0; flex: 1; }
+  .nav__apps { overflow-x: auto; scrollbar-width: none; min-width: 0; }
   .nav__apps a { padding: 6px 8px; font-size: 13px; }
-  .nav__apps .dot { display: none; }
-  .nav__apps .badge { display: none; }
-  .btn--sponsor { padding: 0 11px; }
+  .nav__end .btn--sponsor { padding: 0 11px; }
   .btn--sponsor span { display: none; }
 }
 
