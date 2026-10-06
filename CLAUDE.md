@@ -14,8 +14,9 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   Open Graph images were removed (in git history before 2026-10-06); the home cards carry no icon
   and ryolune's no capture. The lsuite logo is gone from the nav, footer and favicon (a plain grain
   tile). When an app moves to v2, write its page again in the v2 look with new captures and icon.
-- ryolune and zenith repositories are private. Their old download routes redirect to their
-  coming-soon pages, and only kimchi has public source links and release-version lookups.
+- ryolune and zenith are "coming soon" on the site by choice (one paragraph, no download), although their
+  repositories are public and publish releases on GitHub (ryolune 0.14.0, zenith 0.3.0 on 2026-10-06). Their old
+  download routes redirect to their coming-soon pages; only kimchi has source links and release-version lookups here.
 - Earlier completed notes below describe the previous pages; keep the current availability
   above unless explicitly asked to change it.
 
