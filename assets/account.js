@@ -4,7 +4,7 @@
 
 const page = document.body.dataset.page;
 const params = new URLSearchParams(location.search);
-const APP_NAMES = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori' };
+const APP_NAMES = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori', folio: 'folio' };
 let plans = [];
 
 async function api(path, body) {

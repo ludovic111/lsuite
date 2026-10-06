@@ -1,21 +1,21 @@
 # lsuite
 
-The site of **lsuite** (written in lowercase), at [lsuite.xyz](https://lsuite.xyz): a free,
-open-source creative suite whose apps can be driven end to end by an AI agent.
+The site of **lsuite** (written in lowercase), at [lsuite.xyz](https://lsuite.xyz): every kind of
+creative and office tool, combined, free and open source, and driven by your agent. Five apps, all
+in beta:
 
-| App | On the site | Page | Repository and releases |
+| App | Kind | Page | Repository and releases |
 | --- | --- | --- | --- |
-| ryolune · music | coming soon | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) (0.14.0) |
-| kimchi · video | beta | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) (0.9.x) |
-| zenith · code | coming soon | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) (0.3.0) |
+| ryolune | music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) (0.14.x) |
+| kimchi | video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) (0.9.x) |
+| zenith | code | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) (0.3.x) |
+| nori | image and design (Photoshop + Illustrator + InDesign in one document) | `/nori` | not on GitHub yet: "First build coming" |
+| folio | office (documents, spreadsheets, presentations) | `/folio` | not on GitHub yet: "First build coming" |
 
-kimchi is the app the site offers. Its page covers the beta: 0.9.0 brought design system v2, an
-agent that looks at what it renders, conversations and memory per project, steering an agent
-while it works, sound generation and the Studio's modelling workbench; 0.9.1 adds other editors'
-projects, looks, a first-run setup and more agent providers. ryolune and zenith are coming soon on
-the site by choice, while work focuses on kimchi: their pages show one line (name, kind, Coming
-soon), the nav and footer mark them "soon", and the site offers no download for them. Their
-repositories are public and publish releases on GitHub all the same.
+The apps are free and MIT licensed. The one thing lsuite sells is optional: **lsuite AI**
+([AI.md](AI.md)), agents that work in every app without setup, a demo for now (no payment is
+taken), served by this site (`ai.js`) with its pages at `/ai` and `/account`. Every app has
+plugins ([PLUGINS.md](PLUGINS.md)), and [STANDARD.md](STANDARD.md) is the contract they all meet.
 
 Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
 
@@ -34,13 +34,17 @@ npm test
 - `assets/` is the only static folder: `styles.css` (every page, built on the design system's
   `/design/tokens.css`, loaded first; `data-app` on `<html>` picks the app's color, light and dark
   follow the system), `main.js` (reveals, "Download for your OS", copy buttons, and the ryolune
-  theme gallery, unused while ryolune's page is empty), fonts (Chakra Petch, IBM Plex Mono, OFL)
+  theme gallery, unused for now), fonts (Chakra Petch, IBM Plex Mono, OFL)
   and images.
+- `ai/index.html` is `/ai`; `account/index.html`, `account/connect.html` and
+  `account/checkout.html` are the account pages (`assets/account.js`, the only script they run;
+  `<!-- include:plans -->` is filled from the plans of `ai.js`). `/account/connect` and
+  `/account/checkout` stay out of the sitemap.
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
 - `%VERSION:<app>%` becomes the version of the app's latest published GitHub release (cached
   10 min, `FALLBACK_VERSIONS` when GitHub cannot be reached), so a page never announces a version
-  that cannot be downloaded yet. Only kimchi is looked up (`REPOS` in `server.js`); the
-  coming-soon pages ask for no version.
+  that cannot be downloaded yet. ryolune, kimchi and zenith are looked up (`REPOS` in
+  `server.js`); nori and folio ask for no version until their first release.
 - CSP is `'self'` only: no inline scripts, no third-party requests.
 
 ## Design system
@@ -54,9 +58,9 @@ are under `/design/`.
 
 | Path | Does |
 | --- | --- |
-| `/ryolune/download[/<platform>]` | 302 to `/ryolune`: ryolune is coming soon on the site (its releases are on GitHub). |
-| `/kimchi/download[/<platform>]` | 302 to the matching asset of kimchi's latest release, looked up on the GitHub API (cached 10 min): `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm`. Without a platform, the visitor's OS picks one. A platform with no matching asset goes to the release page: the native app ships no MSI or RPM, so `windows-msi` and `linux-rpm` land there. |
-| `/zenith/download[/<platform>]` | 302 to `/zenith`: zenith is coming soon on the site (its releases are on GitHub). |
+| `/<app>/download[/<platform>]` | 302 to the matching asset of the app's latest release on GitHub (`DOWNLOADS` in `server.js`, looked up on the GitHub API, cached 10 min); without a platform the visitor's OS picks one; a platform with no matching asset goes to the release page. ryolune: `macos-arm64`, `macos-x86_64` (.zip), `windows-x86_64` (.exe), `windows-zip`, `linux-x86_64` (.tar.gz). kimchi: `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm` (the native app ships no MSI or RPM, so those land on the release page). zenith: `macos-arm64`, `macos-x86_64`, `linux-x86_64`. nori and folio (`published: false`): 302 to their pages. |
+| `/api/ai/…`, `/api/account/…` | lsuite AI and accounts (AI.md, `ai.js`): JSON, Anthropic-compatible `/api/ai/v1/messages`. `LSUITE_DATA_DIR` holds `accounts.json` (in memory when unset); `LSUITE_ANTHROPIC_API_KEY` makes model requests real (a demo answer without it). |
+| `/ai`, `/account`, `/account/connect`, `/account/checkout` | lsuite AI and the account pages (session cookie `lsuite_session`, HttpOnly, SameSite=Lax). |
 | `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
 | `/health` | `ok`, for Railway's health check. |
 | `/robots.txt`, `/sitemap.xml` | Generated for the request's origin. |
@@ -68,7 +72,7 @@ are under `/design/`.
 - **ryolune.com** is a Porkbun URL forward (permanent 301, path included, wildcard so www
   follows) to `https://lsuite.xyz/ryolune`: `ryolune.com/support` → `/ryolune/support`,
   `ryolune.com/download/macos-arm64` → `/ryolune/download/macos-arm64`, and the browser keeps
-  URL fragments. The coming-soon page no longer has the old feature or download sections. Its DNS is
+  URL fragments. The ryolune page has its download section again (`#downloads`). Its DNS is
   Porkbun's forwarder (ALIAS and `*` CNAME to `uixie.porkbun.com`); no Railway service is involved.
   `MOVED_HOSTS` in `server.js` does the same redirect should those hosts ever point here.
 - `/ondera` and `/ondera/*` redirect to `/ryolune` (its name before 0.11).
@@ -81,8 +85,10 @@ are under `/design/`.
 The copy is written from each app's README and release notes. When an app ships: versions update by themselves;
 update what's new, features and screenshots. On kimchi's page that is "New in 0.x", the command
 count and a new card on top of the changelog (`#changelog`, from `../kimchi/CHANGELOG.md`, with
-`release--now` moved to it). The ryolune and zenith pages stay one line until those apps wear
-design system v2; then they are written again in the v2 look, with new captures and icons.
+`release--now` moved to it). Every app page has a changelog (`#changelog`) with `release--now` on the newest card.
+Placeholders still waiting for the app agents' captures are marked `shot--soon` with
+`data-capture="<app>/<file>"` (and `card__shot--soon` on the home cards): replace each with a
+`<picture>` like kimchi's hero.
 Screenshots live in `assets/img/<app>/` (2000x1250 WebP, dark and `-light`,
 `magick shot.png -quality 76 shot.webp`). kimchi's come from the real app on a
 virtual screen: `vscreen size 2000x1250`, then `vscreen start target/debug/kimchi` with

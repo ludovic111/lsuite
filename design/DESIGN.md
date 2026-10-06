@@ -5,8 +5,7 @@ rounded, surfaces that cast hard shadows, and a page of film grain and dithered 
 chrome. The apps are told apart by their names and their work, not by a color. See it live at
 **lsuite.xyz/design** (`design/index.html`).
 
-kimchi wears v2 first (from its next release). ryolune and zenith still wear v1 (frosted glass, one signature color
-per app); their pages on the site stay empty until they move over.
+kimchi (0.9) and ryolune (0.14) wear v2; zenith moves to it in 0.4; nori and folio are born in it.
 
 - **Source**: `design/tokens.json`. **Generated**: `design/tokens.css` (`node design/build.mjs`).
   Web UIs copy `tokens.css` and use the `--ls-*` variables; Rust or native code reads
@@ -78,7 +77,9 @@ docked areas are hairlines (`--ls-line`). `prefers-reduced-transparency` makes e
 The app's mark, in one ink with one dithered part, white on a near-black tile (the macOS icon grid:
 824 px continuous-corner tile on 1024, the platform's shape), with a corner of dithered light like
 the page. Marks: kimchi's napa stalk cut square, a sharp leaf and a leaf dissolving into dither
-(kimchi `scripts/gen-mark.py`). ryolune and zenith get theirs when they move to v2.
+(kimchi `scripts/gen-mark.py`); ryolune's ring and dot cut square, its shadow side in dither
+(ryolune `scripts/gen-mark.py`); zenith's Z cut square, its foot in dither (zenith
+`scripts/gen-mark.py`). nori and folio get theirs with their first builds.
 
 ## Accessibility
 

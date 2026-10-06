@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { hostRedirect, osFor, supportTarget, downloadTarget, renderPage, handle } from '../server.js';
+import { hostRedirect, osFor, supportTarget, downloadTarget, renderPage, handle, DOWNLOADS } from '../server.js';
 
 test('ryolune.com lands on the ryolune page, path and query kept', () => {
   assert.equal(hostRedirect('ryolune.com', '/', 'lsuite.xyz'), 'https://lsuite.xyz/ryolune');
@@ -30,26 +30,35 @@ test('platform from the user agent', () => {
   assert.equal(osFor('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'), null);
 });
 
-test('unknown kimchi platforms land on its public releases', async () => {
-  assert.equal(await downloadTarget('kimchi', 'nope'), 'https://github.com/ludovic111/kimchi/releases/latest');
-});
-
-test('coming-soon apps send old downloads to their empty pages without private repository links', async () => {
-  for (const app of ['ryolune', 'zenith']) {
-    for (const platform of [undefined, 'macos-arm64', 'macos-x86_64', 'windows-x86_64', 'linux-x86_64', 'nope']) {
+test('download routes of every app: released apps to GitHub, unreleased ones to their pages', async () => {
+  for (const app of ['ryolune', 'kimchi', 'zenith']) {
+    assert.equal(await downloadTarget(app, 'nope'), `https://github.com/ludovic111/${app}/releases/latest`, app);
+  }
+  for (const app of ['nori', 'folio']) {
+    for (const platform of [undefined, 'macos-arm64', 'windows-x86_64', 'linux-x86_64', 'nope']) {
       assert.equal(await downloadTarget(app, platform, 'Macintosh'), `/${app}`);
     }
     const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', {});
-    assert.ok(html.includes('Coming soon'));
-    // Empty until the app wears design v2: its name and status, no summary and no logo.
-    assert.equal([...html.matchAll(/<p\b/g)].length, 0, `${app}: an empty page`);
-    assert.ok(!html.includes('appid__mark'), `${app}: no logo`);
-    assert.ok(!/\/download|data-download|softwareVersion|downloadUrl/.test(html));
+    assert.ok(html.includes('First build coming'), app);
+    assert.ok(!/data-download|softwareVersion|%VERSION/.test(html), `${app}: no version, no download yet`);
   }
-  for (const page of ['index.html', 'kimchi/index.html', 'ryolune/index.html', 'zenith/index.html']) {
-    const html = await renderPage(page, 'https://lsuite.xyz', { kimchi: '8.8.8' });
-    assert.ok(!/github\.com\/ludovic111\/(ryolune|zenith)|\/(ryolune|zenith)\/download/.test(html), page);
+  // The route table is ready for each app's repository.
+  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) assert.equal(DOWNLOADS[app].repo, `ludovic111/${app}`);
+  assert.equal(await downloadTarget('photoshop', 'macos-arm64'), null);
+});
+
+test('beta apps: every page says Beta, the nav lists all five, nothing says coming soon', async () => {
+  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) {
+    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
+    assert.ok(html.includes('<span class="badge">Beta</span>'), app);
+    assert.ok(!/coming soon/i.test(html), `${app}: no "coming soon"`);
+    for (const other of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) assert.ok(html.includes(`href="/${other}" data-app="${other}"`), `${app}: nav has ${other}`);
+    assert.ok(html.includes('id="changelog"'), `${app}: changelog`);
+    assert.ok(html.includes('id="ai"') || app === 'zenith', `${app}: lsuite AI`);
   }
+  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
+  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) assert.ok(home.includes(`class="card app-${app}`), `home card ${app}`);
+  assert.ok(!/coming soon/i.test(home));
 });
 
 test('donations only go to https', () => {
@@ -59,7 +68,7 @@ test('donations only go to https', () => {
 });
 
 test('pages are rendered with their includes and the current app', async () => {
-  for (const app of ['ryolune', 'kimchi', 'zenith']) {
+  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) {
     const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
     assert.ok(!/%VERSION:/.test(html), `${app}: versions filled`);
     assert.ok(!html.includes('<!-- include:'), `${app}: includes filled`);

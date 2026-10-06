@@ -37,6 +37,8 @@ export const PAGES = {
   '/ryolune': 'ryolune/index.html',
   '/kimchi': 'kimchi/index.html',
   '/zenith': 'zenith/index.html',
+  '/nori': 'nori/index.html',
+  '/folio': 'folio/index.html',
   '/ai': 'ai/index.html',
   '/account': 'account/index.html',
   '/account/connect': 'account/connect.html',
@@ -104,21 +106,74 @@ export function osFor(userAgent = '') {
   return null;
 }
 
-// kimchi's file names carry the version (Tauri bundles), so the latest release is looked up.
-const KIMCHI = {
-  repo: 'ludovic111/kimchi',
-  releases: 'https://github.com/ludovic111/kimchi/releases/latest',
-  patterns: {
-    'macos-arm64': /_aarch64\.dmg$/,
-    'macos-x86_64': /_x64\.dmg$/,
-    'windows-x86_64': /_x64-setup\.exe$/,
-    'windows-msi': /_x64_en-US\.msi$/,
-    'linux-appimage': /_amd64\.AppImage$/,
-    'linux-deb': /_amd64\.deb$/,
-    'linux-rpm': /\.x86_64\.rpm$/,
+/**
+ * Each app's downloads: its repository, an asset pattern per platform, and the platform each OS
+ * gets by default. `/<app>/download/<platform>` looks the asset up in the latest published
+ * release; a platform with no matching asset goes to the release page. `published: false` keeps an
+ * app's route table ready before its first release (the route lands on the app's page).
+ */
+export const DOWNLOADS = {
+  // ryolune's and zenith's file names are stable (no version), kimchi's carry it (Tauri bundles).
+  ryolune: {
+    repo: 'ludovic111/ryolune',
+    patterns: {
+      'macos-arm64': /\/ryolune-macos-arm64\.zip$/,
+      'macos-x86_64': /\/ryolune-macos-x86_64\.zip$/,
+      'windows-x86_64': /\/ryolune-windows-x86_64\.exe$/,
+      'windows-zip': /\/ryolune-windows-x86_64\.zip$/,
+      'linux-x86_64': /\/ryolune-linux-x86_64\.tar\.gz$/,
+    },
+    byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
   },
-  byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-appimage' },
+  kimchi: {
+    repo: 'ludovic111/kimchi',
+    patterns: {
+      'macos-arm64': /_aarch64\.dmg$/,
+      'macos-x86_64': /_x64\.dmg$/,
+      'windows-x86_64': /_x64-setup\.exe$/,
+      'windows-msi': /_x64_en-US\.msi$/,
+      'linux-appimage': /_amd64\.AppImage$/,
+      'linux-deb': /_amd64\.deb$/,
+      'linux-rpm': /\.x86_64\.rpm$/,
+    },
+    byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-appimage' },
+  },
+  zenith: {
+    repo: 'ludovic111/zenith',
+    patterns: {
+      'macos-arm64': /\/zenith-macos-arm64\.zip$/,
+      'macos-x86_64': /\/zenith-macos-x86_64\.zip$/,
+      'linux-x86_64': /\/zenith-linux-x86_64\.tar\.gz$/,
+    },
+    byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
+  },
+  // No repository on GitHub yet: the first build is coming. When ludovic111/nori publishes a
+  // release with these names, set `published: true` (and add nori to REPOS for its version).
+  nori: {
+    repo: 'ludovic111/nori',
+    published: false,
+    patterns: {
+      'macos-arm64': /\/nori-macos-arm64\.(zip|dmg)$/,
+      'macos-x86_64': /\/nori-macos-x86_64\.(zip|dmg)$/,
+      'windows-x86_64': /\/nori-windows-x86_64\.(exe|zip)$/,
+      'linux-x86_64': /\/nori-linux-x86_64\.(tar\.gz|AppImage)$/,
+    },
+    byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
+  },
+  // The office app: no repository on GitHub yet either (ludovic111/folio when it ships).
+  folio: {
+    repo: 'ludovic111/folio',
+    published: false,
+    patterns: {
+      'macos-arm64': /\/folio-macos-arm64\.(zip|dmg)$/,
+      'macos-x86_64': /\/folio-macos-x86_64\.(zip|dmg)$/,
+      'windows-x86_64': /\/folio-windows-x86_64\.(exe|zip)$/,
+      'linux-x86_64': /\/folio-linux-x86_64\.(tar\.gz|AppImage)$/,
+    },
+    byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
+  },
 };
+export const APP_NAMES = Object.keys(DOWNLOADS);
 
 const releaseCache = new Map();
 /** A repository's latest published release (`tag`, asset `urls`), cached for ten minutes. */
@@ -142,9 +197,9 @@ async function latestRelease(repo) {
 
 // Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
 // latest published release, so the page never announces a version you cannot download yet.
-// ryolune and zenith are coming soon: no page asks for their versions.
-const FALLBACK_VERSIONS = { kimchi: '0.1.0' };
-const REPOS = { kimchi: 'ludovic111/kimchi' };
+// nori and folio have no release yet: no page asks for their versions.
+const FALLBACK_VERSIONS = { ryolune: '0.14.0', kimchi: '0.9.1', zenith: '0.3.0' };
+const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith' };
 
 /** `{ app: version }` for every app whose version a page asks for. */
 export async function appVersions(apps) {
@@ -160,16 +215,15 @@ export async function appVersions(apps) {
 
 /** Where `/<app>/download[/<platform>]` sends the visitor. */
 export async function downloadTarget(app, wanted, userAgent) {
-  // Coming-soon apps aren't offered for download yet: old download links land on their pages.
-  if (app === 'ryolune' || app === 'zenith') return `/${app}`;
-  if (app === 'kimchi') {
-    const platform = wanted || KIMCHI.byOs[osFor(userAgent)];
-    const pattern = KIMCHI.patterns[platform];
-    if (!pattern) return KIMCHI.releases;
-    const url = (await latestRelease(KIMCHI.repo)).urls.find((u) => pattern.test(u));
-    return url ?? KIMCHI.releases;
-  }
-  return null;
+  const d = DOWNLOADS[app];
+  if (!d) return null;
+  // Not released yet: the download link lands on the app's page ("First build coming").
+  if (d.published === false) return `/${app}`;
+  const releases = `https://github.com/${d.repo}/releases/latest`;
+  const pattern = d.patterns[wanted || d.byOs[osFor(userAgent)]];
+  if (!pattern) return releases;
+  const url = (await latestRelease(d.repo)).urls.find((u) => pattern.test(u));
+  return url ?? releases;
 }
 
 /**
@@ -301,7 +355,7 @@ function originOf(req) {
 }
 
 async function notFound(req, res) {
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Not found · lsuite</title><link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml"><link rel="stylesheet" href="/design/tokens.css"><link rel="stylesheet" href="/assets/styles.css"></head><body>${(await readFile(join(ROOT, 'partials', 'nav.html'), 'utf8')).trim()}<main id="content" class="hero hero--center" style="min-height:60vh"><div class="hero__glow"></div><div class="wrap hero__in"><span class="eyebrow eyebrow--plain">404</span><h1 class="h2">Nothing at this address.</h1><p class="lede">Maybe one of the apps?</p><div class="hero__actions"><a class="btn btn--primary" href="/">lsuite home</a><a class="btn" href="/ryolune">ryolune</a><a class="btn" href="/kimchi">kimchi</a><a class="btn" href="/zenith">zenith</a></div></div></main></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Not found · lsuite</title><link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml"><link rel="stylesheet" href="/design/tokens.css"><link rel="stylesheet" href="/assets/styles.css"></head><body>${(await readFile(join(ROOT, 'partials', 'nav.html'), 'utf8')).trim()}<main id="content" class="hero hero--center" style="min-height:60vh"><div class="hero__glow"></div><div class="wrap hero__in"><span class="eyebrow eyebrow--plain">404</span><h1 class="h2">Nothing at this address.</h1><p class="lede">Maybe one of the apps?</p><div class="hero__actions"><a class="btn btn--primary" href="/">lsuite home</a><a class="btn" href="/ryolune">ryolune</a><a class="btn" href="/kimchi">kimchi</a><a class="btn" href="/zenith">zenith</a><a class="btn" href="/nori">nori</a><a class="btn" href="/folio">folio</a></div></div></main></body></html>`;
   send(res, 404, html, TYPES['.html'], 'no-store', req);
 }
 
@@ -350,9 +404,9 @@ export async function handle(req, res) {
     return send(res, 200, html, TYPES['.html'], 'no-cache', req);
   }
 
-  const download = /^\/(ryolune|kimchi|zenith)\/download(?:\/([\w-]+))?$/.exec(pathname);
+  const download = /^\/(ryolune|kimchi|zenith|nori|folio)\/download(?:\/([\w-]+))?$/.exec(pathname);
   if (download) return redirect(res, 302, await downloadTarget(download[1], download[2], req.headers['user-agent']));
-  if (/^\/(?:(?:ryolune|kimchi|zenith)\/)?support$/.test(pathname)) {
+  if (/^\/(?:(?:ryolune|kimchi|zenith|nori|folio)\/)?support$/.test(pathname)) {
     return redirect(res, 302, supportTarget());
   }
   if (pathname === '/favicon.ico') return redirect(res, 301, '/assets/img/lsuite.svg', 'public, max-age=86400');

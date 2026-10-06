@@ -1,14 +1,18 @@
 # The lsuite standard
 
-lsuite (always lowercase) is a free, open-source creative suite: **ryolune** (music),
-**kimchi** (video), **zenith** (code: a Mac app for coding with agents, coming soon). Like a creative suite you pay for,
+lsuite (always lowercase) combines every kind of creative and office tool, free and open source:
+**ryolune** (music), **kimchi** (video), **zenith** (code: an app for coding with agents),
+**nori** (image and design: photo editing, vector illustration and page layout in one document)
+and **folio** (office: documents, spreadsheets and presentations). Like the suites you pay for,
 but MIT licensed, written in Rust, and **every app can be driven end to end by an AI agent**.
 
 | App | Repository | Local folder (next to this repo) |
 | --- | --- | --- |
 | ryolune · music · the reference implementation | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) | `../ryolune` |
 | kimchi · video | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) | `../kimchi` |
-| zenith · code · coming soon | [ludovic111/zenith](https://github.com/ludovic111/zenith) | `../zenith` |
+| zenith · code | [ludovic111/zenith](https://github.com/ludovic111/zenith) | `../zenith` |
+| nori · image and design | `ludovic111/nori` (not published yet) | `../nori` |
+| folio · office | `ludovic111/folio` (not published yet) | `../folio` |
 
 This file is the contract every app meets. Each app's `CLAUDE.md` has an "lsuite" section with
 the gaps that app still has against it. When an app closes a gap, update its section and the
@@ -58,7 +62,7 @@ The apps are separate programs but must be usable as one suite, by a person and 
 - **Discovery.** Each app writes `~/.lsuite/apps/<app>.json` when it starts, and the others read
   that folder to know what is installed and how to drive it (`LSUITE_HOME` replaces `~/.lsuite`).
   Format 1 (kimchi's `kimchi-control/src/discovery.rs`, zenith's `zenith-commands/src/lsuite.rs`):
-  `format` (1), `app`, `version`, `kind` (`music`, `video`, `code`), absolute paths `appPath`,
+  `format` (1), `app`, `version`, `kind` (`music`, `video`, `code`, `image`, `office`), absolute paths `appPath`,
   `executable`, `cli`, `mcp` (the MCP server's program, run with `--live`), `dataDir`, optional
   `documents` (`{extensions, description}`), `running` (`{pid, port?, controlFile?, since}` while
   the app runs, else `null`; check the pid is alive) and `updatedAt`. Readers ignore unknown
@@ -80,7 +84,9 @@ The apps are separate programs but must be usable as one suite, by a person and 
 - Name in lowercase everywhere. README starts with "Part of [lsuite](https://lsuite.xyz)" and links
   `https://lsuite.xyz/<app>`. GitHub "website" field is that page.
 - Support/donate links go to `https://lsuite.xyz/<app>/support` (redirects to GitHub Sponsors).
-  Donations only: nothing is ever sold, no account, no telemetry.
+- **The apps are free**, every feature, for everyone, with no account. The one thing lsuite sells
+  is optional: an **lsuite AI** subscription (section 9). Still **no telemetry**: an app talks to
+  lsuite only when the person signed in to lsuite AI and asked the agent something.
 - The app's page lives in the lsuite repo (`<app>/index.html`). **Each release updates it**:
   version, what changed, screenshots (`assets/img/<app>/`), download notes.
 
@@ -102,21 +108,44 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 - Every area titled like a sidebar, tools boxed by kind, switches always in view.
 - Chakra Petch + IBM Plex Mono, shared spacing and motion, dark and light, tested contrast.
 - App icons: the mark in one ink, white on a near-black tile with a corner of dithered light.
-- v1 (frosted glass, one signature color per app) is what ryolune and zenith still wear; their
-  site pages stay empty until they move to v2.
+- ryolune wears v2 since 0.14; zenith moves to v2 in 0.4 (its new mark is a Z); nori and folio are
+  born in v2.
 
-## Status (2026-10-02)
+## 8. Plugins
 
-| | ryolune | kimchi | zenith (coming soon) |
-| --- | --- | --- | --- |
-| Command registry, one undo | ✅ | ✅ 200 commands, one undo history | ✅ 52 `family.verb` commands (`zenith-commands`) shared by the window, CLI and MCP, git, pull requests and terminals included; undo is per turn (`thread.revert`) |
-| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | ✅ `zenith-cli` |
-| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live`, and `/mcp` handed to each thread's agent |
-| Built-in agent | ✅ | ✅ Agent panel (Claude Code, Codex, API keys, Ollama) | ✅ Claude Code and Codex threads |
-| Signed auto-update | ✅ | ✅ own updater (same key and `latest.json` as the Tauri builds) | Coming soon: in-app updater, Ed25519-signed `SHA256SUMS`, built in the repo; nothing offered until zenith is ready |
-| Release binaries, all platforms | ✅ notarized macOS | ✅ notarized macOS (Apple Silicon, Intel), Windows, Linux | Coming soon: no download on the site (taken down 2026-10-02) until zenith is ready |
-| Rust core | ✅ native window (GPUI) | ✅ native window (GPUI), no web UI | ✅ server (`crates/zenith-code`) and native window (GPUI, `crates/zenith-app`); React interface kept for the browser |
-| Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ✅ writes `zenith.json`, reads the others (format 1) |
-| Hand-offs | ✅ to and from kimchi (`export.toKimchi`, `session.scoreCut`, `handoff.inbox`) | ✅ Ryolune songs/stems, editable audio sessions and `handoff.*` through the bridge | partly: hands the other apps' MCP servers to its agents |
-| README / site / support links (site on the design system) | ✅ | ✅ | ✅ page marked Coming soon, no download |
-| lsuite design system (`design/`) | v1: GPUI on the v1 tokens (glass, teal, dark/light, contrast test, icon); v2 to do | ✅ v2: black and white, square, grain, Chakra Petch/Plex, titled areas and grouped tools, one-ink mark and icon, contrast test (next release) | v1: native window and web interface on the v1 tokens; v2 to do |
+Every app has plugins: its stock plugins, the plugin formats of its trade it can really load
+(each shown with its maker's logo), and plugins written in Rust that a person gets by asking their
+agent. One **Plugins** area per app (Stock, Installed, Formats, Build with your agent), the same
+`plugin.*` commands in every app, a frozen `repr(C)` SDK per app, bundles in
+`~/.lsuite/plugins/<app>/`. The contract: [PLUGINS.md](PLUGINS.md).
+
+## 9. lsuite AI
+
+One account for the whole suite (`~/.lsuite/account.json`), signed in through the browser with a
+loopback redirect, and an Anthropic-compatible endpoint on lsuite.xyz, so an app reaches it with
+the Anthropic provider it already has. lsuite AI is the first provider in every agent ("No setup.
+Sign in and your agent works."), with `account.*` commands; bringing your own stays free and is
+never pushed aside, and a used-up allowance is said in one line, never a silent switch. A demo for
+now: no payment is taken. The contract: [AI.md](AI.md).
+
+## Status (2026-10-07)
+
+All five apps are in beta on the site. nori and folio are being built (first builds coming); the
+plugin and lsuite AI rows describe tonight's work in progress until each app's release says
+otherwise.
+
+| | ryolune | kimchi | zenith | nori | folio |
+| --- | --- | --- | --- | --- | --- |
+| Command registry, one undo | ✅ 224 commands | ✅ 229 commands, one undo history | ✅ 64 `family.verb` commands shared by the window, CLI and MCP; undo is per turn (`thread.revert`) | being built (`nori-control`) | being built |
+| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | ✅ `zenith-cli` | being built (`nori-cli`) | being built |
+| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live`, and `/mcp` handed to each thread's agent | being built (`nori-mcp`) | being built |
+| Built-in agent | ✅ 14 providers, Zenith · lsuite | ✅ Agent panel (Claude Code, Codex, API keys, Gemini, Bedrock, Ollama…) | ✅ Claude Code and Codex threads | being built (`nori-agent`) | being built |
+| Signed auto-update | ✅ Ed25519-signed `SHA256SUMS` | ✅ own updater (same key and `latest.json` as the Tauri builds) | ✅ Ed25519-signed `SHA256SUMS` | to do | to do |
+| Release binaries | ✅ notarized macOS, Windows, Linux | ✅ notarized macOS (Apple silicon, Intel), Windows, Linux | ✅ notarized macOS (Apple silicon, Intel), Linux | first build coming | first build coming |
+| Rust core | ✅ native window (GPUI) | ✅ native window (GPUI), no web UI | ✅ server and native window (GPUI); React interface kept for the browser | GPUI, tiled renderer | GPUI |
+| Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ✅ writes `zenith.json`, reads the others | to do | to do |
+| Hand-offs | ✅ to and from kimchi | ✅ ryolune songs, stems and sessions | partly: `lsuite.run`, the other apps' MCP servers for its agents | to do | to do |
+| Plugins (PLUGINS.md) | 35 stock, CLAP, VST3, AU, native SDK `ryolune-plugin`; Plugins area and agent recipe in 0.15 | ryolune's audio plugins, LUTs; `kimchi-plugin` and the agent recipe in 0.10 | `zenith-plugin` in 0.4 | `nori-plugin` (filters on RGBA f32 tiles) | to do |
+| lsuite AI (AI.md) | in 0.15 | in 0.10 | in 0.4 | in 0.1 | in 0.1 |
+| Site page | ✅ beta, download | ✅ beta, download | ✅ beta, download | ✅ beta, "First build coming" | ✅ beta, "First build coming" |
+| Design system v2 | ✅ since 0.14 | ✅ since 0.9 | in 0.4 (new Z mark) | ✅ from the start | ✅ from the start |

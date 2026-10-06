@@ -60,7 +60,7 @@
         <div><b>15</b><span>model providers, cloud and local</span></div>
         <div><b>24</b><span>motion templates, 2D and 3D</span></div>
         <div><b>200</b><span>commands, for you and your AI alike</span></div>
-        <div><b>0</b><span>accounts, subscriptions, telemetry</span></div>
+        <div><b>0</b><span>telemetry. No account needed</span></div>
       </div>
     </div>
   </section>
@@ -167,7 +167,7 @@
         <span class="eyebrow">Agents and scripts</span>
         <h2 class="h2 reveal" id="agent-title">Your AI can cut too.</h2>
         <p class="lede reveal" style="--d:1">Everything you can do in the window is a named command, and the window, the built-in agent, <code>kimchi-cli</code> and <code>kimchi-mcp</code> all use the same ones, with one undo history. Claude Code, Codex or any MCP client can drive the open project live; scripts can work on a project file without the app.</p>
-        <p class="muted reveal" style="--d:2">The Agent panel runs the model you already have (Claude Code, Codex, an Anthropic or OpenAI key, or a local Ollama model), shows one card per command and reverts a whole run in one click. Ask it for a title sequence and it writes the motion scene, looks at the frames it made and fixes what's off; it knows what you've selected, keeps its conversations with each project, and you can steer it while it works. You decide what agents may touch: files, projects, generation, settings. Scoring a cut in <a href="/ryolune">ryolune</a> and bringing the music back is coming soon.</p>
+        <p class="muted reveal" style="--d:2">The Agent panel runs the model you already have (Claude Code, Codex, an Anthropic or OpenAI key, or a local Ollama model), shows one card per command and reverts a whole run in one click. Ask it for a title sequence and it writes the motion scene, looks at the frames it made and fixes what's off; it knows what you've selected, keeps its conversations with each project, and you can steer it while it works. You decide what agents may touch: files, projects, generation, settings. Score a cut in <a href="/ryolune">ryolune</a> and bring the music back.</p>
       </div>
       <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># Claude Code drives the running app</span></span>
 <span class="line">claude mcp add kimchi -- /Applications/kimchi.app/Contents/MacOS/kimchi-mcp --live</span>
@@ -179,6 +179,60 @@
 <span class="line">kimchi-cli motion.addTemplate template=title3d values='{"text":"NIGHT MARKET"}'</span>
 <span class="line">kimchi-cli captions.transcribe</span>
 <span class="line">kimchi-cli export.start path=cut.mp4 quality=high wait=true</span></pre></div>
+    </div>
+  </section>
+
+  <section class="section" id="from" aria-labelledby="from-title">
+    <div class="wrap split split--top">
+      <div class="stack">
+        <span class="eyebrow">Coming from another editor</span>
+        <h2 class="h2 reveal" id="from-title">Bring your timeline with you.</h2>
+        <p class="lede reveal" style="--d:1">kimchi opens and exports the timelines of the editors you know, with a report of what came across, and finds missing media. Your looks and LUTs come too, and Settings › Keyboard has their shortcuts.</p>
+      </div>
+      <div class="logos reveal" style="--d:1">
+        <div class="logo-tile"><img src="/assets/img/logos/premiere-pro.svg" width="32" height="32" alt=""><b>Adobe Premiere Pro</b><span>Premiere XML, Lumetri looks, its keys</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/final-cut-pro.png" width="32" height="32" alt=""><b>Final Cut Pro</b><span>FCPXML and Final Cut 7 XML, its keys</span></div>
+        <div class="logo-tile"><picture><source srcset="/assets/img/logos/resolve-dark.svg" media="(prefers-color-scheme: dark)"><img src="/assets/img/logos/resolve.svg" width="32" height="32" alt=""></picture><b>DaVinci Resolve</b><span>OpenTimelineIO and EDL, its keys</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="plugins" aria-labelledby="plugins-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Plugins</span>
+        <h2 class="h2 reveal" id="plugins-title">Your sound plugins today. Your own effects next.</h2>
+        <p class="lede reveal" style="--d:1">kimchi's audio runs on ryolune's engine, so its stock effects and your CLAP, VST3 and Audio Unit plugins work on your clips and buses. Looks come in as LUTs (<code>.cube</code>, <code>.3dl</code>, <code>.csp</code>, <code>.spi</code>, Hald) and Lightroom and Lumetri presets.</p>
+      </div>
+      <div class="logos reveal">
+        <div class="logo-tile"><picture><source srcset="/assets/img/logos/clap-dark.svg" media="(prefers-color-scheme: dark)"><img src="/assets/img/logos/clap.svg" width="32" height="32" alt=""></picture><b>CLAP</b><span>Audio effects</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/steinberg.svg" width="32" height="32" alt=""><b>VST3</b><span>Audio effects</span></div>
+        <div class="logo-tile"><picture><source srcset="/assets/img/logos/apple-dark.svg" media="(prefers-color-scheme: dark)"><img src="/assets/img/logos/apple.svg" width="32" height="32" alt=""></picture><b>Audio Units</b><span>Audio effects, on the Mac</span></div>
+        <div class="logo-tile logo-tile--lsuite"><img src="/assets/img/icons/ryolune.webp" width="32" height="32" alt=""><b>ryolune effects</b><span>The stock effects of ryolune</span></div>
+      </div>
+      <div class="split split--top" style="margin-top: clamp(40px, 6vw, 72px);">
+        <div class="stack">
+          <span class="eyebrow eyebrow--plain">Build with your agent · next release</span>
+          <h3 class="h3 reveal" style="font-size:1.5rem">Describe the effect. Your agent writes it in Rust.</h3>
+          <p class="muted reveal">kimchi 0.10 adds a Plugins area with one field: "Describe the plugin you want". The agent scaffolds a crate from the <code>kimchi-plugin</code> SDK, builds it until it's green, installs it and renders a frame with it, without a restart. It offers to install Rust if you don't have it, and it only builds plugins when you've allowed it to.</p>
+        </div>
+        <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># the recipe the agent follows (PLUGINS.md)</span></span>
+<span class="line">kimchi-cli plugin.guide</span>
+<span class="line">kimchi-cli plugin.new name=film-burn kind=effect</span>
+<span class="line">kimchi-cli plugin.build name=film-burn</span>
+<span class="line">kimchi-cli plugin.publishLocal name=film-burn</span></pre></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="ai" aria-labelledby="ai-title">
+    <div class="wrap">
+      <div class="band reveal">
+        <span class="eyebrow">lsuite AI · next release</span>
+        <h2 class="h2" id="ai-title">No setup: sign in and the agent works.</h2>
+        <p class="lede" style="margin-inline:auto">From kimchi 0.10, lsuite AI is the first choice in the Agent panel and the first-run setup: sign in once and Claude cuts in kimchi and every other lsuite app, with nothing to install. Your own subscriptions and keys stay free and first-class. A demo for now: no payment is taken.</p>
+        <div class="hero__actions" style="justify-content:center"><a class="btn btn--primary" href="/ai">About lsuite AI</a><a class="btn" href="/account">Your account</a></div>
+      </div>
     </div>
   </section>
 
@@ -355,8 +409,10 @@
     <div class="wrap">
       <div class="section__head"><span class="eyebrow eyebrow--plain">Also in lsuite</span><h2 class="h3" id="more-title" style="font-size:1.5rem">Same idea, other crafts.</h2></div>
       <div class="others">
-        <a class="card app-ryolune" href="/ryolune"><div><span class="card__name">ryolune</span><span class="muted">Music with agents, coming soon</span></div><span class="arrow" aria-hidden="true">→</span></a>
-        <a class="card app-zenith" href="/zenith"><div><span class="card__name">zenith</span><span class="muted">Coding with agents, coming soon</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-ryolune" href="/ryolune"><img src="/assets/img/icons/ryolune.webp" width="44" height="44" alt=""><div><span class="card__name">ryolune</span><span class="muted">Music with agents, beta</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-zenith" href="/zenith"><img src="/assets/img/icons/zenith.webp" width="44" height="44" alt=""><div><span class="card__name">zenith</span><span class="muted">Coding with agents, beta</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-nori" href="/nori"><img src="/assets/img/icons/nori.webp" width="44" height="44" alt=""><div><span class="card__name">nori</span><span class="muted">Images, vectors and pages, beta</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-folio" href="/folio"><img src="/assets/img/icons/folio.webp" width="44" height="44" alt=""><div><span class="card__name">folio</span><span class="muted">Documents, sheets and slides, beta</span></div><span class="arrow" aria-hidden="true">→</span></a>
       </div>
     </div>
   </section>

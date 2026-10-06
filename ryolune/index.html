@@ -3,33 +3,286 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ryolune — coming soon · lsuite</title>
-  <meta name="description" content="Coming soon: ryolune will be a digital audio workstation for macOS, Windows and Linux, with tools to record audio, arrange tracks, edit MIDI, mix and export stems. It will support built-in effects and instruments alongside your own plugins, and let you work by hand or ask an AI agent to make edits through the same commands and undo history.">
+  <title>ryolune beta — the open-source DAW your AI can drive · lsuite</title>
+  <meta name="description" content="ryolune is a free, open-source digital audio workstation in beta for macOS, Windows and Linux, written in Rust: record, arrange, edit MIDI, mix and export stems with 35 stock instruments and effects and your own CLAP, VST3 and Audio Unit plugins. Every action is a command your AI can run, with the same undo.">
   <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/ryolune">
-  <link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/img/icons/ryolune.webp" type="image/webp">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="lsuite">
-  <meta property="og:title" content="ryolune — coming soon">
-  <meta property="og:description" content="Coming soon: ryolune will be a digital audio workstation for macOS, Windows and Linux, with tools to record audio, arrange tracks, edit MIDI, mix and export stems. It will support built-in effects and instruments alongside your own plugins, and let you work by hand or ask an AI agent to make edits through the same commands and undo history.">
+  <meta property="og:title" content="ryolune beta — the open-source DAW your AI can drive">
+  <meta property="og:description" content="Record, arrange, edit MIDI, mix and export stems, with 35 stock plugins and your own CLAP, VST3 and Audio Units. Every action is a command your AI can run. Free and MIT licensed.">
   <meta property="og:url" content="%ORIGIN%/ryolune">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
   <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ryolune","url":"%ORIGIN%/ryolune","description":"A free, open-source digital audio workstation in beta that your AI can drive.","applicationCategory":"MultimediaApplication","applicationSubCategory":"Digital audio workstation","operatingSystem":"macOS, Windows, Linux","softwareVersion":"%VERSION:ryolune%","downloadUrl":"https://github.com/ludovic111/ryolune/releases/latest","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isPartOf":{"@type":"WebSite","name":"lsuite","url":"%ORIGIN%/"}}</script>
   <link rel="preload" href="/assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/design/tokens.css?v=1">
   <link rel="stylesheet" href="/assets/styles.css?v=1">
+  <script src="/assets/main.js?v=1"></script>
 </head>
 <body class="app-ryolune">
 <!-- include:nav -->
 
 <main id="content">
-  <!-- Empty until ryolune wears the new look (design v2, see design/DESIGN.md). -->
-  <section class="hero hero--empty">
+  <section class="hero">
+    <div class="hero__glow"></div>
+    <div class="hero__grid"></div>
     <div class="wrap hero__in">
-      <span class="eyebrow">ryolune · music · Coming soon</span>
+      <div class="appid reveal">
+        <img class="appid__mark" src="/assets/img/icons/ryolune.webp" width="56" height="56" alt="">
+        <div><div class="appid__name">ryolune</div><div class="appid__kind">lsuite · music</div></div>
+        <span class="badge">Beta</span>
+      </div>
+      <h1 class="display reveal" style="--d:1">Finish the song.<br>Hand the busywork <span class="neg">to an agent</span>.</h1>
+      <p class="lede reveal" style="--d:2">ryolune is a complete DAW in beta: record while you hear yourself through your effects, arrange, edit MIDI, mix on a real mixer and export stems, with 35 stock instruments and effects and your own CLAP, VST3 and Audio Units. When you'd rather not quantise forty notes by hand, ask the built-in agent, or plug Claude Code, Codex or any MCP client straight into the song.</p>
+      <div class="hero__actions reveal" style="--d:3">
+        <a class="btn btn--primary" href="#downloads" data-download="ryolune" data-href-macos="/ryolune/download/macos-arm64" data-href-windows="/ryolune/download/windows-x86_64" data-href-linux="/ryolune/download/linux-x86_64"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span data-os>Download ryolune</span></a>
+        <a class="btn" href="#downloads">All platforms</a>
+        <a class="btn" href="https://github.com/ludovic111/ryolune">Source on GitHub</a>
+      </div>
+      <p class="fine hero__fine reveal" style="--d:4">Beta · Version %VERSION:ryolune% · free and MIT licensed · macOS, Windows, Linux · native Rust app · drivable by your AI · no telemetry</p>
+    </div>
+    <div class="wrap">
+      <!-- Placeholder: replace with <picture> of assets/img/ryolune/arrangement.webp and arrangement-light.webp (2000x1250, v2 look) when the ryolune agent's captures arrive. -->
+      <figure class="shot shot--hero shot--soon reveal" style="--d:3" data-capture="ryolune/arrangement">
+        <img src="/assets/img/icons/ryolune.webp" width="140" height="140" alt="">
+        <span>ryolune in black and white · new captures on the way</span>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top: 0; border-top: 0;">
+    <div class="wrap">
+      <div class="stats reveal">
+        <div><b>35</b><span>stock instruments and effects</span></div>
+        <div><b>224</b><span>commands, for you and your AI alike</span></div>
+        <div><b>3</b><span>systems: macOS, Windows, Linux</span></div>
+        <div><b>0</b><span>telemetry. No account needed</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="new" aria-labelledby="new-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">New in 0.14</span>
+        <h2 class="h2 reveal" id="new-title">Black and white, and at home with your old songs.</h2>
+        <p class="lede reveal" style="--d:1">ryolune takes on lsuite's new look: black and white, square, with film grain behind the chrome. It opens songs from other music apps, keeps the agent's conversations with each song, lets you steer the agent while it works, and tells you what changed after an update.</p>
+      </div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">The look</span><h3>Ink on paper</h3><p>Everything is a grey and what you choose is inverted; red only means recording. Every area has a title bar, tools are boxed by kind, and track headers keep mute, solo and arm in view.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Coming from another app</span><h3>DAWproject in and out</h3><p>Tracks, sends, MIDI, audio with fades, markers, tempo, automation and plugins with their settings, from Bitwig Studio, Studio One, Cubase and others, with a report of what came across.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">First run</span><h3>Set up in a minute</h3><p>Which app you made music in, whether you want AI, which agent, and a sound check; then the demo song, an empty song or your old one.</p></div>
+        <div class="cell reveal"><span class="cell__k">The agent</span><h3>Conversations, kept</h3><p>Each song keeps its conversations and a project memory the agent reads first: the key, the style, what to leave alone.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">The agent</span><h3>Steer while it works</h3><p>Type while it runs: Send becomes Steer. The agent reads your note at its next step and keeps what it has done. zenith's agents can work on your song too.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Updates</span><h3>What's new, and what went wrong</h3><p>A sheet of what changed after each update, logs and crash reports in Settings › Diagnostics, and Report a Problem. Nothing leaves your computer.</p></div>
+      </div>
+      <p class="fine reveal" style="margin-top:18px"><a href="#changelog">Every version</a> · <a href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.14.0.md">ryolune 0.14 release notes</a></p>
+    </div>
+  </section>
+
+  <section class="section" id="features" aria-labelledby="features-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Features</span>
+        <h2 class="h2 reveal" id="features-title">Everything between an idea and a bounced master.</h2>
+      </div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">Record and arrange</span><h3>Hear yourself, then shape the song</h3><p>Arm a track and hear yourself through its effects, with a count-in. Name sections with markers and loop them; split, trim, fade and snap from bars to 1/64.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">MIDI</span><h3>Three editors on the same notes</h3><p>Piano roll, score and step views, with controller lanes. Quantise, humanise, legato, velocity ramps, fit to scale and transpose.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Mixing</span><h3>A real mixer</h3><p>Fader, pan, mute, solo, arm and live meters per channel, eight inserts a strip, buses and sends, a master chain and automation of any parameter.</p></div>
+        <div class="cell reveal"><span class="cell__k">Tempo</span><h3>Songs that breathe</h3><p>Tempo changes and ramps on a tempo track. Notes and markers stay on their bars; exports and the metronome follow.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Sound from words</span><h3>Describe a sound</h3><p>Loops and one-shots from ElevenLabs, Stable Audio, fal or your own endpoint, and Sample Keys to play them.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Export</span><h3>Mixes and stems</h3><p>WAV up to 96 kHz or 32-bit float, AIFF, FLAC and Ogg Vorbis, for the song, a range or one file per track, plus MIDI and DAWproject.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="plugins" aria-labelledby="plugins-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Plugins</span>
+        <h2 class="h2 reveal" id="plugins-title">35 in the box. Yours too. Or ask for one.</h2>
+        <p class="lede reveal" style="--d:1">Twelve instruments, from a polysynth and an electric piano to an 808 and a string ensemble, and twenty-three effects, each drawing what it does from the same maths as the audio. Your own plugins are scanned in a separate process, so one bad plugin can't take the app down.</p>
+      </div>
+      <div class="logos reveal">
+        <div class="logo-tile"><picture><source srcset="/assets/img/logos/clap-dark.svg" media="(prefers-color-scheme: dark)"><img src="/assets/img/logos/clap.svg" width="32" height="32" alt=""></picture><b>CLAP</b><span>Instruments and effects, every system</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/steinberg.svg" width="32" height="32" alt=""><b>VST3</b><span>Steinberg's format, every system</span></div>
+        <div class="logo-tile"><picture><source srcset="/assets/img/logos/apple-dark.svg" media="(prefers-color-scheme: dark)"><img src="/assets/img/logos/apple.svg" width="32" height="32" alt=""></picture><b>Audio Units</b><span>On the Mac</span></div>
+        <div class="logo-tile logo-tile--lsuite"><img src="/assets/img/icons/ryolune.webp" width="32" height="32" alt=""><b>ryolune plugins</b><span>Native, written in Rust with the <code>ryolune-plugin</code> SDK</span></div>
+      </div>
+      <div class="split split--top" style="margin-top: clamp(40px, 6vw, 72px);">
+        <div class="stack">
+          <span class="eyebrow eyebrow--plain">Build with your agent · next release</span>
+          <h3 class="h3 reveal" style="font-size:1.5rem">Describe the plugin. Your agent writes it in Rust.</h3>
+          <p class="muted reveal">ryolune 0.15 adds a Plugins window with one field: "Describe the plugin you want". The agent scaffolds a crate from the SDK, builds it until it's green, installs it and plays it, without a restart. It offers to install Rust if you don't have it, and it only builds plugins when you've allowed it to.</p>
+        </div>
+        <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># the recipe the agent follows (PLUGINS.md)</span></span>
+<span class="line">ryolune-cli plugin.guide</span>
+<span class="line">ryolune-cli plugin.new name=tape-wobble kind=effect</span>
+<span class="line">ryolune-cli plugin.build name=tape-wobble</span>
+<span class="line">ryolune-cli plugin.publishLocal name=tape-wobble</span></pre></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="agent" aria-labelledby="agent-title">
+    <div class="wrap split split--top">
+      <div class="stack">
+        <span class="eyebrow">Agent</span>
+        <h2 class="h2 reveal" id="agent-title">Ask for the edit. Keep the undo.</h2>
+        <p class="lede reveal" style="--d:1">The agent panel shows one card per command it runs. It uses the model you already have: Codex or Claude Code, an Anthropic, OpenAI, Gemini, OpenRouter, Mistral, Groq, DeepSeek or xAI key, Ollama or LM Studio on this computer, or zenith's agents.</p>
+        <ul class="bullets reveal" style="--d:2">
+          <li><span><b>Undo from here.</b> The Changes tab lists every change the agent made; roll back to any point.</span></li>
+          <li><span><b>On a leash you hold.</b> Permissions gate files, transport, replacing the song, settings and quitting, for the panel and MCP clients alike.</span></li>
+          <li><span><b>Bring your own agent.</b> Claude Code, Codex, Cursor, VS Code, Zed and any MCP app get a ready connection to the open song.</span></li>
+          <li><span><b>Nothing leaves your machine</b> until you connect a provider and send a prompt.</span></li>
+        </ul>
+      </div>
+      <div class="stack">
+        <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># the whole song in one call</span></span>
+<span class="line">ryolune-cli session.overview</span>
+<span class="line">ryolune-cli track.add --kind midi --name Keys --instrument "E-Piano Mk I"</span>
+<span class="line">ryolune-cli strip.setPlugin --trackId master --slot 7 --pluginId stock:Limiter</span>
+<span class="line">ryolune-cli history.undo</span>
+<span class="line">ryolune-cli --file song.ryolune session.exportAudio --path mix.flac</span>
+<span class="line"></span>
+<span class="line"><span class="c"># plug it into Claude Code, live on the open song</span></span>
+<span class="line">claude mcp add ryolune -- /Applications/ryolune.app/Contents/MacOS/ryolune-mcp --live</span></pre></div>
+        <p class="fine reveal">The window, the agent, <code>ryolune-cli</code> and <code>ryolune-mcp</code> run the same <a href="https://github.com/ludovic111/ryolune/blob/main/docs/COMMANDS.md">224 commands</a>, with the same undo history.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="ai" aria-labelledby="ai-title">
+    <div class="wrap">
+      <div class="band reveal">
+        <span class="eyebrow">lsuite AI · next release</span>
+        <h2 class="h2" id="ai-title">No setup: sign in and the agent works.</h2>
+        <p class="lede" style="margin-inline:auto">From ryolune 0.15, lsuite AI is the first choice in the agent's providers: sign in once and Claude works in ryolune and every other lsuite app, with nothing to install. Your own subscriptions and keys stay free and first-class. A demo for now: no payment is taken.</p>
+        <div class="hero__actions" style="justify-content:center"><a class="btn btn--primary" href="/ai">About lsuite AI</a><a class="btn" href="/account">Your account</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="changelog" aria-labelledby="changelog-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Changelog</span>
+        <h2 class="h2 reveal" id="changelog-title">Every version, in plain words.</h2>
+        <p class="lede reveal" style="--d:1">ryolune shows the same notes after it updates; the full notes are in <a href="https://github.com/ludovic111/ryolune/tree/main/docs/releases">docs/releases</a> and on <a href="https://github.com/ludovic111/ryolune/releases">GitHub releases</a>.</p>
+      </div>
+      <ol class="releases reveal">
+        <li class="release release--now">
+          <div class="release__meta"><span class="release__v">0.14</span><time class="release__date" datetime="2026-10-06">6 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>The lsuite look, version 2</h3>
+            <ul>
+              <li><b>Black and white, square, with grain</b>, Chakra Petch and IBM Plex Mono, titled areas and boxed tools, and a new mark.</li>
+              <li><b>A first-run setup</b>, and <b>DAWproject</b> import and export with a report; MIDI and stems for the rest.</li>
+              <li><b>Conversations saved with the song</b>, a project memory, steering, and <b>Zenith · lsuite</b> as a provider.</li>
+              <li><b>What's New</b>, logs and crash reports, Report a Problem, and update checks every six hours.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.14.0.md">Full notes for 0.14.0 →</a></div>
+          </div>
+        </li>
+        <li class="release">
+          <div class="release__meta"><span class="release__v">0.13</span><time class="release__date" datetime="2026-10-02">2 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>A native window</h3>
+            <ul>
+              <li>The window is <b>Rust, drawn on the GPU with GPUI</b>: no web view left.</li>
+              <li>The first lsuite look, the macOS menu bar, and <b>hand-offs with kimchi</b>: score a cut, send the mix back.</li>
+              <li>ryolune tells the other lsuite apps where it is (<code>~/.lsuite/apps</code>).</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.13.0.md">Full notes for 0.13.0 →</a></div>
+          </div>
+        </li>
+        <li class="release">
+          <div class="release__meta"><span class="release__v">0.12</span><time class="release__date" datetime="2026-10-01">1 Oct 2026</time></div>
+          <div class="release__body">
+            <h3>Sounds from a description</h3>
+            <ul>
+              <li><b>Generate sounds</b> with ElevenLabs, Stable Audio, fal or your own endpoint, and play them with <b>Sample Keys</b>.</li>
+              <li>Many more agent providers; one theme in dark and light.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.12.0.md">Full notes for 0.12.0 →</a></div>
+          </div>
+        </li>
+        <li class="release">
+          <div class="release__meta"><span class="release__v">0.11</span><time class="release__date" datetime="2026-09-28">28 Sep 2026</time></div>
+          <div class="release__body">
+            <h3>Ondera becomes ryolune</h3>
+            <ul>
+              <li>The new name, <code>.ryolune</code> songs (old <code>.ondera</code> songs still open), and signed, notarized Mac builds.</li>
+              <li>0.11.1: free forever, donations welcome.</li>
+            </ul>
+            <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.11.0.md">Full notes for 0.11.0 →</a></div>
+          </div>
+        </li>
+      </ol>
+      <details class="releases__older reveal">
+        <summary>Earlier releases, as Ondera</summary>
+        <ol class="releases">
+          <li class="release">
+            <div class="release__meta"><span class="release__v">0.10</span><time class="release__date" datetime="2026-09-27">27 Sep 2026</time></div>
+            <div class="release__body">
+              <h3>Tempo changes, buses and groups</h3>
+              <ul><li>Tempo changes and ramps on a tempo track, bus tracks, groups and aux returns, and <code>tempo.*</code> commands.</li></ul>
+              <div class="release__links"><a class="release__link" href="https://github.com/ludovic111/ryolune/blob/main/docs/releases/0.10.0.md">Full notes for 0.10.0 →</a></div>
+            </div>
+          </li>
+        </ol>
+      </details>
+    </div>
+  </section>
+
+  <section class="section" id="downloads" aria-labelledby="downloads-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Download</span>
+        <h2 class="h2 reveal" id="downloads-title">Download ryolune beta</h2>
+        <p class="lede reveal" style="--d:1"><code>ryolune-cli</code> and <code>ryolune-mcp</code> come with the app. ryolune checks for updates on launch and every six hours; updates are signed (Ed25519) and verified before anything is replaced.</p>
+      </div>
+      <div class="dl reveal">
+        <a href="/ryolune/download/macos-arm64" data-os-match="macos"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Apple silicon</b><span>.zip · signed and notarized</span></a>
+        <a href="/ryolune/download/macos-x86_64"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Intel</b><span>.zip · signed and notarized</span></a>
+        <a href="/ryolune/download/windows-x86_64" data-os-match="windows"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z"/></svg>Windows · 64-bit</b><span>.exe · or portable .zip</span></a>
+        <a href="/ryolune/download/linux-x86_64" data-os-match="linux"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10l3 2-3 2M13 15h3" stroke-linecap="round" stroke-linejoin="round"/></svg>Linux · x86-64</b><span>.tar.gz</span></a>
+      </div>
+      <p class="fine reveal" style="margin-top: 18px;">Also: <a href="/ryolune/download/windows-zip">Windows portable .zip</a> · <a href="https://github.com/ludovic111/ryolune/releases">All releases</a>, with <code>SHA256SUMS</code> and its signature. The Windows build isn't code-signed yet.</p>
+    </div>
+  </section>
+
+  <section class="section" id="support" aria-labelledby="support-title">
+    <div class="wrap">
+      <div class="band reveal">
+        <span class="eyebrow">Support</span>
+        <h2 class="h2" id="support-title">Free, open source, yours to fork.</h2>
+        <p class="lede" style="margin-inline:auto">ryolune is MIT licensed with every feature included. Donations keep it moving.</p>
+        <div class="hero__actions" style="justify-content:center">
+          <a class="btn btn--primary btn--heart" href="/ryolune/support"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 14.25s-5.75-3.4-5.75-7.6A3.15 3.15 0 015.4 3.5c1.1 0 2 .55 2.6 1.4.6-.85 1.5-1.4 2.6-1.4a3.15 3.15 0 013.15 3.15c0 4.2-5.75 7.6-5.75 7.6z"/></svg>Sponsor on GitHub</a>
+          <a class="btn" href="https://github.com/ludovic111/ryolune">Star on GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="more-title">
+    <div class="wrap">
+      <div class="section__head"><span class="eyebrow eyebrow--plain">Also in lsuite</span><h2 class="h3" id="more-title" style="font-size:1.5rem">Same idea, other crafts.</h2></div>
+      <div class="others">
+        <a class="card app-kimchi" href="/kimchi"><img src="/assets/img/icons/kimchi.webp" width="44" height="44" alt=""><div><span class="card__name">kimchi</span><span class="muted">Video with agents, beta</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-zenith" href="/zenith"><img src="/assets/img/icons/zenith.webp" width="44" height="44" alt=""><div><span class="card__name">zenith</span><span class="muted">Coding with agents, beta</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-nori" href="/nori"><img src="/assets/img/icons/nori.webp" width="44" height="44" alt=""><div><span class="card__name">nori</span><span class="muted">Images, vectors and pages, beta</span></div><span class="arrow" aria-hidden="true">→</span></a>
+        <a class="card app-folio" href="/folio"><img src="/assets/img/icons/folio.webp" width="44" height="44" alt=""><div><span class="card__name">folio</span><span class="muted">Documents, sheets and slides, beta</span></div><span class="arrow" aria-hidden="true">→</span></a>
+      </div>
     </div>
   </section>
 </main>
+
+<!-- include:foot -->
 </body>
 </html>

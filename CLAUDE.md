@@ -1,22 +1,33 @@
 # lsuite.xyz
 
 The suite's site; see README.md (layout, routes, domains) and STANDARD.md (the contract every
-lsuite app meets, with a status table). Each app repo (`../ryolune`, `../kimchi`, `../zenith`)
+lsuite app meets, with a status table), PLUGINS.md and AI.md (the plugin and lsuite AI contracts).
+Each app repo (`../ryolune`, `../kimchi`, `../zenith`, `../nori`, `../folio`)
 has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 
-## Current availability (2026-10-06)
+## Current availability (2026-10-07)
 
-- kimchi is in beta. ryolune and zenith are coming soon while development focuses on kimchi.
-- The site wears **design system v2** (2026-10-06: black and white, square, grain, Chakra Petch;
-  `design/DESIGN.md`). kimchi's page shows the v2 app and its new one-ink icon.
-- **The ryolune and zenith pages are empty** until those apps wear v2: one line (name, kind,
-  Coming soon) with the shared navigation, no logo, no summary. Their icons, captures, film and
-  Open Graph images were removed (in git history before 2026-10-06); the home cards carry no icon
-  and ryolune's no capture. The lsuite logo is gone from the nav, footer and favicon (a plain grain
-  tile). When an app moves to v2, write its page again in the v2 look with new captures and icon.
-- ryolune and zenith are "coming soon" on the site by choice (one paragraph, no download), although their
-  repositories are public and publish releases on GitHub (ryolune 0.14.0, zenith 0.3.0 on 2026-10-06). Their old
-  download routes redirect to their coming-soon pages; only kimchi has source links and release-version lookups here.
+- **Five apps, all in beta** (owner's decision on the night of 2026-10-06): ryolune (music),
+  kimchi (video), zenith (code), nori (image and design: Photoshop + Illustrator + InDesign in one
+  document) and folio (office: documents, spreadsheets and presentations). The suite's line: every
+  kind of creative and office tool, combined, free and open source, driven by your agent.
+- ryolune, kimchi and zenith have full pages with downloads (`DOWNLOADS` and `REPOS` in
+  `server.js`, `%VERSION:<app>%`); nori and folio have no repository on GitHub yet: their pages
+  say "First build coming", `/<app>/download[/…]` lands on the page (`published: false`), and the
+  route table already names `ludovic111/nori` and `ludovic111/folio`. When one ships: set
+  `published: true`, check the asset names, add it to `REPOS`/`FALLBACK_VERSIONS`, put back a
+  download section like zenith's and a version in its hero.
+- **lsuite AI** (AI.md) is live as a demo: `ai.js` serves the API, `/ai`, `/account`,
+  `/account/connect`, `/account/checkout` (Demo — no payment is taken). The apps stay free;
+  lsuite AI is the one optional thing sold. Footer and home say so; no telemetry still holds.
+- The site wears **design system v2** (`design/DESIGN.md`). Marks: ryolune's (its
+  `scripts/gen-mark.py`) and zenith's new Z (rendered from zenith's `scripts/gen-mark.py`, branch
+  `lsuite-night`) are in `assets/img/icons/`. **Placeholders** to swap when the app agents deliver:
+  `assets/img/icons/nori.webp` and `folio.webp` (the lsuite grain tile), the hero figures marked
+  `shot--soon` / `data-capture` on ryolune, nori and folio (and the home cards marked
+  `card__shot--soon`), zenith's hero (the `zmock` illustration until real captures). Open Graph
+  images of the four new pages are `og/lsuite.png` for now.
+- The favicon and the nav keep the plain lsuite grain tile (no lsuite logo).
 - Earlier completed notes below describe the previous pages; keep the current availability
   above unless explicitly asked to change it.
 
