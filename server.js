@@ -10,7 +10,7 @@ import { dirname, extname, join, normalize, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
-import { createAccounts } from './ai.js';
+import { createAccounts, plansDocument } from './ai.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
@@ -32,7 +32,37 @@ const TYPES = {
 };
 
 /** The pages, by path. Each app page is `<app>/index.html`. */
-export const PAGES = { '/': 'index.html', '/ryolune': 'ryolune/index.html', '/kimchi': 'kimchi/index.html', '/zenith': 'zenith/index.html', '/design': 'design/index.html' };
+export const PAGES = {
+  '/': 'index.html',
+  '/ryolune': 'ryolune/index.html',
+  '/kimchi': 'kimchi/index.html',
+  '/zenith': 'zenith/index.html',
+  '/ai': 'ai/index.html',
+  '/account': 'account/index.html',
+  '/account/connect': 'account/connect.html',
+  '/account/checkout': 'account/checkout.html',
+  '/design': 'design/index.html',
+};
+/** Pages that stay out of the sitemap (steps of a flow, not places to land). */
+const UNLISTED = new Set(['/account/connect', '/account/checkout']);
+
+const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
+/** The plans of `/api/ai/plans` as cards (`<!-- include:plans -->`). */
+export function plansHtml() {
+  const { plans } = plansDocument();
+  const cards = plans.map((p) => {
+    const free = p.id === 'free';
+    const items = free
+      ? ['Every feature of every app', 'Your subscriptions and keys, as they are', 'Nothing to pay, ever']
+      : [`<b>${p.credits.toLocaleString('en-US')} credits</b> a month`, escapeHtml(p.families.join(', ')), ...(p.priority ? ['Priority when it’s busy'] : [])];
+    const action = free
+      ? `<a class="btn" href="/account">Create a free account</a>`
+      : `<a class="btn${p.id === 'pro' ? ' btn--primary' : ''}" href="/account/checkout?plan=${p.id}">Choose ${escapeHtml(p.name)}</a>`;
+    return `<div class="plan${p.id === 'pro' ? ' plan--lit' : ''}" data-plan="${p.id}"><div class="plan__head"><h3>${escapeHtml(p.name)}</h3><span class="plan__price">${free ? '<b>$0</b>' : `<b>$${p.price}</b> / month`}</span></div><p class="plan__say">${escapeHtml(p.summary)}</p><ul class="plan__list">${items.map((i) => `<li><span>${i}</span></li>`).join('')}</ul>${action}</div>`;
+  });
+  return `<div class="plans">${cards.join('')}</div>`;
+}
 
 /** The design system's files, served as they are (design/DESIGN.md explains them). */
 const DESIGN_FILES = new Set(['/design/tokens.css', '/design/tokens.json', '/design/preview.js']);
@@ -215,6 +245,7 @@ export async function renderPage(file, origin, versions) {
       html = html.replace(`<!-- include:${name} -->`, (await readFile(join(ROOT, 'partials', `${name}.html`), 'utf8')).trim());
     }
   }
+  if (html.includes('<!-- include:plans -->')) html = html.replace('<!-- include:plans -->', plansHtml());
   const app = file.split('/').length > 1 ? file.split('/')[0] : null;
   if (app) html = html.replaceAll(`data-app="${app}"`, `data-app="${app}" aria-current="page"`);
   for (const [whole, quote, path] of [...html.matchAll(/(["'])(\/(?:assets|design)\/[\w./-]+\.(?:js|css))\?v=[\w.-]*\1/g)]) {
@@ -327,11 +358,11 @@ export async function handle(req, res) {
   if (pathname === '/favicon.ico') return redirect(res, 301, '/assets/img/lsuite.svg', 'public, max-age=86400');
 
   if (pathname === '/robots.txt') {
-    return send(res, 200, `User-agent: *\nAllow: /\n\nSitemap: ${originOf(req)}/sitemap.xml\n`, TYPES['.txt'], 'public, max-age=3600', req);
+    return send(res, 200, `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /account/\n\nSitemap: ${originOf(req)}/sitemap.xml\n`, TYPES['.txt'], 'public, max-age=3600', req);
   }
   if (pathname === '/sitemap.xml') {
     const urls = await Promise.all(
-      Object.entries(PAGES).map(async ([path, file]) => {
+      Object.entries(PAGES).filter(([path]) => !UNLISTED.has(path)).map(async ([path, file]) => {
         const { mtime } = await stat(join(ROOT, file));
         return `  <url><loc>${originOf(req)}${path}</loc><lastmod>${mtime.toISOString().slice(0, 10)}</lastmod></url>`;
       }),

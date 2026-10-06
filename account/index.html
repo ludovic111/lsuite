@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your account · lsuite</title>
+  <meta name="description" content="Your lsuite account: your lsuite AI plan, what's left of this month's allowance, a key for the apps' CLIs, and the apps signed in with it.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
+  <link rel="canonical" href="%ORIGIN%/account">
+  <link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/design/tokens.css?v=1">
+  <link rel="stylesheet" href="/assets/styles.css?v=1">
+  <script src="/assets/main.js?v=1"></script>
+  <script src="/assets/account.js?v=1" defer></script>
+</head>
+<body class="app-suite" data-page="account">
+<!-- include:nav -->
+
+<main id="content">
+  <section class="hero">
+    <div class="hero__glow"></div>
+    <div class="wrap hero__in">
+      <div class="acct" data-state="loading"><p class="muted">Loading your account…</p></div>
+
+      <!-- Signed out -->
+      <div class="acct" data-state="out" hidden>
+        <span class="eyebrow">lsuite account</span>
+        <h1 class="h2">Sign in, or create your account.</h1>
+        <p class="lede">One account for every lsuite app: your lsuite AI plan, and the apps signed in with it. The apps work without one.</p>
+        <div class="notice"><span class="notice__tag">Demo</span><span><b>No password and no email check yet.</b> Anyone who types your email can open this account, so keep nothing private here.</span></div>
+        <form class="form" data-signin novalidate>
+          <div class="field"><label for="in-email">Email</label><input id="in-email" name="email" type="email" autocomplete="email" required maxlength="254"></div>
+          <div class="field"><label for="in-name">Name <span class="fine">(for a new account)</span></label><input id="in-name" name="name" type="text" autocomplete="name" maxlength="80"></div>
+          <p class="form__error" role="alert"></p>
+          <div class="row"><button class="btn btn--primary" type="submit">Continue</button><a class="fine" href="/ai">What is lsuite AI?</a></div>
+        </form>
+      </div>
+
+      <!-- Signed in -->
+      <div class="acct acct--wide" data-state="in" hidden>
+        <div class="acct__who">
+          <div><h1 data-bind="name"></h1><p class="fine" data-bind="email"></p></div>
+          <button class="btn btn--sm" type="button" data-action="signout">Sign out</button>
+        </div>
+        <div class="notice"><span class="notice__tag">Demo</span><span>lsuite AI is a demo: <b>no payment is taken</b>, and the agents answer with a short demo message until it goes live.</span></div>
+
+        <div class="panel">
+          <div class="panel__title">Plan <span data-bind="period"></span></div>
+          <div class="panel__body">
+            <div class="row" style="justify-content:space-between"><div><b style="font-size:22px" data-bind="planName"></b> <span class="muted" data-bind="planPrice"></span></div><a class="btn btn--sm" href="#plans" data-action="plans">Change plan</a></div>
+            <div data-when="paid">
+              <div class="meter" role="meter" aria-label="Allowance used" aria-valuemin="0" aria-valuemax="100"><i></i></div>
+              <p class="fine" style="margin-top:8px" data-bind="usage"></p>
+            </div>
+            <p class="muted" data-when="free">Free: the apps use the model you bring (Claude Code, Codex, an API key or a local model). Pick a plan to have the agents work with nothing to set up.</p>
+            <p class="fine" data-bind="models"></p>
+          </div>
+        </div>
+
+        <div class="panel" id="plans" data-plans hidden>
+          <div class="panel__title">Plans <span>Demo · no payment is taken</span></div>
+          <div class="panel__body"><!-- include:plans --></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__title">Sign in an app</div>
+          <div class="panel__body">
+            <p>In any lsuite app, choose <b>lsuite AI</b> in the agent's providers and press <b>Sign in</b>: the app opens this site, you press <b>Connect</b>, and every lsuite app on that computer is signed in.</p>
+            <p>For a CLI or a computer without a browser, make a key and paste it. A new key replaces the last one.</p>
+            <div class="row"><button class="btn btn--sm" type="button" data-action="key">Make a key</button></div>
+            <div data-keyout hidden>
+              <div class="keybox"><code data-bind="key"></code><button class="btn btn--sm" type="button" data-action="copy">Copy</button></div>
+              <p class="fine" style="margin-top:10px">Shown once. Paste it with <code>kimchi-cli account.signIn key=…</code> (any app's CLI), or run Claude Code on your plan with <code>ANTHROPIC_BASE_URL=<span data-bind="origin"></span>/api/ai</code> and <code>ANTHROPIC_AUTH_TOKEN=</code> this key.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__title">Signed in with this account</div>
+          <div class="panel__body">
+            <p class="muted" data-when="noconns">No app yet.</p>
+            <table class="conns" data-conns hidden>
+              <thead><tr><th scope="col">App</th><th scope="col">Since</th><th scope="col">Last used</th><th scope="col"><span class="sr">Disconnect</span></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- include:foot -->
+</body>
+</html>

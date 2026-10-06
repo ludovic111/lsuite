@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>lsuite AI — the agents in every lsuite app, without setup · lsuite</title>
+  <meta name="description" content="lsuite AI puts Claude inside ryolune, kimchi, zenith and nori with no setup: install an app, sign in once and its agent works. A demo for now: no payment is taken. Bringing your own Claude Code, Codex, API keys or local model stays free.">
+  <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
+  <link rel="canonical" href="%ORIGIN%/ai">
+  <link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="lsuite">
+  <meta property="og:title" content="lsuite AI — the agents in every lsuite app, without setup">
+  <meta property="og:description" content="Install an lsuite app, sign in once, and its agent works: no Claude Code to install, no key to paste. A demo for now: no payment is taken.">
+  <meta property="og:url" content="%ORIGIN%/ai">
+  <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="/assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/design/tokens.css?v=1">
+  <link rel="stylesheet" href="/assets/styles.css?v=1">
+  <script src="/assets/main.js?v=1"></script>
+</head>
+<body class="app-suite">
+<!-- include:nav -->
+
+<main id="content">
+  <section class="hero">
+    <div class="hero__glow"></div>
+    <div class="hero__grid"></div>
+    <div class="wrap hero__in">
+      <span class="eyebrow reveal">lsuite AI · demo</span>
+      <h1 class="display reveal" style="--d:1">Install it.<br>The agent <span class="neg">just works</span>.</h1>
+      <p class="lede reveal" style="--d:2">lsuite AI puts Claude inside every lsuite app with nothing to set up: no Claude Code to install, no API key to paste. Sign in once, and the agents in <a href="/ryolune">ryolune</a>, <a href="/kimchi">kimchi</a>, <a href="/zenith">zenith</a> and <a href="/nori">nori</a> work. The apps stay free; this is the one thing lsuite sells.</p>
+      <div class="hero__actions reveal" style="--d:3">
+        <a class="btn btn--primary" href="/account">Create your account <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn" href="#plans">See the plans</a>
+      </div>
+      <div class="notice reveal" style="--d:4"><span class="notice__tag">Demo</span><span><b>No payment is taken.</b> Plans start at once and the prices are placeholders. Until it goes live, the agents answer with a short demo message.</span></div>
+    </div>
+  </section>
+
+  <section class="section" id="how" aria-labelledby="how-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">How it works</span>
+        <h2 class="h2 reveal" id="how-title">Three steps, once.</h2>
+      </div>
+      <div class="grid grid--3 steps">
+        <div class="cell reveal"><span class="cell__k">Install</span><h3>Get an lsuite app</h3><p>ryolune, kimchi, zenith or nori, free and open source. lsuite AI is the first choice in the agent's providers and in the first-run setup.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Sign in</span><h3>Press Connect, once</h3><p>The app opens this site; you sign in, pick a plan and press <b>Connect</b>. Every lsuite app on the computer is signed in with it.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Work</span><h3>Ask the agent</h3><p>Claude cuts, mixes, paints and codes with the app's commands, one undo away. The agent panel shows your plan and what's left: <code>Pro · 38 % used · resets 1 Nov</code>.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="plans" aria-labelledby="plans-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Plans</span>
+        <h2 class="h2 reveal" id="plans-title">One account for the whole suite.</h2>
+        <p class="lede reveal" style="--d:1">A credit is half a US cent of model usage at Anthropic's list price, so a quick edit takes a few credits and a long agent run more. The allowance resets on the first of each month. When it runs out, the agent says so in one line with <b>Manage plan</b>; it never switches provider behind your back.</p>
+      </div>
+      <div class="reveal"><!-- include:plans --></div>
+      <p class="fine reveal" style="margin-top:18px">Demo: no payment is taken, and the prices are placeholders. <a href="/api/ai/plans">The plans as JSON</a>, as the apps read them.</p>
+    </div>
+  </section>
+
+  <section class="section" id="byo" aria-labelledby="byo-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Bring your own stays free</span>
+        <h2 class="h2 reveal" id="byo-title">Already have a model? Keep using it.</h2>
+        <p class="lede reveal" style="--d:1">lsuite AI is one provider among the ones the apps already speak, never in their way. Your subscriptions and keys work as they always did, and a local model never leaves your computer.</p>
+      </div>
+      <div class="logos reveal">
+        <div class="logo-tile logo-tile--lsuite"><img src="/assets/img/lsuite.svg" width="32" height="32" alt=""><b>lsuite AI</b><span>No setup. Sign in and your agent works.</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/claude.svg" width="32" height="32" alt=""><b>Claude</b><span>Claude Code, or an Anthropic API key</span></div>
+        <div class="logo-tile"><picture><source srcset="/assets/img/logos/openai-dark.svg" media="(prefers-color-scheme: dark)"><img src="/assets/img/logos/openai.svg" width="32" height="32" alt=""></picture><b>OpenAI</b><span>Codex, or an OpenAI API key</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/gemini.svg" width="32" height="32" alt=""><b>Google Gemini</b><span>A Gemini API key (ryolune, kimchi)</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/openrouter.svg" width="32" height="32" alt=""><b>OpenRouter</b><span>And other OpenAI-compatible services (ryolune, kimchi)</span></div>
+        <div class="logo-tile"><picture><source srcset="/assets/img/logos/ollama-dark.svg" media="(prefers-color-scheme: dark)"><img src="/assets/img/logos/ollama.svg" width="32" height="32" alt=""></picture><b>Ollama</b><span>A model on your own computer (ryolune, kimchi)</span></div>
+      </div>
+      <p class="fine reveal" style="margin-top:18px">zenith runs Claude Code and Codex threads. Logos belong to their owners and name what the apps work with.</p>
+    </div>
+  </section>
+
+  <section class="section" id="developers" aria-labelledby="dev-title">
+    <div class="wrap split split--top">
+      <div class="stack">
+        <span class="eyebrow">Under the hood</span>
+        <h2 class="h2 reveal" id="dev-title">It speaks Anthropic's API.</h2>
+        <p class="lede reveal" style="--d:1">The apps reach lsuite AI with the Anthropic provider they already have, pointed at lsuite. Claude Code runs through it too, with a key from <a href="/account">your account</a>.</p>
+        <p class="muted reveal" style="--d:2">Requests go through lsuite's server to Anthropic and back; lsuite keeps the token counts it needs for your allowance, not what you asked. The apps send nothing else: no telemetry.</p>
+      </div>
+      <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># Claude Code on your lsuite AI plan</span></span>
+<span class="line">ANTHROPIC_BASE_URL=%ORIGIN%/api/ai \</span>
+<span class="line">ANTHROPIC_AUTH_TOKEN=lsk_… claude</span>
+<span class="line"></span>
+<span class="line"><span class="c"># an app's CLI, with the key from your account</span></span>
+<span class="line">kimchi-cli account.signIn key=lsk_…</span>
+<span class="line">kimchi-cli account.status</span></pre></div>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <div class="section__head"><span class="eyebrow">Questions</span><h2 class="h2 reveal" id="faq-title">Before you sign in.</h2></div>
+      <div class="faq reveal">
+        <details><summary>Is this a real subscription?</summary><p>Not yet. lsuite AI is a demo: checkout takes no payment and starts the plan at once, and until it goes live the agents answer with a short message saying so. Your account, plan, allowance and the sign-in from the apps all work, so the apps can be built and tried against it.</p></details>
+        <details><summary>Do I need it to use the apps?</summary><p>No. Every app is free and open source with every feature, and works with the model you already have: Claude Code, Codex, an API key or a local model. lsuite AI is for people who'd rather not set any of that up.</p></details>
+        <details><summary>What happens when my allowance runs out?</summary><p>The agent stops and says so in one line, with <b>Manage plan</b>. It never moves you to another provider without asking. The allowance comes back on the first of the month.</p></details>
+        <details><summary>Which apps does one account cover?</summary><p>All of them. Signing in from any lsuite app signs in every lsuite app on the computer; signing out from one signs that copy out.</p></details>
+        <details><summary>How do I sign in without a browser?</summary><p>Your <a href="/account">account page</a> makes a key (<code>lsk_…</code>) to paste into an app's CLI or a headless machine. A new key replaces the last one.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- include:foot -->
+</body>
+</html>

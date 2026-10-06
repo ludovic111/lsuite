@@ -84,3 +84,32 @@ test('assets are served wherever the site lives, dotfiles inside it never', asyn
     server.close();
   }
 });
+
+test('lsuite AI and the account pages: plans from the API, scripts as files, flow steps unlisted', async () => {
+  const ai = await renderPage('ai/index.html', 'https://lsuite.xyz', {});
+  for (const plan of ['free', 'plus', 'pro', 'studio']) assert.ok(ai.includes(`data-plan="${plan}"`), plan);
+  assert.ok(ai.includes('href="/account/checkout?plan=pro"'));
+  assert.ok(ai.includes('data-app="ai" aria-current="page"'), 'AI is current in the nav');
+  for (const logo of ['claude', 'openai', 'ollama', 'gemini']) assert.ok(ai.includes(`/assets/img/logos/${logo}.svg`), logo);
+  for (const page of ['account/index.html', 'account/connect.html', 'account/checkout.html']) {
+    const html = await renderPage(page, 'https://lsuite.xyz', {});
+    assert.match(html, /<script src="\/assets\/account\.js\?v=[0-9a-f]{10}" defer><\/script>/, page);
+    assert.ok(!/<script>(?!\s*$)|on(click|submit)=/i.test(html), `${page}: no inline script`);
+    assert.ok(html.includes('noindex'), page);
+  }
+  const checkout = await renderPage('account/checkout.html', 'https://lsuite.xyz', {});
+  assert.ok(checkout.includes('Demo — no payment is taken'));
+
+  const server = createServer((req, res) => handle(req, res));
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    for (const path of ['/ai', '/account', '/account/connect', '/account/checkout']) assert.equal((await fetch(base + path)).status, 200, path);
+    const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
+    assert.ok(sitemap.includes('/ai</loc>') && sitemap.includes('/account</loc>'));
+    assert.ok(!sitemap.includes('/account/connect') && !sitemap.includes('/account/checkout'));
+    assert.match(await (await fetch(`${base}/robots.txt`)).text(), /Disallow: \/account\//);
+  } finally {
+    server.close();
+  }
+});

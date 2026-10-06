@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout (demo, no payment) · lsuite</title>
+  <meta name="description" content="Start an lsuite AI plan. A demo: no payment is taken.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
+  <link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml">
+  <link rel="preload" href="/assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/design/tokens.css?v=1">
+  <link rel="stylesheet" href="/assets/styles.css?v=1">
+  <script src="/assets/main.js?v=1"></script>
+  <script src="/assets/account.js?v=1" defer></script>
+</head>
+<body class="app-suite" data-page="checkout">
+<!-- include:nav -->
+
+<main id="content">
+  <section class="hero">
+    <div class="hero__glow"></div>
+    <div class="wrap hero__in">
+      <div class="acct">
+        <span class="eyebrow">lsuite AI · checkout</span>
+        <div class="notice notice--big"><span class="notice__tag">Demo — no payment is taken</span><span>This checkout charges nothing and asks for no card. The plan starts as soon as you press the button; the prices are placeholders.</span></div>
+      </div>
+
+      <div class="acct" data-state="loading"><p class="muted">Loading…</p></div>
+
+      <div class="acct" data-state="bad" hidden>
+        <h1 class="h2">Which plan?</h1>
+        <p class="lede">This link doesn't name a plan. <a href="/ai#plans">See the plans</a>.</p>
+      </div>
+
+      <div class="acct" data-state="out" hidden>
+        <h1 class="h2">Sign in to start <span data-bind="planName"></span>.</h1>
+        <form class="form" data-signin novalidate>
+          <div class="field"><label for="in-email">Email</label><input id="in-email" name="email" type="email" autocomplete="email" required maxlength="254"></div>
+          <div class="field"><label for="in-name">Name <span class="fine">(for a new account)</span></label><input id="in-name" name="name" type="text" autocomplete="name" maxlength="80"></div>
+          <p class="form__error" role="alert"></p>
+          <div class="row"><button class="btn btn--primary" type="submit">Continue</button></div>
+        </form>
+      </div>
+
+      <div class="acct" data-state="ready" hidden>
+        <div class="panel">
+          <div class="panel__title">Your plan <span data-bind="email"></span></div>
+          <div class="panel__body">
+            <div class="row" style="justify-content:space-between"><b style="font-size:26px" data-bind="planName"></b><span class="plan__price" data-bind="planPrice"></span></div>
+            <p class="muted" data-bind="summary"></p>
+            <dl class="kv"><dt>Allowance</dt><dd data-bind="credits"></dd><dt>Models</dt><dd data-bind="families"></dd><dt>Today</dt><dd><b>$0.00</b> · demo, nothing is charged</dd></dl>
+            <p class="fine" data-bind="current"></p>
+          </div>
+        </div>
+        <p class="form__error" role="alert" data-checkout-error></p>
+        <div class="row">
+          <button class="btn btn--primary" type="button" data-action="checkout"><span>Start <span data-bind="planName"></span> · demo, no payment</span></button>
+          <a class="btn" href="/ai#plans">Other plans</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- include:foot -->
+</body>
+</html>

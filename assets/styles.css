@@ -135,8 +135,20 @@ p { margin: 0; text-wrap: pretty; }
 .nav__gh:hover { color: var(--text); background: var(--surface-2); }
 .nav__gh svg { width: 18px; height: 18px; }
 
+/* AI sits after the apps, behind a hairline: it is the suite's service, not an app. */
+.nav__ai { margin-left: 6px; padding-left: 10px; border-left: 1px solid var(--line); }
+.nav__account[aria-current="page"] { color: var(--ls-text-on-accent); background: var(--ls-ink); border-color: var(--ls-ink); }
 @media (max-width: 900px) {
   .nav__end .nav__get { display: none; }
+}
+@media (max-width: 560px) {
+  .nav__in { gap: 8px; }
+  .nav__apps { overflow-x: auto; scrollbar-width: none; min-width: 0; }
+  .nav nav { min-width: 0; flex: 1; }
+  .nav__end .nav__gh, .nav__end .btn--sponsor { display: none; }
+  .nav__apps a { padding: 6px 6px; }
+  .nav__ai { margin-left: 2px; padding-left: 4px; }
+  .nav__end .nav__account { padding: 0 10px; }
 }
 @media (max-width: 720px) {
   .nav__in { gap: 12px; }
@@ -554,6 +566,96 @@ figcaption b { color: var(--text-2); font-weight: 600; }
   .zmock__side { display: none; }
   .zmock__head .zmock__chip { display: none; }
 }
+
+/* ---------- lsuite AI and the account pages ---------- */
+.plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 1080px) { .plans { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .plans { grid-template-columns: minmax(0, 1fr); } }
+.plan { display: grid; gap: 14px; align-content: start; grid-template-rows: auto auto 1fr auto; padding: 24px 22px; border: 1px solid var(--ls-glass-edge); box-shadow: var(--ls-glass-highlight); }
+.plan--lit { border-color: var(--ls-accent-ring); box-shadow: var(--ls-glass-highlight), var(--ls-glass-shadow); }
+.plan__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.plan__head h3 { font-size: 19px; }
+.plan__price { font: 400 13px/1 var(--mono); color: var(--text-3); white-space: nowrap; }
+.plan__price b { font: 600 24px/1 var(--sans); color: var(--text); letter-spacing: -0.01em; }
+.plan__say { color: var(--text-2); font-size: 15px; }
+.plan__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; align-content: start; }
+.plan__list li { display: grid; grid-template-columns: 14px 1fr; gap: 8px; font-size: 14.5px; color: var(--text-2); }
+.plan__list li::before { content: ""; width: 6px; height: 6px; margin-top: 8px; background: var(--ls-ink); }
+.plan__list b { color: var(--text); font-weight: 600; }
+.plan .btn { width: 100%; }
+.plan.is-current { border-color: var(--ls-ink); }
+.plan.is-current .btn { pointer-events: none; opacity: 0.6; }
+.plan, .panel, .notice, .logo-tile { background: var(--ls-glass-1-bg); -webkit-backdrop-filter: var(--ls-glass-1-filter); backdrop-filter: var(--ls-glass-1-filter); }
+@media (prefers-reduced-transparency: reduce) { .plan, .panel, .notice, .logo-tile { background: var(--ls-glass-opaque); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+
+/* "Demo — no payment is taken": an ink block that can't be missed. */
+.notice { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border: 1px solid var(--line-2); font-size: 14.5px; color: var(--text-2); }
+.notice b { color: var(--text); }
+.notice__tag { flex: none; font: 600 11.5px/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 8px; background: var(--ls-ink); color: var(--ls-text-on-accent); }
+.notice--big { padding: 18px 20px; font-size: 16px; border-color: var(--ls-ink); box-shadow: var(--ls-glass-shadow); }
+.notice--big .notice__tag { font-size: 13px; padding: 8px 10px; }
+@media (max-width: 620px) { .notice { flex-direction: column; } }
+.notice--error { border-color: var(--ls-ink); }
+
+/* A titled panel, like an area in the apps: a mono caps title running into a hairline. */
+.panel { border: 1px solid var(--ls-glass-edge); box-shadow: var(--ls-glass-highlight); }
+.panel__title { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font: 500 11.5px/1.2 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); }
+.panel__title span { margin-left: auto; text-transform: none; letter-spacing: 0; }
+.panel__body { padding: 20px 18px 22px; display: grid; gap: 16px; }
+.panel__body > p { color: var(--text-2); }
+.acct { display: grid; gap: 16px; max-width: 760px; }
+.acct--wide { max-width: none; }
+.acct__who { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.acct__who h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; }
+.acct__who .fine { font-family: var(--mono); }
+.acct__who .btn { margin-left: auto; }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.kv { display: grid; grid-template-columns: max-content 1fr; gap: 8px 18px; margin: 0; font-size: 15px; }
+.kv dt { font: 500 12px/1.9 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+.kv dd { margin: 0; color: var(--text); }
+
+/* The allowance: a square meter, ink on a sunken track. */
+.meter { height: 10px; background: var(--ls-bg-sunken); border: 1px solid var(--line-2); }
+.meter i { display: block; height: 100%; width: var(--used, 0%); background: var(--ls-ink); transition: width 0.4s var(--ease); }
+
+/* Forms (sign in): square fields, the ink ring on focus. */
+.form { display: grid; gap: 14px; max-width: 440px; }
+.field { display: grid; gap: 6px; }
+.field label { font: 500 12px/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+.field input { height: 44px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 0; background: var(--ls-bg-sunken); color: var(--text); font: 400 15px/1 var(--sans); }
+.field input:focus { outline: 2px solid var(--ls-accent-ring); outline-offset: 0; border-color: var(--ls-ink); }
+.form__error { color: var(--text); font-size: 14px; min-height: 1.4em; }
+.form__error::before { content: "! "; font-family: var(--mono); font-weight: 600; }
+.form__error:empty { display: none; }
+.keybox { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--ls-ink); background: var(--ls-bg-sunken); font: 400 13px/1.4 var(--mono); overflow-x: auto; }
+.keybox code { background: none !important; border: 0 !important; padding: 0 !important; white-space: nowrap; }
+.keybox .btn { margin-left: auto; flex: none; }
+.conns { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.conns th, .conns td { padding: 10px 0; text-align: left; border-bottom: 1px solid var(--line); }
+.conns th { font: 500 11.5px/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); }
+.conns td { color: var(--text-2); }
+.conns td:first-child { color: var(--text); font-weight: 600; }
+.conns td:last-child { text-align: right; }
+.conns tr:last-child td { border-bottom: 0; }
+[hidden] { display: none !important; }
+.linkish { padding: 0; border: 0; background: none; font: inherit; color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line-2); text-underline-offset: 3px; cursor: pointer; }
+.linkish:hover { color: var(--text); text-decoration-color: currentColor; }
+
+/* Numbered steps (install, sign in, it works). */
+.steps { counter-reset: step; }
+.steps .cell { counter-increment: step; }
+.steps .cell__k::before { content: counter(step, decimal-leading-zero) " · "; color: var(--text); }
+
+/* Other makers' logos keep their colours, on a neutral tile. */
+.logos { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.logo-tile { display: grid; gap: 10px; align-content: start; padding: 18px; border: 1px solid var(--ls-glass-edge); box-shadow: var(--ls-glass-highlight); }
+.logo-tile img { width: 32px; height: 32px; object-fit: contain; }
+.logo-tile b { font-size: 15.5px; font-weight: 600; }
+.logo-tile span { font-size: 13.5px; color: var(--text-3); line-height: 1.45; }
+.logo-tile--lsuite { border-color: var(--ls-ink); }
+.logo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
+.logo-row span { display: inline-flex; align-items: center; gap: 9px; font-size: 14.5px; color: var(--text-2); }
+.logo-row img { width: 22px; height: 22px; object-fit: contain; }
 
 /* ---------- Footer ---------- */
 .foot { border-top: 1px solid var(--ls-glass-edge); padding: 56px 0 44px; color: var(--text-3); font-size: 14px; box-shadow: var(--ls-glass-highlight); }
