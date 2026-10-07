@@ -128,6 +128,16 @@ Sign in and your agent works."), with `account.*` commands; bringing your own st
 never pushed aside, and a used-up allowance is said in one line, never a silent switch. A demo for
 now: no payment is taken. The contract: [AI.md](AI.md).
 
+## 10. The launcher
+
+**lsuite** (`launcher/` in the lsuite repo, started 2026-10-07) is the suite's own native app, in
+Rust and GPUI like the apps: it installs, updates, opens and removes the five apps from their
+signed GitHub releases (the release keys are built in), holds the shared lsuite AI account, and
+manages lsuite Cloud ([CLOUD.md](CLOUD.md)). It reads the discovery files of section 4 and never
+touches a copy it didn't install outside the usual places. It meets this standard's shape: one
+command registry, `lsuite-cli`, `lsuite-mcp` (agents held to `settings.agent`), design v2. Not
+released yet: it needs a release pipeline and a signing key of its own.
+
 ## Status (2026-10-07)
 
 All five apps have public beta releases: ryolune 0.15.3, kimchi 0.10.0, zenith 0.4.0,

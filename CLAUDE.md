@@ -25,6 +25,12 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   All five marks come from the app repositories' own generated icons. App capabilities and
   command counts describe the new beta builds; public download versions follow GitHub Releases.
   nori and folio have local macOS builds but no public release yet.
+- **lsuite launcher** (`launcher/`, 2026-10-07, see its README): a Rust/GPUI app that installs and
+  updates the five apps from their signed releases, manages the lsuite AI account and **lsuite
+  Cloud** (CLOUD.md, `cloud.js`, `/api/cloud`, two-way synced folders; storage per plan is a
+  proposal awaiting the owner; an S3-compatible store is supported for production). Its page is
+  `/launcher` (`pages/launcher.html`), downloads from `launcher-v*` releases of this repository,
+  built by kimchi's suite release workflow (launcher/README.md, Releasing).
 - The favicon and the nav keep the plain lsuite grain tile (no lsuite logo).
 - Earlier completed notes below describe the previous pages; keep the current availability
   above unless explicitly asked to change it.

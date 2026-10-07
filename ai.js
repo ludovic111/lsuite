@@ -8,9 +8,11 @@
 // - `/api/ai/v1/messages` speaks the Anthropic Messages API. With `LSUITE_ANTHROPIC_API_KEY` it
 //   forwards to Anthropic (streaming passed through as it arrives) and counts the usage the response
 //   reports into credits; without it, it answers with a short demo message in the same format.
+// - `/api/cloud…` is lsuite Cloud (CLOUD.md, `cloud.js`): the storage that comes with a plan.
 // - Production requires verified email, Stripe billing and persistent storage. Demo mode uses
 //   separate data, takes no payment and never forwards to a real provider.
 import { productionServices, requestQueue, ServiceError } from './live.js';
+import { CloudError, cloudPath, createCloud, demoCaps, disposition, storageLabel } from './cloud.js';
 import { createHash, randomBytes } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -35,18 +37,21 @@ export const MODELS = [
   { id: 'claude-fable-5-1', name: 'Claude Fable 5.1', family: 'fable', input: 10, output: 50, cacheRead: 0.25, created: '2026-09-01' },
 ];
 
-/** The plans of AI.md. Prices approved by the owner: monthly USD; demo mode never charges. */
+/**
+ * The plans of AI.md. Prices approved by the owner: monthly USD; demo mode never charges. `storage`
+ * is lsuite Cloud's (CLOUD.md, bytes, decimal: 50 GB is 50e9), a proposal awaiting the owner.
+ */
 export const PLANS = [
-  { id: 'free', name: 'Free', price: 0, credits: 0, families: [], defaultModel: null, priority: false, summary: 'Bring your own provider: Claude Code, Codex, API keys or a local model.' },
-  { id: 'plus', name: 'Plus', price: 12, credits: 1000, families: ['sonnet', 'haiku'], defaultModel: 'claude-sonnet-5-5', priority: false, summary: 'Claude Sonnet and Claude Haiku in every app, no setup.' },
-  { id: 'pro', name: 'Pro', price: 29, credits: 4000, families: ['sonnet', 'haiku', 'opus'], defaultModel: 'claude-opus-5-5', priority: false, summary: 'Adds Claude Opus, for long agent runs and hard edits.' },
-  { id: 'studio', name: 'Studio', price: 79, credits: 12000, families: ['sonnet', 'haiku', 'opus', 'fable'], defaultModel: 'claude-opus-5-5', priority: true, summary: 'Every model, the most allowance, priority.' },
+  { id: 'free', name: 'Free', price: 0, credits: 0, families: [], defaultModel: null, priority: false, storage: 0, summary: 'Bring your own provider: Claude Code, Codex, API keys or a local model.' },
+  { id: 'plus', name: 'Plus', price: 12, credits: 1000, families: ['sonnet', 'haiku'], defaultModel: 'claude-sonnet-5-5', priority: false, storage: 50e9, summary: 'Claude Sonnet and Claude Haiku in every app, no setup.' },
+  { id: 'pro', name: 'Pro', price: 29, credits: 4000, families: ['sonnet', 'haiku', 'opus'], defaultModel: 'claude-opus-5-5', priority: false, storage: 250e9, summary: 'Adds Claude Opus, for long agent runs and hard edits.' },
+  { id: 'studio', name: 'Studio', price: 79, credits: 12000, families: ['sonnet', 'haiku', 'opus', 'fable'], defaultModel: 'claude-opus-5-5', priority: true, storage: 1e12, summary: 'Every model, the most allowance, priority.' },
 ];
 const PLAN = Object.fromEntries(PLANS.map((p) => [p.id, p]));
 const FAMILY_NAMES = { haiku: 'Claude Haiku', sonnet: 'Claude Sonnet', opus: 'Claude Opus', fable: 'Claude Fable' };
 
-/** The apps that may ask for a sign-in (`/account/connect?app=`). */
-export const APPS = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori', folio: 'folio' };
+/** The apps that may ask for a sign-in (`/account/connect?app=`); `lsuite` is the launcher. */
+export const APPS = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori', folio: 'folio', lsuite: 'lsuite' };
 
 export const modelsOf = (plan) => MODELS.filter((m) => PLAN[plan]?.families.includes(m.family));
 
@@ -71,8 +76,8 @@ export function creditsFor(model, usage = {}) {
   return usd / CREDIT_USD;
 }
 
-/** `GET /api/ai/plans`: what the apps and the site show. */
-export function plansDocument(production = false) {
+/** `GET /api/ai/plans`: what the apps and the site show. `cloudCaps`: lsuite Cloud's demo caps. */
+export function plansDocument(production = false, cloudCaps = demoCaps()) {
   return {
     demo: !production,
     currency: 'USD',
@@ -88,9 +93,12 @@ export function plansDocument(production = false) {
       families: p.families.map((f) => FAMILY_NAMES[f]),
       defaultModel: p.defaultModel,
       priority: p.priority,
+      storage: p.storage,
+      storageLabel: storageLabel(p.storage),
       summary: p.summary,
     })),
     models: MODELS.map(({ id, name, family, input, output }) => ({ id, name, family, price: { input, output } })),
+    ...(production ? {} : { cloudDemo: { quota: cloudCaps.quota, maxFile: cloudCaps.maxFile } }),
   };
 }
 
@@ -311,7 +319,9 @@ const estimateTokens = (value) => Math.max(1, Math.ceil(JSON.stringify(value ?? 
 /**
  * The accounts service. Options (all optional, for tests and the host):
  * `dataDir`, `anthropicKey`, `upstream` (Anthropic's base URL), `fetch`, `demoDelayMs`,
- * `limits: {signin: [max, windowMs], token: [max, windowMs]}`.
+ * `limits: {signin: [max, windowMs], token: [max, windowMs]}`, `cloud: {quota, maxFile, total}`
+ * (lsuite Cloud's demo caps in bytes; `LSUITE_CLOUD_DEMO_*` by default), `cloudStore` (lsuite
+ * Cloud's object store, `objectStoreConfig()` in `cloud.js`; blobs stay in the data dir without it).
  */
 export function createAccounts(options = {}) {
   const production = options.mode === 'production';
@@ -322,6 +332,8 @@ export function createAccounts(options = {}) {
   const upstream = (options.upstream ?? 'https://api.anthropic.com').replace(/\/+$/, '');
   const fetchImpl = options.fetch ?? fetch;
   const live = production ? productionServices(options.live, store, fetchImpl) : null;
+  // Production applies the plans' sizes once blobs go to an object store; until then the demo caps (CLOUD.md).
+  const cloud = createCloud({ dataDir: options.dataDir ?? null, production, caps: options.cloud, store: options.cloudStore ?? null });
   const inFlight = new Set();
   const enqueue = requestQueue();
   const demoDelayMs = options.demoDelayMs ?? 18;
@@ -552,6 +564,88 @@ export function createAccounts(options = {}) {
     return modelsOf(activePlan(user).id).map((m) => ({ type: 'model', id: m.id, display_name: m.name, created_at: `${m.created}T00:00:00Z` }));
   }
 
+  /**
+   * `/api/cloud…` (CLOUD.md). `raw` is the path as sent, before any `..` is resolved: file paths
+   * are checked segment by segment in `cloudPath()`.
+   */
+  async function cloudRoute(req, res, origin, method, raw) {
+    const reading = method === 'GET' || method === 'HEAD';
+    const auth = appAuth(req) ?? (reading ? session(req) : null);
+    if (!auth) return fail(res, 401, 'authentication_error', `Sign in to lsuite again: this key isn't valid (signed out or revoked). ${origin}/account`);
+    if (auth.entry.kind !== 'session') auth.entry.lastUsedAt = now();
+    const { user } = auth;
+    const plan = activePlan(user);
+    const { quota } = cloud.limits(plan);
+    const manage = { manage_url: `${origin}/account`, plan: plan.id };
+    // Free keeps what is there (list, download, delete) but adds nothing.
+    const free = () => {
+      if (plan.storage) return false;
+      fail(res, 403, 'plan_required', `lsuite Cloud comes with an lsuite AI plan. Pick one at ${origin}/account${production ? '' : ' (demo: no payment is taken)'}; files already there can still be downloaded and deleted.`, manage);
+      return true;
+    };
+    const only = (...methods) => {
+      if (methods.includes(method)) return false;
+      fail(res, 405, 'invalid_request_error', `Use ${methods.join(' or ')}.`, {}, { Allow: methods.join(', ') });
+      return true;
+    };
+    const sub = raw.slice('/api/cloud'.length);
+    try {
+      if (sub === '' || sub === '/') {
+        if (only('GET', 'HEAD')) return;
+        return json(res, 200, { plan: plan.id, planName: plan.name, ...(await cloud.status(user.id, plan)), demo: !production, manageUrl: `${origin}/account` });
+      }
+      if (sub === '/files' || sub === '/files/' && reading) {
+        if (only('GET', 'HEAD')) return;
+        return json(res, 200, await cloud.list(user.id, plan));
+      }
+      if (sub.startsWith('/files/')) {
+        if (only('GET', 'HEAD', 'PUT', 'DELETE')) return;
+        const path = cloudPath(sub.slice('/files/'.length), true);
+        if (reading) {
+          const file = await cloud.find(user.id, path);
+          const tag = `"${file.sha256}"`;
+          const headers = { ETag: tag, 'X-Lsuite-Modified': file.modifiedAt, ...API_HEADERS };
+          const match = String(req.headers['if-none-match'] ?? '').split(',').map((s) => s.trim().replace(/^W\//, ''));
+          if (match.includes(tag) || match.includes('*')) {
+            res.writeHead(304, headers);
+            return res.end();
+          }
+          const body = method === 'GET' ? await cloud.read(user.id, file) : null;
+          res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Length': file.size, 'Content-Disposition': disposition(path), ...headers });
+          if (!body) return res.end();
+          body.on('error', () => res.destroy());
+          res.on('close', () => body.destroy());
+          return body.pipe(res);
+        }
+        if (method === 'DELETE') return json(res, 200, await cloud.remove(user.id, plan, path));
+        if (free()) return;
+        const { created, ...result } = await cloud.upload(user.id, plan, path, req);
+        return json(res, created ? 201 : 200, result);
+      }
+      if (sub === '/folders') {
+        if (only('POST')) return;
+        const { value } = await readJson(req);
+        const path = cloudPath(value.path);
+        if (free()) return;
+        const { created, folder } = await cloud.mkdir(user.id, plan, path);
+        return json(res, created ? 201 : 200, { folder });
+      }
+      if (sub === '/move') {
+        if (only('POST')) return;
+        const { value } = await readJson(req);
+        const from = cloudPath(value.from);
+        const to = cloudPath(value.to);
+        if (free()) return;
+        return json(res, 200, await cloud.move(user.id, plan, from, to, value.overwrite === true));
+      }
+      return fail(res, 404, 'not_found_error', `No API at ${method} ${raw}.`);
+    } catch (err) {
+      if (!(err instanceof CloudError)) throw err;
+      const extra = err.type === 'storage_full' ? { used: err.extra.used, quota, ...err.extra, ...manage } : err.extra;
+      return fail(res, err.status, err.type, err.message, extra);
+    }
+  }
+
   /** Handles `/api/…`; returns false for any other path. */
   async function handle(req, res, url) {
     const path = url.pathname;
@@ -560,7 +654,14 @@ export function createAccounts(options = {}) {
     const origin = live?.origin ?? originOf(req);
     const method = req.method;
     try {
-      if (path === '/api/ai/plans' && method === 'GET') return json(res, 200, plansDocument(production), { 'Cache-Control': 'public, max-age=300' }), true;
+      if (path === '/api/ai/plans' && method === 'GET') return json(res, 200, plansDocument(production, cloud.caps), { 'Cache-Control': 'public, max-age=300' }), true;
+
+      // ---- lsuite Cloud (CLOUD.md): matched on the raw path, so `..` reaches `cloudPath()` ----
+      const raw = String(req.url ?? '').split('?')[0];
+      if (raw === '/api/cloud' || raw.startsWith('/api/cloud/')) {
+        await cloudRoute(req, res, origin, method, raw);
+        return true;
+      }
 
       if (live && path === '/api/billing/webhook' && method === 'POST') {
         await live.webhook(await readBody(req, 1024 * 1024), req.headers['stripe-signature']);
@@ -590,6 +691,7 @@ export function createAccounts(options = {}) {
         const auth = appAuth(req) ?? session(req);
         if (!auth) return fail(res, 401, 'authentication_error', 'Not signed in.'), true;
         const body = account(auth.user, origin);
+        body.cloud = await cloud.summary(auth.user.id, activePlan(auth.user));
         if (auth.entry.kind === 'session') body.connections = connections(auth.user);
         return json(res, 200, body), true;
       }
@@ -709,5 +811,5 @@ export function createAccounts(options = {}) {
     }
   }
 
-  return { handle, store, ready };
+  return { handle, store, ready, cloud };
 }

@@ -14,7 +14,9 @@ in beta:
 
 The apps are free and MIT licensed. The one thing lsuite sells is optional: **lsuite AI**
 ([AI.md](AI.md)), agents that work in every app without setup, a demo for now (no payment is
-taken), served by this site (`ai.js`) with its pages at `/ai` and `/account`. Every app has
+taken), served by this site (`ai.js`) with its pages at `/ai` and `/account`; a paid plan also
+includes **lsuite Cloud** storage ([CLOUD.md](CLOUD.md), `cloud.js`), managed from the lsuite
+launcher. Every app has
 plugins ([PLUGINS.md](PLUGINS.md)), and [STANDARD.md](STANDARD.md) is the contract they all meet.
 
 Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
@@ -27,7 +29,10 @@ npm test
 ## Layout
 
 - `index.html` is the suite page; `<app>/index.html` is each app's page, served at `/<app>`
-  (`/<app>/` and `/index.html` redirect to the bare path).
+  (`/<app>/` and `/index.html` redirect to the bare path). The launcher's page is
+  `pages/launcher.html`, served at `/launcher`: the folder `launcher/` holds its Rust workspace,
+  which is never served (only `/assets/` is static). A page's app, for the nav, is its path's
+  first segment.
 - `partials/nav.html` and `partials/foot.html` are inserted where a page says
   `<!-- include:nav -->` / `<!-- include:foot -->`; the nav link of the page's app gets
   `aria-current="page"`. `%ORIGIN%` becomes the request's origin (Open Graph, canonical).
@@ -40,12 +45,25 @@ npm test
 - `ai/index.html` is `/ai`; `account/index.html`, `account/connect.html` and
   `account/checkout.html` are the account pages (`assets/account.js`, the only script they run;
   `<!-- include:plans -->` is filled from the plans of `ai.js`). `/account/connect` and
-  `/account/checkout` stay out of the sitemap.
+  `/account/checkout` stay out of the sitemap. `/account` also shows the account's lsuite Cloud
+  usage.
+- `ai.js` serves the API (accounts, lsuite AI); `cloud.js` is lsuite Cloud's storage behind
+  `/api/cloud`; `live.js` holds the production services (Stripe, email).
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
 - `%VERSION:<app>%` becomes the version of the app's latest published GitHub release (cached
   10 min, `FALLBACK_VERSIONS` when GitHub cannot be reached), so a page never announces a version
-  that cannot be downloaded yet. All five apps are looked up (`REPOS` in `server.js`).
+  that cannot be downloaded yet. All five apps are looked up (`REPOS` in `server.js`), and
+  `%VERSION:launcher%` is the newest published `launcher-vX.Y.Z` release of `ludovic111/lsuite`.
 - CSP is `'self'` only: no inline scripts, no third-party requests.
+
+## The launcher
+
+`launcher/` is **lsuite**, the suite's native launcher (Rust, GPUI; its own Cargo workspace, not
+part of the site's deployment): installs and updates the apps, the lsuite AI account and lsuite
+Cloud. See [launcher/README.md](launcher/README.md). Its page is `/launcher` (`pages/launcher.html`,
+captures in `assets/img/launcher/`: `apps`, `account`, `cloud`, each with `-light`, 2000x1250;
+mark in `assets/img/icons/lsuite.webp`, from `launcher/brand/icon.png`); the home page and the
+footer link to it. Its releases are published in this repository, tagged `launcher-vX.Y.Z`.
 
 ## Design system
 
@@ -59,7 +77,10 @@ are under `/design/`.
 | Path | Does |
 | --- | --- |
 | `/<app>/download[/<platform>]` | 302 to the matching asset of the app's latest release on GitHub (`DOWNLOADS` in `server.js`, looked up on the GitHub API, cached 10 min); without a platform the visitor's OS picks one; a platform with no matching asset goes to the release page. ryolune: `macos-arm64`, `macos-x86_64` (.zip), `windows-x86_64` (.exe), `windows-zip`, `linux-x86_64` (.tar.gz). kimchi: `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm` (the native app ships no MSI or RPM, so those land on the release page). zenith: `macos-arm64`, `macos-x86_64`, `linux-x86_64`. nori and folio: `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `linux-x86_64`. |
+| `/launcher/download[/<platform>]` | The same for the lsuite launcher, from the newest published `launcher-vX.Y.Z` release of `ludovic111/lsuite` (`tagPrefix` in `DOWNLOADS`; with no matching asset, that release's page, or the releases list): `macos-arm64`, `macos-x86_64` (.dmg), `windows-x86_64` (setup .exe), `windows-zip`, `linux-x86_64` (.AppImage), `linux-tar` (.tar.gz). The launcher is not one of the apps: not in `/api/apps`, no `/launcher/support`. |
 | `/api/ai/…`, `/api/account/…` | lsuite AI and accounts (AI.md, `ai.js`): JSON, Anthropic-compatible `/api/ai/v1/messages`. `LSUITE_DATA_DIR` holds account state. Live service requires explicit `LSUITE_MODE=production` and the complete Stripe, Anthropic and verified-email configuration in AI.md; adding an API key alone never turns demo accounts into paid access. |
+| `/api/cloud`, `/api/cloud/…` | lsuite Cloud (CLOUD.md, `cloud.js` through `ai.js`): the account's files, app token (GET also takes the session cookie). Stored under `LSUITE_DATA_DIR/cloud/` (`production-cloud/` in production), a temporary folder without it. Demo caps: `LSUITE_CLOUD_DEMO_QUOTA`, `LSUITE_CLOUD_DEMO_MAX_FILE`, `LSUITE_CLOUD_DEMO_TOTAL` (bytes). With `LSUITE_CLOUD_S3_ENDPOINT`, `…_BUCKET`, `…_ACCESS_KEY_ID`, `…_SECRET_ACCESS_KEY` (optional `…_REGION`, `…_PREFIX`, `…_PATH_STYLE`), the files go to an S3-compatible object store and the index stays in the data dir; production then applies the plans' sizes (CLOUD.md, "The object store"). |
+| `/api/apps` | The five apps for the lsuite launcher (CLOUD.md): `{apps: [{id, name, kind, summary, page, repo, version, published, platforms}]}` from `DOWNLOADS`, `REPOS` and the latest release versions; `Cache-Control: public, max-age=300`. |
 | `/ai`, `/account`, `/account/connect`, `/account/checkout` | lsuite AI and the account pages (session cookie `lsuite_session`, HttpOnly, SameSite=Lax). |
 | `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
 | `/health` | `ok`, for Railway's health check. |

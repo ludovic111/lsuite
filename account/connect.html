@@ -47,7 +47,7 @@
       <div class="acct acct--wide" data-state="plan" hidden>
         <span class="eyebrow">Connect <span data-bind="app"></span> · step 2 of 2</span>
         <h1 class="h2">Pick a plan for lsuite AI.</h1>
-        <p class="lede">Signed in as <b data-bind="email"></b>. A plan lets the agent in <span data-bind="app"></span> work with nothing to set up.</p>
+        <p class="lede">Signed in as <b data-bind="email"></b>. A plan lets the agents in every lsuite app work with nothing to set up.</p>
         <!-- demo:start --><div data-demo class="notice"><span class="notice__tag">Demo</span><span><b>No payment is taken.</b> The plan starts at once.</span></div><!-- demo:end -->
         <div data-plan-links><!-- include:plans --></div>
         <p class="fine">Or <button class="linkish" type="button" data-action="connect">connect <span data-bind="app"></span> on Free</button>, and keep using your own model in it.</p>
@@ -62,7 +62,7 @@
             <dl class="kv"><dt>Name</dt><dd data-bind="name"></dd><dt>Email</dt><dd data-bind="email"></dd><dt>Plan</dt><dd data-bind="planLine"></dd></dl>
           </div>
         </div>
-        <p class="muted"><span data-bind="app"></span> on this computer gets a key to your account; every lsuite app there is signed in with it. You can disconnect it from <a href="/account">your account</a> any time.</p>
+        <p class="muted">On this computer, <span data-bind="app"></span> gets a key to your account; every lsuite app there is signed in with it. You can disconnect it from <a href="/account">your account</a> any time.</p>
         <p class="form__error" role="alert" data-connect-error></p>
         <div class="row">
           <button class="btn btn--primary" type="button" data-action="connect"><span>Connect <span data-bind="app"></span></span></button>

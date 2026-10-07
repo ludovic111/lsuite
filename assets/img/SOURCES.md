@@ -11,3 +11,4 @@ It has been cropped and combined with vector and text layers in nori. These adap
 captures are shared under CC BY-SA 4.0; this attribution also applies to their use on the home page.
 
 Third-party app/provider logo sources remain documented in `logos/SOURCES.md`.
+- `launcher/*.webp`: the lsuite launcher (`launcher/`, release AppImage 0.1.0) on a virtual screen at 2000×1250, dark and light, against a local demo server (demo account, demo files) on 2026-10-07.
