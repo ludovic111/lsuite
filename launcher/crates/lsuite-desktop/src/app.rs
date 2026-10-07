@@ -439,7 +439,7 @@ pub fn mcp_command() -> Option<String> {
 }
 
 /// A path for a shell: `~/…` under the home folder (when it needs no quotes), quoted otherwise.
-fn tilde(p: &std::path::Path) -> String {
+pub fn tilde(p: &std::path::Path) -> String {
     let s = p.display().to_string();
     if !cfg!(windows)
         && let Some(home) = dirs::home_dir()

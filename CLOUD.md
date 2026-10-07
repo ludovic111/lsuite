@@ -10,8 +10,8 @@ capped small (below) because demo accounts need no verified email.
 
 ## Storage per plan
 
-The storage per plan is a **proposal awaiting the owner's approval**; the prices themselves are
-unchanged.
+Decided on 2026-10-07 (the owner left it to the demo's builder: the prices are unchanged).
+These sizes apply once lsuite AI takes payments and the files live in an object store.
 
 | Plan | Price | Cloud storage | Largest file |
 | --- | --- | --- | --- |
@@ -23,9 +23,12 @@ unchanged.
 Sizes are decimal: 1 GB is 10⁹ bytes, 1 TB 10¹² (`PLANS[].storage` in `ai.js`, `MAX_FILE` in
 `cloud.js`).
 
-Demo mode caps every plan at **250 MB per account** and **100 MB per file**
+Demo mode caps every plan at **100 MB per account** and **25 MB per file**
 (`LSUITE_CLOUD_DEMO_QUOTA`, `LSUITE_CLOUD_DEMO_MAX_FILE`, bytes), and all demo accounts together
-at **5 GB** (`LSUITE_CLOUD_DEMO_TOTAL`). Production applies the plans' own sizes once blobs go to
+at **300 MB** (`LSUITE_CLOUD_DEMO_TOTAL`): the site's Railway volume is 500 MB and also holds the
+accounts. Whatever the caps, an upload is refused (507 `storage_full`) when it would leave less
+than **100 MB free** on the disk the uploads stream to (`LSUITE_CLOUD_DISK_RESERVE`), so cloud
+files can never stop the accounts from being saved. Production applies the plans' own sizes once blobs go to
 an object store (below); on the data dir alone it keeps the demo caps.
 `GET /api/ai/plans` gives each plan's `storage` (bytes) and `storageLabel` ("50 GB", "None" on
 Free); in demo mode also `cloudDemo: {quota, maxFile}`. Whatever applies to an account is in

@@ -86,7 +86,7 @@ test('upload, replace, download, HEAD, ETag and If-None-Match', async () => {
     const status = await (await t.cloud.status(token)).json();
     assert.deepEqual(
       { ...status, manageUrl: undefined },
-      { plan: 'plus', planName: 'Plus', quota: 250e6, used: 0, files: 0, folders: 0, maxFile: 100e6, demo: true, manageUrl: undefined },
+      { plan: 'plus', planName: 'Plus', quota: 100e6, used: 0, files: 0, folders: 0, maxFile: 25e6, demo: true, manageUrl: undefined },
     );
     assert.match(status.manageUrl, /\/account$/);
 
@@ -97,7 +97,7 @@ test('upload, replace, download, HEAD, ETag and If-None-Match', async () => {
     const created = await put.json();
     assert.deepEqual(created.file, { path: 'Projects/kimchi/Demo cut é.kimchi', size: one.length, sha256: sha(one), modifiedAt: '2026-10-01T10:30:00.000Z' });
     assert.equal(created.used, one.length);
-    assert.equal(created.quota, 250e6);
+    assert.equal(created.quota, 100e6);
 
     const get = await t.cloud.get(token, 'Projects/kimchi/Demo cut é.kimchi');
     assert.equal(get.status, 200);
@@ -149,7 +149,7 @@ test('upload, replace, download, HEAD, ETag and If-None-Match', async () => {
     assert.deepEqual(Object.keys(list.files[0]).sort(), ['modifiedAt', 'path', 'sha256', 'size']);
     assert.deepEqual(list.folders, []);
     assert.equal(list.used, two.length + 1);
-    assert.equal(list.quota, 250e6);
+    assert.equal(list.quota, 100e6);
     const after = await (await t.cloud.status(token)).json();
     assert.equal(after.files, 2);
     assert.equal(after.folders, 2, 'Projects and Projects/kimchi');
@@ -243,6 +243,24 @@ test('caps: the largest file (413), the quota (507, replacing frees the old size
   }
 });
 
+test('the disk keeps its reserve whatever the caps say (the accounts share it)', async () => {
+  // A disk with 1100 bytes free and 1000 kept back: 100 bytes of room for uploads.
+  let free = 1100;
+  const statfs = async () => ({ bavail: free, bsize: 1 });
+  const t = await start({ cloud: { quota: 1e9, maxFile: 1e9, total: 1e9 }, cloudDiskReserve: 1000, cloudStatfs: statfs });
+  try {
+    const token = await t.connect();
+    assert.equal((await t.cloud.put(token, 'small.bin', Buffer.alloc(100))).status, 201);
+    free = 1000;
+    const full = await error(await t.cloud.put(token, 'more.bin', Buffer.alloc(1)), 507);
+    assert.equal(full.type, 'storage_full');
+    assert.match(full.message, /no room left on this server/);
+    assert.equal((await t.cloud.list(token)).files.length, 1);
+  } finally {
+    await t.close();
+  }
+});
+
 test('two uploads at once cannot both take the last of the room', async () => {
   const t = await start({ cloud: { quota: 1000, maxFile: 1000, total: 1e9 } });
   try {
@@ -317,14 +335,14 @@ test('folders: implicit and explicit, never also a file, deleted with everything
     await t.cloud.put(token, 'Empty/two.txt', '22');
     await t.cloud.put(token, 'Emptyish.txt', '333');
     const del = await (await t.cloud.del(token, 'Empty')).json();
-    assert.deepEqual(del, { deleted: 2, used: 5 + 3, quota: 250e6 });
+    assert.deepEqual(del, { deleted: 2, used: 5 + 3, quota: 100e6 });
     const left = await t.cloud.list(token);
     assert.deepEqual(left.files.map((f) => f.path), ['Emptyish.txt', 'Music/song.ryolune']);
     assert.deepEqual(left.folders.map((f) => f.path), ['Music']);
     assert.equal((await error(await t.cloud.del(token, 'Empty'), 404)).type, 'not_found_error');
     // An empty folder of its own goes too, with nothing deleted.
     await t.cloud.mkdir(token, 'Lonely');
-    assert.deepEqual(await (await t.cloud.del(token, 'Lonely')).json(), { deleted: 0, used: 8, quota: 250e6 });
+    assert.deepEqual(await (await t.cloud.del(token, 'Lonely')).json(), { deleted: 0, used: 8, quota: 100e6 });
   } finally {
     await t.close();
   }
@@ -339,7 +357,7 @@ test('move: rename, new parents, overwrite, conflicts, folders with their conten
     const names = async () => (await t.cloud.list(token)).files.map((f) => `${f.path}=${f.size}`);
 
     // A file: renamed, then into folders that don't exist yet.
-    assert.deepEqual(await (await t.cloud.move(token, { from: 'a.txt', to: 'c.txt' })).json(), { moved: 1, used: 5, quota: 250e6 });
+    assert.deepEqual(await (await t.cloud.move(token, { from: 'a.txt', to: 'c.txt' })).json(), { moved: 1, used: 5, quota: 100e6 });
     assert.equal((await t.cloud.move(token, { from: 'c.txt', to: 'New/Parent/c.txt' })).status, 200);
     assert.deepEqual(await names(), ['New/Parent/c.txt=3', 'b.txt=2']);
     assert.equal((await error(await t.cloud.move(token, { from: 'nope.txt', to: 'x.txt' }), 404)).type, 'not_found_error');
@@ -349,7 +367,7 @@ test('move: rename, new parents, overwrite, conflicts, folders with their conten
     assert.equal(err.type, 'conflict_error');
     assert.equal(err.path, 'New/Parent/c.txt');
     const over = await (await t.cloud.move(token, { from: 'b.txt', to: 'New/Parent/c.txt', overwrite: true })).json();
-    assert.deepEqual(over, { moved: 1, used: 2, quota: 250e6 });
+    assert.deepEqual(over, { moved: 1, used: 2, quota: 100e6 });
     assert.deepEqual(await names(), ['New/Parent/c.txt=2']);
 
     // A file onto a folder, or under a file: refused even with overwrite.
@@ -494,13 +512,13 @@ test('me.cloud, the plans\' storage and the plan cards', async () => {
     const token = await t.connect({ plan: 'studio' });
     await t.cloud.put(token, 'x.txt', 'hello');
     const me = await (await t.call('GET', '/api/account/me', token)).json();
-    assert.deepEqual(me.cloud, { used: 5, quota: 250e6, files: 1 });
+    assert.deepEqual(me.cloud, { used: 5, quota: 100e6, files: 1 });
     const site = await (await t.site('/api/account/me')).json();
     assert.deepEqual(site.cloud, me.cloud);
 
     const plans = await (await fetch(`${t.base}/api/ai/plans`)).json();
     assert.deepEqual(plans.plans.map((p) => [p.id, p.storage, p.storageLabel]), [['free', 0, 'None'], ['plus', 50e9, '50 GB'], ['pro', 250e9, '250 GB'], ['studio', 1e12, '1 TB']]);
-    assert.deepEqual(plans.cloudDemo, { quota: 250e6, maxFile: 100e6 });
+    assert.deepEqual(plans.cloudDemo, { quota: 100e6, maxFile: 25e6 });
     assert.equal(storageLabel(12.34e6), '12.3 MB');
 
     const html = plansHtml();
