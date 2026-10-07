@@ -30,20 +30,15 @@ test('platform from the user agent', () => {
   assert.equal(osFor('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'), null);
 });
 
-test('download routes of every app: released apps to GitHub, unreleased ones to their pages', async () => {
-  for (const app of ['ryolune', 'kimchi', 'zenith', 'folio']) {
+test('download routes of every released app point to GitHub', async () => {
+  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) {
     assert.equal(await downloadTarget(app, 'nope'), `https://github.com/ludovic111/${app}/releases/latest`, app);
-  }
-  for (const app of ['nori']) {
-    for (const platform of [undefined, 'macos-arm64', 'windows-x86_64', 'linux-x86_64', 'nope']) {
-      assert.equal(await downloadTarget(app, platform, 'Macintosh'), `/${app}`);
-    }
+    assert.equal(DOWNLOADS[app].repo, `ludovic111/${app}`);
+    assert.notEqual(DOWNLOADS[app].published, false);
     const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', {});
-    assert.ok(html.includes('First public build coming'), app);
-    assert.ok(!/data-download|softwareVersion|%VERSION/.test(html), `${app}: no version, no download yet`);
+    assert.ok(html.includes(`href="/${app}/download`), `${app}: public download link`);
+    assert.ok(!html.includes('First public build coming'), app);
   }
-  // The route table is ready for each app's repository.
-  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) assert.equal(DOWNLOADS[app].repo, `ludovic111/${app}`);
   assert.equal(await downloadTarget('photoshop', 'macos-arm64'), null);
 });
 

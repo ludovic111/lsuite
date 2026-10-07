@@ -6,10 +6,10 @@ in beta:
 
 | App | Kind | Page | Repository and releases |
 | --- | --- | --- | --- |
-| ryolune | music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) (0.14.x) |
+| ryolune | music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) (0.15.3) |
 | kimchi | video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) (0.10.0) |
 | zenith | code | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) (0.4.0) |
-| nori | image and design (Photoshop + Illustrator + InDesign in one document) | `/nori` | local 0.1.0 build; first public release pending |
+| nori | image and design (Photoshop + Illustrator + InDesign in one document) | `/nori` | [ludovic111/nori](https://github.com/ludovic111/nori/releases/tag/v0.1.0) (0.1.0) |
 | folio | office (documents, spreadsheets, presentations) | `/folio` | [ludovic111/folio](https://github.com/ludovic111/folio/releases/tag/v0.1.0) (0.1.0) |
 
 The apps are free and MIT licensed. The one thing lsuite sells is optional: **lsuite AI**
@@ -44,8 +44,7 @@ npm test
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
 - `%VERSION:<app>%` becomes the version of the app's latest published GitHub release (cached
   10 min, `FALLBACK_VERSIONS` when GitHub cannot be reached), so a page never announces a version
-  that cannot be downloaded yet. ryolune, kimchi and zenith are looked up (`REPOS` in
-  `server.js`); nori asks for no version until its first release.
+  that cannot be downloaded yet. All five apps are looked up (`REPOS` in `server.js`).
 - CSP is `'self'` only: no inline scripts, no third-party requests.
 
 ## Design system
@@ -59,8 +58,8 @@ are under `/design/`.
 
 | Path | Does |
 | --- | --- |
-| `/<app>/download[/<platform>]` | 302 to the matching asset of the app's latest release on GitHub (`DOWNLOADS` in `server.js`, looked up on the GitHub API, cached 10 min); without a platform the visitor's OS picks one; a platform with no matching asset goes to the release page. ryolune: `macos-arm64`, `macos-x86_64` (.zip), `windows-x86_64` (.exe), `windows-zip`, `linux-x86_64` (.tar.gz). kimchi: `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm` (the native app ships no MSI or RPM, so those land on the release page). zenith: `macos-arm64`, `macos-x86_64`, `linux-x86_64`. folio: `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `linux-x86_64`. nori (`published: false`): 302 to its page. |
-| `/api/ai/…`, `/api/account/…` | lsuite AI and accounts (AI.md, `ai.js`): JSON, Anthropic-compatible `/api/ai/v1/messages`. `LSUITE_DATA_DIR` holds `accounts.json` (in memory when unset); `LSUITE_ANTHROPIC_API_KEY` makes model requests real (a demo answer without it). |
+| `/<app>/download[/<platform>]` | 302 to the matching asset of the app's latest release on GitHub (`DOWNLOADS` in `server.js`, looked up on the GitHub API, cached 10 min); without a platform the visitor's OS picks one; a platform with no matching asset goes to the release page. ryolune: `macos-arm64`, `macos-x86_64` (.zip), `windows-x86_64` (.exe), `windows-zip`, `linux-x86_64` (.tar.gz). kimchi: `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `windows-msi`, `linux-appimage`, `linux-deb`, `linux-rpm` (the native app ships no MSI or RPM, so those land on the release page). zenith: `macos-arm64`, `macos-x86_64`, `linux-x86_64`. nori and folio: `macos-arm64`, `macos-x86_64`, `windows-x86_64`, `linux-x86_64`. |
+| `/api/ai/…`, `/api/account/…` | lsuite AI and accounts (AI.md, `ai.js`): JSON, Anthropic-compatible `/api/ai/v1/messages`. `LSUITE_DATA_DIR` holds account state. Live service requires explicit `LSUITE_MODE=production` and the complete Stripe, Anthropic and verified-email configuration in AI.md; adding an API key alone never turns demo accounts into paid access. |
 | `/ai`, `/account`, `/account/connect`, `/account/checkout` | lsuite AI and the account pages (session cookie `lsuite_session`, HttpOnly, SameSite=Lax). |
 | `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
 | `/health` | `ok`, for Railway's health check. |
