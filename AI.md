@@ -51,7 +51,7 @@ copy in an app. The allowance resets on the first day of each month (UTC).
 | `GET /api/account/me` | With `Authorization: Bearer <token>`: `{email, name, plan, status, usage: {used, limit, resetsAt}, models}`. |
 | `POST /api/account/token` | `{code}` → `{token, account}` (codes live 5 minutes, used once). |
 | `POST /api/account/signout` | Revokes the token. |
-| `POST /api/ai/v1/messages` | **The Anthropic Messages API**, streaming included, for the plan's models; auth by `x-api-key: <token>` or `Authorization: Bearer <token>`. Checks the plan and the allowance, then forwards to Anthropic with the server's key (`LSUITE_ANTHROPIC_API_KEY`) and counts the usage. Without a server key the demo answers with a short streamed message saying so. |
+| `POST /api/ai/v1/messages` | **The Anthropic Messages API**, streaming included, for the plan's models; auth by `x-api-key: <token>` or `Authorization: Bearer <token>`. In validated production mode, checks the paid subscription and remaining allowance, forwards to Anthropic with `LSUITE_ANTHROPIC_API_KEY`, and counts usage. Demo mode always returns a clearly marked simulated response; adding a provider key alone does not activate forwarding. |
 | `GET /api/ai/v1/models` | The plan's models. |
 
 Model ids are the Anthropic ids (`claude-sonnet-5-5`, `claude-opus-5-5`, `claude-haiku-4-5`…;

@@ -56,4 +56,4 @@ Agent permissions: building and installing plugins are a permission of their own
   reference. The template's `Cargo.toml` points at the SDK by git URL and tag, so a plugin builds
   without the app's sources.
 - A plugin never blocks the interface: it runs where the app's own effects run (audio thread,
-  compositor, filter worker), and a crash in a plugin call disables the plugin, not the app.
+  compositor, filter worker), and Rust panics caught by the guarded callbacks disable the plugin.

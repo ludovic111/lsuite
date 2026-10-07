@@ -148,16 +148,15 @@ export const DOWNLOADS = {
     },
     byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
   },
-  // No repository on GitHub yet: the first build is coming. When ludovic111/nori publishes a
-  // release with these names, set `published: true` (and add nori to REPOS for its version).
+  // Source is public; enable downloads after the first signed release completes.
   nori: {
     repo: 'ludovic111/nori',
     published: false,
     patterns: {
-      'macos-arm64': /\/nori-macos-arm64\.(zip|dmg)$/,
-      'macos-x86_64': /\/nori-macos-x86_64\.(zip|dmg)$/,
-      'windows-x86_64': /\/nori-windows-x86_64\.(exe|zip)$/,
-      'linux-x86_64': /\/nori-linux-x86_64\.(tar\.gz|AppImage)$/,
+      'macos-arm64': /\/nori_aarch64\.dmg$/,
+      'macos-x86_64': /\/nori_x64\.dmg$/,
+      'windows-x86_64': /\/nori_x64-setup\.exe$/,
+      'linux-x86_64': /\/nori_amd64\.AppImage$/,
     },
     byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
   },
