@@ -8,8 +8,9 @@
 // - `/api/ai/v1/messages` speaks the Anthropic Messages API. With `LSUITE_ANTHROPIC_API_KEY` it
 //   forwards to Anthropic (streaming passed through as it arrives) and counts the usage the response
 //   reports into credits; without it, it answers with a short demo message in the same format.
-// - This is a demo: signing in takes an email and a name (no password, no email check) and checkout
-//   takes no payment. Both say so wherever a person sees them.
+// - Production requires verified email, Stripe billing and persistent storage. Demo mode uses
+//   separate data, takes no payment and never forwards to a real provider.
+import { productionServices, requestQueue, ServiceError } from './live.js';
 import { createHash, randomBytes } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -34,7 +35,7 @@ export const MODELS = [
   { id: 'claude-fable-5-1', name: 'Claude Fable 5.1', family: 'fable', input: 10, output: 50, cacheRead: 0.25, created: '2026-09-01' },
 ];
 
-/** The plans of AI.md. Prices are placeholders the owner will set; nothing is charged (demo). */
+/** The plans of AI.md. Prices approved by the owner: monthly USD; demo mode never charges. */
 export const PLANS = [
   { id: 'free', name: 'Free', price: 0, credits: 0, families: [], defaultModel: null, priority: false, summary: 'Bring your own provider: Claude Code, Codex, API keys or a local model.' },
   { id: 'plus', name: 'Plus', price: 12, credits: 1000, families: ['sonnet', 'haiku'], defaultModel: 'claude-sonnet-5-5', priority: false, summary: 'Claude Sonnet and Claude Haiku in every app, no setup.' },
@@ -71,9 +72,9 @@ export function creditsFor(model, usage = {}) {
 }
 
 /** `GET /api/ai/plans`: what the apps and the site show. */
-export function plansDocument() {
+export function plansDocument(production = false) {
   return {
-    demo: true,
+    demo: !production,
     currency: 'USD',
     credit: { usd: CREDIT_USD, description: 'A credit is half a US cent of model usage at the provider’s list price: input, output and cached tokens weighted by the model’s price.' },
     plans: PLANS.map((p) => ({
@@ -109,8 +110,8 @@ const EMAIL = /^[^\s@<>()",;:]{1,64}@[^\s@<>()",;:]{1,190}\.[a-z0-9-]{2,24}$/i;
 
 /** The account file: users, hashed tokens and codes. */
 class Store {
-  constructor(dir) {
-    this.file = dir ? join(dir, 'accounts.json') : null;
+  constructor(dir, production = false) {
+    this.file = dir ? join(dir, production ? 'production-accounts.json' : 'accounts.json') : null;
     this.data = { format: 1, users: {}, tokens: {}, codes: {} };
     this.writing = Promise.resolve();
     this.dirty = false;
@@ -121,7 +122,7 @@ class Store {
     await mkdir(join(this.file, '..'), { recursive: true });
     try {
       const data = JSON.parse(await readFile(this.file, 'utf8'));
-      if (data?.format === 1) this.data = { format: 1, users: data.users ?? {}, tokens: data.tokens ?? {}, codes: data.codes ?? {} };
+      if (data?.format === 1) this.data = { ...data, format: 1, users: data.users ?? {}, tokens: data.tokens ?? {}, codes: data.codes ?? {} };
     } catch (err) {
       if (err.code !== 'ENOENT') throw err;
     }
@@ -131,14 +132,14 @@ class Store {
   save() {
     if (!this.file) return Promise.resolve();
     this.dirty = true;
-    this.writing = this.writing.then(async () => {
+    this.writing = this.writing.catch(() => {}).then(async () => {
       if (!this.dirty) return;
       this.dirty = false;
       const tmp = `${this.file}.${process.pid}.tmp`;
       await writeFile(tmp, JSON.stringify(this.data), { mode: 0o600 });
       await rename(tmp, this.file);
     });
-    return this.writing.catch((err) => console.error('lsuite accounts: could not save', err.message));
+    return this.writing;
   }
 
   userByEmail(email) {
@@ -313,11 +314,16 @@ const estimateTokens = (value) => Math.max(1, Math.ceil(JSON.stringify(value ?? 
  * `limits: {signin: [max, windowMs], token: [max, windowMs]}`.
  */
 export function createAccounts(options = {}) {
-  const store = new Store(options.dataDir ?? null);
+  const production = options.mode === 'production';
+  if (production && (!options.dataDir || !options.anthropicKey)) throw new Error('Production AI requires persistent storage and an Anthropic API key.');
+  const store = new Store(options.dataDir ?? null, production);
   const ready = store.load();
-  const anthropicKey = options.anthropicKey ?? '';
+  const anthropicKey = production || options.allowDemoUpstream ? (options.anthropicKey ?? '') : '';
   const upstream = (options.upstream ?? 'https://api.anthropic.com').replace(/\/+$/, '');
   const fetchImpl = options.fetch ?? fetch;
+  const live = production ? productionServices(options.live, store, fetchImpl) : null;
+  const inFlight = new Set();
+  const enqueue = requestQueue();
   const demoDelayMs = options.demoDelayMs ?? 18;
   const limits = {
     signin: limiter(...(options.limits?.signin ?? [20, 10 * 60 * 1000])),
@@ -326,14 +332,20 @@ export function createAccounts(options = {}) {
 
   /** Rolls a user's allowance into the current month. */
   function roll(user) {
-    const period = periodOf(now());
+    const period = production && user.billing?.periodStart ? String(user.billing.periodStart) : periodOf(now());
     if (user.usage?.period !== period) user.usage = { period, used: 0 };
     return user.usage;
   }
 
+  function activePlan(user) {
+    if (production && (!user.verifiedAt || user.billing?.status !== 'active' || !(user.billing?.periodEnd > now()))) return PLAN.free;
+    return PLAN[user.plan] ?? PLAN.free;
+  }
+  const resetsAt = (user) => production && user.billing?.periodEnd ? new Date(user.billing.periodEnd).toISOString() : resetOf(now());
+
   /** The account as AI.md describes it (`GET /api/account/me`). */
   function account(user, origin) {
-    const plan = PLAN[user.plan] ?? PLAN.free;
+    const plan = activePlan(user);
     const usage = roll(user);
     return {
       email: user.email,
@@ -341,12 +353,12 @@ export function createAccounts(options = {}) {
       plan: plan.id,
       planName: plan.name,
       status: plan.id === 'free' ? 'none' : 'active',
-      demo: true,
+      demo: !production,
       usage: {
         used: Math.round(usage.used * 10) / 10,
         limit: plan.credits,
         percent: plan.credits ? Math.min(100, Math.round((usage.used / plan.credits) * 100)) : 0,
-        resetsAt: resetOf(now()),
+        resetsAt: resetsAt(user),
       },
       models: modelsOf(plan.id).map((m) => m.id),
       defaultModel: plan.defaultModel,
@@ -363,12 +375,14 @@ export function createAccounts(options = {}) {
 
   /** The site's session (cookie), or null. */
   function session(req) {
-    return store.tokenUser(cookie(req, 'lsuite_session'), ['session']);
+    const auth = store.tokenUser(cookie(req, 'lsuite_session'), ['session']);
+    return auth && (!production || auth.user.verifiedAt) ? auth : null;
   }
 
   /** An app's token (`x-api-key` or Bearer), or null. */
   function appAuth(req) {
-    return store.tokenUser(bearer(req), ['app', 'key']);
+    const auth = store.tokenUser(bearer(req), ['app', 'key']);
+    return auth && (!production || auth.user.verifiedAt) ? auth : null;
   }
 
   /** Cookie-authenticated writes come from this site only (SameSite=Lax does most of it; JSON-only does the rest). */
@@ -383,7 +397,7 @@ export function createAccounts(options = {}) {
   }
 
   function sessionCookie(req, value, maxAge) {
-    const secure = String(req.headers['x-forwarded-proto'] ?? '').startsWith('https') ? '; Secure' : '';
+    const secure = production || String(req.headers['x-forwarded-proto'] ?? '').startsWith('https') ? '; Secure' : '';
     return `lsuite_session=${value}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
   }
 
@@ -396,10 +410,10 @@ export function createAccounts(options = {}) {
 
   /** Checks plan, model and allowance for a model request; answers and returns null when refused. */
   function admit(res, user, modelId, origin) {
-    const plan = PLAN[user.plan] ?? PLAN.free;
+    const plan = activePlan(user);
     const manage = { manage_url: `${origin}/account`, plan: plan.id };
     if (plan.id === 'free') {
-      fail(res, 403, 'plan_required', `lsuite AI needs a plan: your account is on Free (bring your own provider). Pick a plan at ${origin}/account (demo: no payment is taken).`, manage);
+      fail(res, 403, 'plan_required', `lsuite AI needs a plan: your account is on Free (bring your own provider). Pick a plan at ${origin}/account${production ? '.' : ' (demo: no payment is taken).'}`, manage);
       return null;
     }
     const model = resolveModel(modelId);
@@ -413,7 +427,7 @@ export function createAccounts(options = {}) {
     }
     const usage = roll(user);
     if (usage.used >= plan.credits) {
-      const resets = resetOf(now());
+      const resets = resetsAt(user);
       const day = new Date(resets).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
       fail(res, 402, 'allowance_exhausted', `Your lsuite AI allowance for this month is used up (${plan.name}, ${plan.credits.toLocaleString('en-US')} credits). It resets on ${day}. Manage plan: ${origin}/account`, { ...manage, resets_at: resets, used: Math.round(usage.used * 10) / 10, limit: plan.credits });
       return null;
@@ -421,11 +435,11 @@ export function createAccounts(options = {}) {
     return model;
   }
 
-  function charge(user, model, usage) {
+  async function charge(user, model, usage) {
     const credits = creditsFor(model, usage);
     if (credits > 0) {
       roll(user).used += credits;
-      store.save();
+      await store.save();
     }
     return credits;
   }
@@ -436,7 +450,7 @@ export function createAccounts(options = {}) {
     const usage = { input_tokens: estimateTokens([body.system, body.messages, body.tools]), cache_creation_input_tokens: 0, cache_read_input_tokens: 0, output_tokens: estimateTokens(text) };
     const message = { id: `msg_demo_${randomBytes(12).toString('hex')}`, type: 'message', role: 'assistant', model: body.model, content: [], stop_reason: null, stop_sequence: null, usage: { ...usage, output_tokens: 1 } };
     if (!body.stream) {
-      charge(user, model, usage);
+      await charge(user, model, usage);
       return json(res, 200, { ...message, content: [{ type: 'text', text }], stop_reason: 'end_turn', usage });
     }
     res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', Connection: 'keep-alive', ...API_HEADERS });
@@ -450,7 +464,7 @@ export function createAccounts(options = {}) {
       res.write(sse('content_block_delta', { type: 'content_block_delta', index: 0, delta: { type: 'text_delta', text: piece } }));
       if (demoDelayMs) await sleep(demoDelayMs);
     }
-    charge(user, model, usage);
+    await charge(user, model, usage);
     if (closed) return;
     res.write(sse('content_block_stop', { type: 'content_block_stop', index: 0 }));
     res.write(sse('message_delta', { type: 'message_delta', delta: { stop_reason: 'end_turn', stop_sequence: null }, usage: { output_tokens: usage.output_tokens } }));
@@ -494,7 +508,7 @@ export function createAccounts(options = {}) {
       } catch {
         // The app went away, or the provider dropped the stream: count what was reported.
       } finally {
-        if (counts) charge(user, model, usage);
+        if (counts) await charge(user, model, usage);
         if (!res.writableEnded) res.end();
       }
       return;
@@ -502,7 +516,7 @@ export function createAccounts(options = {}) {
     const text = Buffer.from(await up.arrayBuffer());
     if (counts && up.ok) {
       try {
-        charge(user, model, JSON.parse(text.toString('utf8')).usage);
+        await charge(user, model, JSON.parse(text.toString('utf8')).usage);
       } catch {}
     }
     res.writeHead(up.status, { ...passed, 'Content-Length': text.length });
@@ -522,12 +536,20 @@ export function createAccounts(options = {}) {
     }
     if (!Array.isArray(body.messages) || !body.messages.length) return fail(res, 400, 'invalid_request_error', 'messages: at least one message is required.');
     if (!Number.isInteger(body.max_tokens) || body.max_tokens < 1) return fail(res, 400, 'invalid_request_error', 'max_tokens: a positive integer is required.');
+    if (production) {
+      if (inFlight.has(auth.user.id)) return fail(res, 429, 'rate_limit_error', 'An AI request is already running on this account. Wait for it to finish.');
+      const worst = creditsFor(model, { input_tokens: Math.ceil(raw.length), output_tokens: body.max_tokens });
+      if (body.max_tokens > 16384 || worst > activePlan(auth.user).credits - roll(auth.user).used) return fail(res, 402, 'allowance_exhausted', 'This request could exceed your remaining allowance. Shorten the conversation or lower max_tokens.');
+      inFlight.add(auth.user.id);
+      try { return await enqueue(activePlan(auth.user).priority, () => forward(req, res, auth.user, model, raw, path)); }
+      finally { inFlight.delete(auth.user.id); }
+    }
     if (anthropicKey) return forward(req, res, auth.user, model, raw, path);
     return demoReply(req, res, auth.user, model, body);
   }
 
   function modelList(user) {
-    return modelsOf(user.plan).map((m) => ({ type: 'model', id: m.id, display_name: m.name, created_at: `${m.created}T00:00:00Z` }));
+    return modelsOf(activePlan(user).id).map((m) => ({ type: 'model', id: m.id, display_name: m.name, created_at: `${m.created}T00:00:00Z` }));
   }
 
   /** Handles `/api/…`; returns false for any other path. */
@@ -535,10 +557,15 @@ export function createAccounts(options = {}) {
     const path = url.pathname;
     if (!path.startsWith('/api/')) return false;
     await ready;
-    const origin = originOf(req);
+    const origin = live?.origin ?? originOf(req);
     const method = req.method;
     try {
-      if (path === '/api/ai/plans' && method === 'GET') return json(res, 200, plansDocument(), { 'Cache-Control': 'public, max-age=300' }), true;
+      if (path === '/api/ai/plans' && method === 'GET') return json(res, 200, plansDocument(production), { 'Cache-Control': 'public, max-age=300' }), true;
+
+      if (live && path === '/api/billing/webhook' && method === 'POST') {
+        await live.webhook(await readBody(req, 1024 * 1024), req.headers['stripe-signature']);
+        return json(res, 200, { received: true }), true;
+      }
 
       // ---- The Anthropic-compatible endpoint (apps, Claude Code with ANTHROPIC_BASE_URL) ----
       if ((path === '/api/ai/v1/messages' || path === '/api/ai/v1/messages/count_tokens') && method === 'POST') {
@@ -575,7 +602,7 @@ export function createAccounts(options = {}) {
         if (hash) delete store.data.codes[hash];
         const user = code && code.expiresAt >= now() ? store.data.users[code.userId] : null;
         if (!user) {
-          store.save();
+          store.save().catch(() => console.error('lsuite account persistence failed'));
           return fail(res, 400, 'invalid_grant', 'This sign-in code is unknown, already used or expired (codes last 5 minutes). Sign in again from the app.'), true;
         }
         const token = store.issue(user.id, 'app', { app: code.app });
@@ -607,6 +634,10 @@ export function createAccounts(options = {}) {
           const email = String(value.email ?? '').trim().toLowerCase();
           const name = String(value.name ?? '').trim().replace(/\s+/g, ' ');
           if (!EMAIL.test(email) || email.length > 254) return fail(res, 400, 'invalid_request_error', 'Enter a valid email address.'), true;
+          if (live) {
+            if (name.length > 80) return fail(res, 400, 'invalid_request_error', 'Name must be at most 80 characters.'), true;
+            return json(res, 202, await live.sendCode(email, name)), true;
+          }
           let user = store.userByEmail(email);
           const created = !user;
           if (!user) {
@@ -619,11 +650,21 @@ export function createAccounts(options = {}) {
           await store.save();
           return json(res, 200, { account: account(user, origin), created }, { 'Set-Cookie': sessionCookie(req, token, SESSION_TTL / 1000) }), true;
         }
+        if (live && path === '/api/account/verify') {
+          if (rateLimited(res, 'token', req)) return true;
+          const { value } = await readJson(req);
+          const user = await live.verifyCode(String(value.challenge ?? ''), String(value.code ?? ''));
+          const token = store.issue(user.id, 'session', { expiresAt: now() + SESSION_TTL });
+          await store.save();
+          return json(res, 200, { account: account(user, origin) }, { 'Set-Cookie': sessionCookie(req, token, SESSION_TTL / 1000) }), true;
+        }
         const auth = session(req);
         if (!auth) return fail(res, 401, 'authentication_error', 'Not signed in.'), true;
         const { user } = auth;
         const { value } = await readJson(req);
+        if (live && path === '/api/account/portal') return json(res, 200, await live.portal(user)), true;
         if (path === '/api/account/checkout') {
+          if (live) return json(res, 200, await live.checkout(user, value.plan, value.next)), true;
           if (!PLAN[value.plan]) return fail(res, 400, 'invalid_request_error', 'Unknown plan.'), true;
           // Demo: no payment is taken; the plan starts at once with a fresh allowance.
           if (user.plan !== value.plan) user.usage = { period: periodOf(now()), used: 0 };
@@ -663,7 +704,7 @@ export function createAccounts(options = {}) {
         res.destroy();
         return true;
       }
-      if (err instanceof HttpError) return fail(res, err.status, err.type, err.message), true;
+      if (err instanceof HttpError || err instanceof ServiceError) return fail(res, err.status, err.type, err.message), true;
       throw err;
     }
   }

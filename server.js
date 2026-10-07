@@ -10,6 +10,7 @@ import { dirname, extname, join, normalize, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
+import { liveConfig } from './live.js';
 import { createAccounts, plansDocument } from './ai.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -292,8 +293,10 @@ async function stampOf(path) {
 }
 
 /** A page as served: includes filled, its app marked current in the nav, versions stamped. */
-export async function renderPage(file, origin, versions) {
+export async function renderPage(file, origin, versions, production = process.env.LSUITE_MODE === 'production') {
   let html = await readFile(join(ROOT, file), 'utf8');
+  html = html.replace(/<!-- demo:start -->([\s\S]*?)<!-- demo:end -->/g, (_, content) => production ? '' : content)
+    .replace(/<!-- live:start -->([\s\S]*?)<!-- live:end -->/g, (_, content) => production ? content : '');
   for (const name of ['nav', 'foot']) {
     if (html.includes(`<!-- include:${name} -->`)) {
       html = html.replace(`<!-- include:${name} -->`, (await readFile(join(ROOT, 'partials', `${name}.html`), 'utf8')).trim());
@@ -365,6 +368,8 @@ async function notFound(req, res) {
  * without it).
  */
 export const accounts = createAccounts({
+  mode: process.env.LSUITE_MODE || 'demo',
+  live: liveConfig(),
   dataDir: process.env.LSUITE_DATA_DIR || null,
   anthropicKey: process.env.LSUITE_ANTHROPIC_API_KEY || '',
 });

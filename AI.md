@@ -6,11 +6,11 @@ no Claude Code to install, no API key to paste. Bringing your own (Claude Code, 
 Ollama) stays free and is never pushed aside.
 
 **For now this is a demo.** No payment is taken: checkout says so and activates the plan at once.
-The prices below are placeholders the owner will set.
+The owner approved these monthly prices on 2026-10-07: **$12 / $29 / $79 USD**.
 
 ## Plans
 
-| Plan | Price (demo) | Models | Monthly allowance |
+| Plan | Monthly price (USD) | Models | Monthly allowance |
 | --- | --- | --- | --- |
 | **Free** | 0 | bring your own provider | — |
 | **Plus** | $12 / month | Claude Sonnet, Claude Haiku | 1,000 credits |
@@ -100,3 +100,57 @@ already has (base URL `<server>/api/ai`, the token as key), and Claude Code runs
   `account.signOut`, `account.plans`.
 - When the allowance runs out, the agent's error says so in one line with **Manage plan**; it
   never silently switches to another provider.
+
+## Production activation
+
+The prices are final: Plus **$12 USD**, Pro **$29 USD**, Studio **$79 USD**, billed monthly.
+The owner has not created Stripe, Anthropic API or transactional email accounts yet. The public
+site therefore remains in demo mode and takes no payments. Setting an Anthropic key alone never
+enables paid model calls. Production uses a separate `production-accounts.json`; demo accounts,
+plans, sessions and app keys are not promoted into paid accounts.
+
+Set these variables privately on the existing Railway `lsuite-site` service after creating the
+provider accounts (do not put secret values in Git, issues or chat):
+
+| Variable | Value |
+| --- | --- |
+| `LSUITE_MODE` | `production` (set last) |
+| `LSUITE_PUBLIC_ORIGIN` | `https://lsuite.xyz` |
+| `LSUITE_DATA_DIR` | `/data/lsuite` on the persistent volume, one service replica |
+| `LSUITE_ANTHROPIC_API_KEY` | Funded Anthropic API account key |
+| `LSUITE_STRIPE_SECRET_KEY` | Stripe live secret key |
+| `LSUITE_STRIPE_WEBHOOK_SECRET` | Signing secret for `/api/billing/webhook` |
+| `LSUITE_STRIPE_PRICE_PLUS` | Monthly USD Price, amount `1200` cents |
+| `LSUITE_STRIPE_PRICE_PRO` | Monthly USD Price, amount `2900` cents |
+| `LSUITE_STRIPE_PRICE_STUDIO` | Monthly USD Price, amount `7900` cents |
+| `LSUITE_RESEND_API_KEY` | Resend transactional email API key |
+| `LSUITE_EMAIL_FROM` | Sender on a domain verified in Resend, e.g. `lsuite <accounts@lsuite.xyz>` |
+
+Stripe: activate the account, create the three recurring prices, enable the customer portal for
+payment methods, invoices, plan changes and cancellation, and add an event destination for
+`customer.subscription.created`, `customer.subscription.updated`,
+`customer.subscription.deleted`, `invoice.paid` and `invoice.payment_failed`.
+Use event API version `2025-06-30.basil`, matching the integration. Stripe Checkout handles card
+entry; the site never receives card details. Prices are validated before checkout. Billing
+configuration and any applicable tax registrations must be completed in the Stripe account.
+
+Resend: verify the sending domain using its DNS records, then configure the sender. Sign-in sends
+an eight-digit code, valid once for ten minutes with at most five attempts. Codes and session/app
+keys are hashed at rest. Session cookies are HttpOnly, SameSite=Lax and Secure in production.
+
+Only signed Stripe events grant access, after retrieving the subscription's current state and
+checking its customer, user, price, paid invoice and period. Duplicate/out-of-order events cannot
+reset usage or restore cancelled access. In production the allowance resets at the subscription's
+billing period, rather than the demo's calendar month. Subscription changes go through the portal;
+usage within the same billing period is preserved. Studio requests have queue priority when the
+gateway is busy. The gateway caps concurrent work and checks request size against remaining credit.
+
+Run `npm test` before activation. The production integration tests simulate email delivery, signed
+webhooks, duplicate checkout, USD price validation, cancellation and provider responses without
+real credentials. A Stripe test-mode checkout and real email-delivery test are still required once
+the accounts exist, before accepting live payments. This has not been tested against live accounts.
+
+Provider references: [Stripe Checkout](https://docs.stripe.com/api/checkout/sessions/create),
+[subscription events](https://docs.stripe.com/billing/subscriptions/webhooks),
+[webhook signatures](https://docs.stripe.com/events/manage-webhook-endpoints),
+[Resend email API](https://resend.com/docs/api-reference/emails/send-email).

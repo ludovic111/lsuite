@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>lsuite AI — the agents in every lsuite app, without setup · lsuite</title>
-  <meta name="description" content="lsuite AI puts Claude inside ryolune, kimchi, zenith, nori and folio with no setup: install an app, sign in once and its agent works. A demo for now: no payment is taken. Bringing your own Claude Code, Codex, API keys or local model stays free.">
+  <meta name="description" content="lsuite AI puts Claude inside ryolune, kimchi, zenith, nori and folio with no setup: install an app, sign in once and its agent works. Bringing your own Claude Code, Codex, API keys or local model stays free.">
   <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/ai">
@@ -29,14 +29,14 @@
     <div class="hero__glow"></div>
     <div class="hero__grid"></div>
     <div class="wrap hero__in">
-      <span class="eyebrow reveal">lsuite AI · demo</span>
+      <span class="eyebrow reveal">lsuite AI<!-- demo:start --> · demo<!-- demo:end --></span>
       <h1 class="display reveal" style="--d:1">Install it.<br>The agent <span class="neg">just works</span>.</h1>
       <p class="lede reveal" style="--d:2">lsuite AI puts Claude inside every lsuite app with nothing to set up: no Claude Code to install, no API key to paste. Sign in once, and the agents in <a href="/ryolune">ryolune</a>, <a href="/kimchi">kimchi</a>, <a href="/zenith">zenith</a>, <a href="/nori">nori</a> and <a href="/folio">folio</a> work. The apps stay free; this is the one thing lsuite sells.</p>
       <div class="hero__actions reveal" style="--d:3">
         <a class="btn btn--primary" href="/account">Create your account <span class="arrow" aria-hidden="true">→</span></a>
         <a class="btn" href="#plans">See the plans</a>
       </div>
-      <div class="notice reveal" style="--d:4"><span class="notice__tag">Demo</span><span><b>No payment is taken.</b> Plans start at once and the prices are placeholders. Until it goes live, the agents answer with a short demo message.</span></div>
+      <!-- demo:start --><div class="notice reveal" style="--d:4"><span class="notice__tag">Demo</span><span><b>No payment is taken.</b> Plans start at once and monthly prices are $12, $29 and $79 USD. Until it goes live, the agents answer with a short demo message.</span></div><!-- demo:end -->
     </div>
   </section>
 
@@ -62,7 +62,7 @@
         <p class="lede reveal" style="--d:1">A credit is half a US cent of model usage at Anthropic's list price, so a quick edit takes a few credits and a long agent run more. The allowance resets on the first of each month. When it runs out, the agent says so in one line with <b>Manage plan</b>; it never switches provider behind your back.</p>
       </div>
       <div class="reveal"><!-- include:plans --></div>
-      <p class="fine reveal" style="margin-top:18px">Demo: no payment is taken, and the prices are placeholders. <a href="/api/ai/plans">The plans as JSON</a>, as the apps read them.</p>
+      <p class="fine reveal" style="margin-top:18px"><!-- demo:start -->Demo: no payment is taken. <!-- demo:end -->Monthly prices are $12, $29 and $79 USD. <a href="/api/ai/plans">The plans as JSON</a>, as the apps read them.</p>
     </div>
   </section>
 
@@ -107,7 +107,7 @@
     <div class="wrap">
       <div class="section__head"><span class="eyebrow">Questions</span><h2 class="h2 reveal" id="faq-title">Before you sign in.</h2></div>
       <div class="faq reveal">
-        <details><summary>Is this a real subscription?</summary><p>Not yet. lsuite AI is a demo: checkout takes no payment and starts the plan at once, and until it goes live the agents answer with a short message saying so. Your account, plan, allowance and the sign-in from the apps all work, so the apps can be built and tried against it.</p></details>
+        <details><summary>Is this a real subscription?</summary><p><!-- demo:start -->Not yet. The demo takes no payment and returns sample responses. <!-- demo:end --><!-- live:start -->Yes. Subscribe through Stripe to use AI in every app; renewals are monthly in USD. Manage or cancel the subscription from your account. <!-- live:end -->Bringing your own provider stays free.</p></details>
         <details><summary>Do I need it to use the apps?</summary><p>No. Every app is free and open source with every feature, and works with the model you already have: Claude Code, Codex, an API key or a local model. lsuite AI is for people who'd rather not set any of that up.</p></details>
         <details><summary>What happens when my allowance runs out?</summary><p>The agent stops and says so in one line, with <b>Manage plan</b>. It never moves you to another provider without asking. The allowance comes back on the first of the month.</p></details>
         <details><summary>Which apps does one account cover?</summary><p>All of them. Signing in from any lsuite app signs in every lsuite app on the computer; signing out from one signs that copy out.</p></details>

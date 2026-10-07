@@ -6,6 +6,7 @@ const page = document.body.dataset.page;
 const params = new URLSearchParams(location.search);
 const APP_NAMES = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori', folio: 'folio' };
 let plans = [];
+let demo = true;
 
 async function api(path, body) {
   const res = await fetch(path, {
@@ -54,8 +55,33 @@ function wireSignIn(after) {
       }
       button.disabled = true;
       try {
-        await api('/api/account/session', { email, name: form.elements.name.value.trim() });
-        await after();
+        if (form.dataset.challenge) {
+          await api('/api/account/verify', { challenge: form.dataset.challenge, code: form.elements.code.value.trim() });
+          delete form.dataset.challenge;
+          await after();
+        } else {
+          const result = await api('/api/account/session', { email, name: form.elements.name.value.trim() });
+          if (result.verificationRequired) {
+            form.dataset.challenge = result.challenge;
+            form.elements.email.readOnly = true;
+            const field = document.createElement('div');
+            field.className = 'field';
+            const label = document.createElement('label');
+            label.htmlFor = 'signin-code';
+            label.textContent = 'Code from your email';
+            const code = document.createElement('input');
+            Object.assign(code, { id: 'signin-code', name: 'code', type: 'text', inputMode: 'numeric', autocomplete: 'one-time-code', maxLength: 8 });
+            field.append(label, code);
+            form.insertBefore(field, error);
+            button.textContent = 'Verify and sign in';
+            error.textContent = 'Check your email. The code expires in 10 minutes.';
+            const again = document.createElement('button');
+            Object.assign(again, { type: 'button', className: 'btn btn--sm', textContent: 'Use another email or resend' });
+            again.onclick = () => { delete form.dataset.challenge; field.remove(); again.remove(); form.elements.email.readOnly = false; error.textContent = ''; button.textContent = 'Send sign-in code'; };
+            form.append(again);
+            code.focus();
+          } else await after();
+        }
       } catch (err) {
         error.textContent = err.message;
       } finally {
@@ -103,7 +129,7 @@ async function accountPage() {
   bind('origin', location.origin);
   bind('planName', account.planName);
   const plan = plans.find((p) => p.id === account.plan);
-  bind('planPrice', plan && plan.price ? `· ${price(plan)} · demo` : '');
+  bind('planPrice', plan && plan.price ? `· ${price(plan)} USD${demo ? ' · demo' : ''}` : '');
   const paid = account.status === 'active';
   document.querySelector('[data-when="paid"]').hidden = !paid;
   document.querySelector('[data-when="free"]').hidden = paid;
@@ -150,6 +176,12 @@ async function accountPage() {
   };
   renderConns(account.connections ?? []);
   show('in');
+  const billing = document.querySelector('[data-action=billing]');
+  if (billing) billing.hidden = demo || account.status !== 'active';
+  if (!demo && params.get('payment') === 'processing' && !paid) {
+    bind('models', 'Your payment is being confirmed. This page updates automatically.');
+    setTimeout(accountPage, 4000);
+  }
   if (location.hash === '#plans') document.querySelector('[data-plans]').hidden = false;
 }
 
@@ -187,7 +219,7 @@ async function connectPage() {
     return;
   }
   const left = Math.max(0, account.usage.limit - account.usage.used);
-  bind('planLine', `${account.planName} · ${credits(left)} left this month (demo)`);
+  bind('planLine', `${account.planName} · ${credits(left)} left this month${demo ? ' (demo)' : ''}`);
   show('ready');
 }
 
@@ -224,7 +256,7 @@ async function checkoutPage() {
     return;
   }
   bind('planName', plan.name);
-  bind('planPrice', plan.price ? `$${plan.price} / month · demo` : 'Free');
+  bind('planPrice', plan.price ? `$${plan.price} USD / month${demo ? ' · demo' : ''}` : 'Free');
   bind('summary', plan.summary);
   bind('credits', plan.credits ? `${credits(plan.credits)} a month` : 'None: bring your own provider');
   bind('families', plan.families.length ? plan.families.join(', ') : 'The ones you bring');
@@ -234,7 +266,7 @@ async function checkoutPage() {
     return;
   }
   bind('email', account.email);
-  bind('current', account.plan === plan.id ? `${plan.name} is already your plan.` : `Today you're on ${account.planName}. Changing plan starts a fresh allowance.`);
+  bind('current', account.plan === plan.id ? `${plan.name} is already your plan.` : `Today you're on ${account.planName}. ${demo ? 'Changing plan starts a fresh allowance.' : 'Manage changes and cancellation through Stripe.'}`);
   show('ready');
 }
 
@@ -243,8 +275,8 @@ async function checkout(e, el) {
   const error = document.querySelector('[data-checkout-error]');
   error.textContent = '';
   try {
-    await api('/api/account/checkout', { plan: params.get('plan') });
-    location.assign(nextPath());
+    const result = await api('/api/account/checkout', { plan: params.get('plan'), next: nextPath() });
+    location.assign(result.url || nextPath());
   } catch (err) {
     error.textContent = err.message;
     el.disabled = false;
@@ -254,11 +286,20 @@ async function checkout(e, el) {
 // ---------- start ----------
 async function start() {
   try {
-    plans = (await api('/api/ai/plans')).plans;
+    const catalogue = await api('/api/ai/plans');
+    plans = catalogue.plans;
+    demo = catalogue.demo;
+    if (!demo) {
+      document.querySelectorAll('[data-demo]').forEach((el) => el.hidden = true);
+      document.querySelectorAll('[data-live]').forEach((el) => el.hidden = false);
+      document.querySelectorAll('[data-signin] [type=submit]').forEach((el) => el.textContent = 'Send sign-in code');
+      document.querySelector('[data-action=checkout]')?.replaceChildren(document.createTextNode('Continue to secure billing'));
+    }
     const run = { account: accountPage, connect: connectPage, checkout: checkoutPage }[page];
     wireSignIn(run);
     wireActions({
       signout: signOut,
+      billing: async (e, el) => { el.disabled = true; try { const result = await api('/api/account/portal', {}); location.assign(result.url); } catch (err) { alert(err.message); el.disabled = false; } },
       connect,
       checkout,
       plans: (e) => {

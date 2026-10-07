@@ -10,7 +10,7 @@ import { handle } from '../server.js';
 
 /** A running accounts service on a free port, with a cookie jar for the site's calls. */
 async function start(options = {}) {
-  const accounts = createAccounts({ demoDelayMs: 0, ...options });
+  const accounts = createAccounts({ demoDelayMs: 0, allowDemoUpstream: !!options.anthropicKey, ...options });
   const server = createServer(async (req, res) => {
     if (!(await accounts.handle(req, res, new URL(req.url, 'http://localhost')))) {
       res.writeHead(404);
@@ -62,6 +62,16 @@ function events(text) {
 }
 
 const ask = (model, extra = {}) => ({ model, max_tokens: 256, messages: [{ role: 'user', content: 'Cut the intro to four seconds.' }], ...extra });
+
+test('configuring a key in demo mode never grants access to a paid provider', async () => {
+  const t = await start({ anthropicKey: 'unused-key', allowDemoUpstream: false, fetch: () => { throw new Error('Demo contacted the real provider'); } });
+  try {
+    const token = await connected(t);
+    const response = await t.api('/api/ai/v1/messages', token, ask('claude-haiku-4-5'));
+    assert.equal(response.status, 200);
+    assert.match((await response.json()).content[0].text, /lsuite AI demo/);
+  } finally { await t.close(); }
+});
 
 test('plans: the four of AI.md, demo, models per plan', async () => {
   const t = await start();

@@ -30,7 +30,7 @@
         <span class="eyebrow">lsuite account</span>
         <h1 class="h2">Sign in, or create your account.</h1>
         <p class="lede">One account for every lsuite app: your lsuite AI plan, and the apps signed in with it. The apps work without one.</p>
-        <div class="notice"><span class="notice__tag">Demo</span><span><b>No password and no email check yet.</b> Anyone who types your email can open this account, so keep nothing private here.</span></div>
+        <!-- demo:start --><div data-demo class="notice"><span class="notice__tag">Demo</span><span><b>No password and no email check yet.</b> Anyone who types your email can open this account, so keep nothing private here.</span></div><!-- demo:end -->
         <form class="form" data-signin novalidate>
           <div class="field"><label for="in-email">Email</label><input id="in-email" name="email" type="email" autocomplete="email" required maxlength="254"></div>
           <div class="field"><label for="in-name">Name <span class="fine">(for a new account)</span></label><input id="in-name" name="name" type="text" autocomplete="name" maxlength="80"></div>
@@ -45,7 +45,7 @@
           <div><h1 data-bind="name"></h1><p class="fine" data-bind="email"></p></div>
           <button class="btn btn--sm" type="button" data-action="signout">Sign out</button>
         </div>
-        <div class="notice"><span class="notice__tag">Demo</span><span>lsuite AI is a demo: <b>no payment is taken</b>, and the agents answer with a short demo message until it goes live.</span></div>
+        <!-- demo:start --><div data-demo class="notice"><span class="notice__tag">Demo</span><span>lsuite AI is a demo: <b>no payment is taken</b>, and the agents answer with a short demo message until it goes live.</span></div><!-- demo:end -->
 
         <div class="panel">
           <div class="panel__title">Plan <span data-bind="period"></span></div>
@@ -56,12 +56,12 @@
               <p class="fine" style="margin-top:8px" data-bind="usage"></p>
             </div>
             <p class="muted" data-when="free">Free: the apps use the model you bring (Claude Code, Codex, an API key or a local model). Pick a plan to have the agents work with nothing to set up.</p>
-            <p class="fine" data-bind="models"></p>
+            <p class="fine" data-bind="models"></p><button class="btn btn--sm" type="button" data-live data-action="billing" hidden>Billing, receipts and cancellation</button>
           </div>
         </div>
 
         <div class="panel" id="plans" data-plans hidden>
-          <div class="panel__title">Plans <span>Demo · no payment is taken</span></div>
+          <div class="panel__title">Plans <span data-demo>Demo · no payment is taken</span></div>
           <div class="panel__body"><!-- include:plans --></div>
         </div>
 

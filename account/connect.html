@@ -35,7 +35,7 @@
         <span class="eyebrow">Connect <span data-bind="app"></span></span>
         <h1 class="h2">Sign in to connect <span data-bind="app"></span>.</h1>
         <p class="lede">One lsuite account signs in every lsuite app on this computer.</p>
-        <div class="notice"><span class="notice__tag">Demo</span><span><b>No password and no email check yet.</b> Anyone who types your email can open this account, so keep nothing private here.</span></div>
+        <!-- demo:start --><div data-demo class="notice"><span class="notice__tag">Demo</span><span><b>No password and no email check yet.</b> Anyone who types your email can open this account, so keep nothing private here.</span></div><!-- demo:end -->
         <form class="form" data-signin novalidate>
           <div class="field"><label for="in-email">Email</label><input id="in-email" name="email" type="email" autocomplete="email" required maxlength="254"></div>
           <div class="field"><label for="in-name">Name <span class="fine">(for a new account)</span></label><input id="in-name" name="name" type="text" autocomplete="name" maxlength="80"></div>
@@ -48,7 +48,7 @@
         <span class="eyebrow">Connect <span data-bind="app"></span> · step 2 of 2</span>
         <h1 class="h2">Pick a plan for lsuite AI.</h1>
         <p class="lede">Signed in as <b data-bind="email"></b>. A plan lets the agent in <span data-bind="app"></span> work with nothing to set up.</p>
-        <div class="notice"><span class="notice__tag">Demo</span><span><b>No payment is taken.</b> The plan starts at once.</span></div>
+        <!-- demo:start --><div data-demo class="notice"><span class="notice__tag">Demo</span><span><b>No payment is taken.</b> The plan starts at once.</span></div><!-- demo:end -->
         <div data-plan-links><!-- include:plans --></div>
         <p class="fine">Or <button class="linkish" type="button" data-action="connect">connect <span data-bind="app"></span> on Free</button>, and keep using your own model in it.</p>
       </div>
