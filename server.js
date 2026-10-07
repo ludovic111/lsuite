@@ -161,10 +161,10 @@ export const DOWNLOADS = {
     },
     byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
   },
-  // The office app: no repository on GitHub yet either (ludovic111/folio when it ships).
+  // Published office app builds.
   folio: {
     repo: 'ludovic111/folio',
-    published: false,
+    published: true,
     patterns: {
       'macos-arm64': /\/folio-macos-arm64\.(zip|dmg)$/,
       'macos-x86_64': /\/folio-macos-x86_64\.(zip|dmg)$/,
@@ -200,7 +200,7 @@ async function latestRelease(repo) {
 // latest published release, so the page never announces a version you cannot download yet.
 // nori and folio have no release yet: no page asks for their versions.
 const FALLBACK_VERSIONS = { ryolune: '0.14.0', kimchi: '0.9.1', zenith: '0.3.0' };
-const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith' };
+const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith', folio: 'ludovic111/folio' };
 
 /** `{ app: version }` for every app whose version a page asks for. */
 export async function appVersions(apps) {
