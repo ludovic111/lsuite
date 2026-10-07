@@ -226,7 +226,7 @@ async function latestRelease(repo, prefix = null) {
 // Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
 // latest published release, so the page never announces a version you cannot download yet.
 // All five apps have public releases; the launcher's are tagged `launcher-vX.Y.Z` in ludovic111/lsuite.
-const FALLBACK_VERSIONS = { ryolune: '0.15.3', kimchi: '0.10.0', zenith: '0.4.0', nori: '0.1.0', folio: '0.1.0', launcher: '0.1.0' };
+const FALLBACK_VERSIONS = { ryolune: '0.15.3', kimchi: '0.10.0', zenith: '0.4.0', nori: '0.1.0', folio: '0.1.0', launcher: '0.1.1' };
 const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith', nori: 'ludovic111/nori', folio: 'ludovic111/folio', launcher: 'ludovic111/lsuite' };
 
 /** What `GET /api/apps` says of each app besides its downloads (the home page's cards). */

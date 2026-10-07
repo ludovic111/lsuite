@@ -4,13 +4,15 @@ The site of **lsuite** (written in lowercase), at [lsuite.xyz](https://lsuite.xy
 creative and office tool, combined, free and open source, and driven by your agent. Five apps, all
 in beta:
 
+**Get the launcher:** [lsuite.xyz/launcher](https://lsuite.xyz/launcher), or the latest `launcher-v*` [release](https://github.com/ludovic111/lsuite/releases).
+
 | App | Kind | Page | Repository and releases |
 | --- | --- | --- | --- |
-| ryolune | music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) (0.15.3) |
-| kimchi | video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) (0.10.0) |
-| zenith | code | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) (0.4.0) |
-| nori | image and design (Photoshop + Illustrator + InDesign in one document) | `/nori` | [ludovic111/nori](https://github.com/ludovic111/nori/releases/tag/v0.1.0) (0.1.0) |
-| folio | office (documents, spreadsheets, presentations) | `/folio` | [ludovic111/folio](https://github.com/ludovic111/folio/releases/tag/v0.1.0) (0.1.0) |
+| ryolune | music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) |
+| kimchi | video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) |
+| zenith | code | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) |
+| nori | images, vectors and page layout | `/nori` | [ludovic111/nori](https://github.com/ludovic111/nori) |
+| folio | documents, spreadsheets and slides | `/folio` | [ludovic111/folio](https://github.com/ludovic111/folio) |
 
 The apps are free and MIT licensed. The one thing lsuite sells is optional: **lsuite AI**
 ([AI.md](AI.md)), agents that work in every app without setup, a demo for now (no payment is
