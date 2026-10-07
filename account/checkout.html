@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Checkout · lsuite</title>
-  <meta name="description" content="Choose an lsuite AI subscription in USD.">
+  <meta name="description" content="Choose an lsuite Pass plan in USD: lsuite AI, lsuite Cloud and the lsuite Marketplace.">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
@@ -23,7 +23,7 @@
     <div class="hero__glow"></div>
     <div class="wrap hero__in">
       <div class="acct">
-        <span class="eyebrow">lsuite AI · checkout</span>
+        <span class="eyebrow">lsuite Pass · checkout</span>
         <!-- demo:start --><div data-demo class="notice notice--big"><span class="notice__tag">Demo — no payment is taken</span><span>This checkout charges nothing and asks for no card. The plan starts as soon as you press the button; monthly prices are $12, $29 and $79 USD.</span></div><!-- demo:end -->
       </div>
 
@@ -31,7 +31,7 @@
 
       <div class="acct" data-state="bad" hidden>
         <h1 class="h2">Which plan?</h1>
-        <p class="lede">This link doesn't name a plan. <a href="/ai#plans">See the plans</a>.</p>
+        <p class="lede">This link doesn't name a plan. <a href="/pass#plans">See the plans</a>.</p>
       </div>
 
       <div class="acct" data-state="out" hidden>
@@ -50,14 +50,14 @@
           <div class="panel__body">
             <div class="row" style="justify-content:space-between"><b style="font-size:26px" data-bind="planName"></b><span class="plan__price" data-bind="planPrice"></span></div>
             <p class="muted" data-bind="summary"></p>
-            <dl class="kv"><dt>Allowance</dt><dd data-bind="credits"></dd><dt>Models</dt><dd data-bind="families"></dd><dt>Today</dt><dd><span data-demo><b>$0.00</b> · demo, nothing is charged</span><span data-live hidden>Shown in USD on Stripe before you pay. Renews monthly until cancelled.</span></dd></dl>
+            <dl class="kv"><dt>lsuite AI</dt><dd data-bind="credits"></dd><dt>Models</dt><dd data-bind="families"></dd><dt>lsuite Cloud</dt><dd data-bind="storage"></dd><dt>Marketplace</dt><dd data-bind="marketplace"></dd><dt>Today</dt><dd><span data-demo><b>$0.00</b> · demo, nothing is charged</span><span data-live hidden>Shown in USD on Stripe before you pay. Renews monthly until cancelled.</span></dd></dl>
             <p class="fine" data-bind="current"></p>
           </div>
         </div>
         <p class="form__error" role="alert" data-checkout-error></p>
         <div class="row">
           <button class="btn btn--primary" type="button" data-action="checkout"><span>Start <span data-bind="planName"></span> · demo, no payment</span></button>
-          <a class="btn" href="/ai#plans">Other plans</a>
+          <a class="btn" href="/pass#plans">Other plans</a>
         </div>
       </div>
     </div>

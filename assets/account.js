@@ -1,6 +1,6 @@
 // lsuite — the account pages (/account, /account/connect, /account/checkout). The session is an
-// HttpOnly cookie the server sets; this script only calls the same-origin JSON API (AI.md) and
-// shows one `[data-state]` block at a time. User data is only ever set as text.
+// HttpOnly cookie the server sets; this script only calls the same-origin JSON API (AI.md, PASS.md,
+// MARKETPLACE.md) and shows one `[data-state]` block at a time. User data is only ever set as text.
 
 const page = document.body.dataset.page;
 const params = new URLSearchParams(location.search);
@@ -191,6 +191,96 @@ async function accountPage() {
     setTimeout(accountPage, 4000);
   }
   if (location.hash === '#plans') document.querySelector('[data-plans]').hidden = false;
+  await showPlugins(account);
+}
+
+// ---------- /account: the lsuite Marketplace ----------
+const PLATFORM_NAMES = { 'macos-arm64': 'macOS Apple silicon', 'macos-x86_64': 'macOS Intel', 'linux-x86_64': 'Linux', 'windows-x86_64': 'Windows' };
+const STATUS = { pending: 'Waiting for review', approved: 'Approved', rejected: 'Not approved' };
+
+/** An element with attributes and children (strings become text). */
+function el(tag, attrs = {}, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') node.className = v;
+    else if (k === 'text') node.textContent = v;
+    else node.setAttribute(k, v);
+  }
+  node.append(...children.filter((c) => c !== null && c !== undefined && c !== false));
+  return node;
+}
+
+/** The head of a submission: name, id and version, status. */
+function subHead(s) {
+  return el('div', { class: 'sub__head' }, el('b', { text: s.name }), el('code', { text: `${s.id} ${s.version}` }), el('span', { class: `status status--${s.status}`, text: STATUS[s.status] ?? s.status }));
+}
+
+const platformsLine = (s) => Object.keys(s.platforms).map((p) => PLATFORM_NAMES[p] ?? p).join(', ') || (s.status === 'rejected' ? 'files removed: publish it again with a fixed bundle' : 'no bundle uploaded yet');
+
+/** "Your plugins", and for reviewers the versions waiting for review. */
+async function showPlugins(account) {
+  const mine = await api('/api/marketplace/mine').catch(() => null);
+  if (mine) {
+    const list = document.querySelector('[data-subs]');
+    list.replaceChildren(
+      ...mine.map((s) =>
+        el('div', { class: 'sub' }, subHead(s), el('p', { class: 'sub__facts', text: `${s.app} · ${s.kind} · ${platformsLine(s)} · submitted ${day(s.submittedAt)}${s.status === 'approved' ? ` · ${s.downloads.toLocaleString('en-US')} downloads` : ''}` }), s.note ? el('p', { class: 'sub__note', text: `Reviewer's note: ${s.note}` }) : null),
+      ),
+    );
+    list.hidden = !mine.length;
+    document.querySelector('[data-when="nosubs"]').hidden = mine.length > 0;
+    bind('subsCount', mine.length ? `${mine.length} version${mine.length === 1 ? '' : 's'}` : '');
+  }
+  const panel = document.querySelector('[data-review]');
+  panel.hidden = !account.admin;
+  if (account.admin) await showReview();
+}
+
+const size = (n) => (n < 1e3 ? `${n} bytes` : bytes(n));
+
+async function showReview() {
+  const pending = await api('/api/marketplace/review');
+  const list = document.querySelector('[data-reviews]');
+  list.replaceChildren(
+    ...pending.map((s) => {
+      const files = Object.entries(s.platforms).map(([p, f]) =>
+        el('li', {}, el('a', { href: `/api/marketplace/review/${encodeURIComponent(s.id)}/${encodeURIComponent(s.version)}/${p}`, text: `${PLATFORM_NAMES[p] ?? p}` }), ` · ${size(f.size)} · sha256 ${f.sha256.slice(0, 12)}… · library ${f.manifest?.library?.[p.split('-')[0]] ?? '?'} · ${f.fileCount} file${f.fileCount === 1 ? '' : 's'}`),
+      );
+      const note = el('input', { type: 'text', maxlength: '2000', 'aria-label': `Note for ${s.name} ${s.version}`, placeholder: 'A note for the author (optional)' });
+      const error = el('p', { class: 'form__error', role: 'alert' });
+      const decide = (decision) => async (e) => {
+        const buttons = e.currentTarget.parentElement.querySelectorAll('button');
+        buttons.forEach((b) => (b.disabled = true));
+        error.textContent = '';
+        try {
+          await api('/api/marketplace/review', { id: s.id, version: s.version, decision, note: note.value.trim() || undefined });
+          await showReview();
+        } catch (err) {
+          error.textContent = err.message;
+          buttons.forEach((b) => (b.disabled = false));
+        }
+      };
+      const approve = el('button', { class: 'btn btn--sm btn--primary', type: 'button', text: 'Approve' });
+      const reject = el('button', { class: 'btn btn--sm', type: 'button', text: 'Reject' });
+      approve.addEventListener('click', decide('approve'));
+      reject.addEventListener('click', decide('reject'));
+      if (!Object.keys(s.platforms).length) approve.disabled = true;
+      return el(
+        'div',
+        { class: 'sub' },
+        subHead(s),
+        el('p', { class: 'sub__facts', text: `${s.app} · ${s.kind} · abi ${s.abi} · by ${s.author.name}${s.author.email ? ` <${s.author.email}>` : ''} · submitted ${day(s.submittedAt)}` }),
+        el('p', { text: s.description }),
+        s.notes ? el('p', { class: 'sub__note', text: s.notes }) : null,
+        files.length ? el('ul', { class: 'sub__facts' }, ...files) : el('p', { class: 'muted', text: 'No bundle uploaded yet.' }),
+        el('div', { class: 'row' }, el('div', { class: 'field' }, note), approve, reject),
+        error,
+      );
+    }),
+  );
+  list.hidden = !pending.length;
+  document.querySelector('[data-when="noreview"]').hidden = pending.length > 0;
+  bind('reviewCount', pending.length ? `${pending.length} waiting` : '');
 }
 
 /** The lsuite Cloud panel: used / quota and the files, or which plans include it. */
@@ -288,6 +378,8 @@ async function checkoutPage() {
   bind('summary', plan.summary);
   bind('credits', plan.credits ? `${credits(plan.credits)} a month` : 'None: bring your own provider');
   bind('families', plan.families.length ? plan.families.join(', ') : 'The ones you bring');
+  bind('storage', plan.storage ? plan.storageLabel : 'None');
+  bind('marketplace', plan.marketplace ? 'Install any approved plugin' : 'Browse and publish');
   const account = await me();
   if (!account) {
     show('out');

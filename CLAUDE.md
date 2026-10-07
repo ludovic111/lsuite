@@ -1,7 +1,8 @@
 # lsuite.xyz
 
 The suite's site; see README.md (layout, routes, domains) and STANDARD.md (the contract every
-lsuite app meets, with a status table), PLUGINS.md and AI.md (the plugin and lsuite AI contracts).
+lsuite app meets, with a status table), PLUGINS.md (plugins), PASS.md (lsuite Pass) with AI.md,
+CLOUD.md and MARKETPLACE.md (its three parts' contracts).
 Each app repo (`../ryolune`, `../kimchi`, `../zenith`, `../nori`, `../folio`)
 has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 
@@ -11,27 +12,34 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   kimchi (video), zenith (code), nori (image and design: Photoshop + Illustrator + InDesign in one
   document) and folio (office: documents, spreadsheets and presentations). The suite's line: every
   kind of creative and office tool, combined, free and open source, driven by your agent.
-- ryolune, kimchi and zenith have full pages with downloads (`DOWNLOADS` and `REPOS` in
-  `server.js`, `%VERSION:<app>%`); nori and folio have no repository on GitHub yet: their pages
-  say "First build coming", `/<app>/download[/…]` lands on the page (`published: false`), and the
-  route table already names `ludovic111/nori` and `ludovic111/folio`. When one ships: set
-  `published: true`, check the asset names, add it to `REPOS`/`FALLBACK_VERSIONS`, put back a
-  download section like zenith's and a version in its hero.
-- **lsuite AI** (AI.md) is live as a demo: `ai.js` serves the API, `/ai`, `/account`,
-  `/account/connect`, `/account/checkout` (Demo — no payment is taken). The apps stay free;
-  lsuite AI is the one optional thing sold. Footer and home say so; no telemetry still holds.
+- All five apps have full pages with downloads from their public GitHub releases (`DOWNLOADS`,
+  `REPOS` and `FALLBACK_VERSIONS` in `server.js`, `%VERSION:<app>%`): ryolune 0.15.3, kimchi
+  0.10.0, zenith 0.4.0, nori 0.1.0 and folio 0.1.0 (`ludovic111/<app>`, all `published`).
+- **lsuite Pass** (PASS.md, owner's decision 2026-10-07) is the paid subscription, renamed from
+  "lsuite AI": one optional plan for everything extra, the apps staying free. It holds **lsuite AI**
+  (AI.md: the agents; the apps' provider keeps that name, and the API paths `/api/ai/…`,
+  `/api/account/…` don't change), **lsuite Cloud** (CLOUD.md) and the **lsuite Marketplace**
+  (MARKETPLACE.md). Tiers Free / Plus $12 / Pro $29 / Studio $79, still a demo (no payment taken).
+  Pages: `/pass` (`pass/index.html`; `/ai` is a 301 to it), `/marketplace`, `/account`,
+  `/account/connect`, `/account/checkout`. Say lsuite Pass for the subscription, lsuite AI for the
+  agents, models and credits. Nav: Pass and Marketplace after the apps; footer and home link both.
+- **lsuite Marketplace** (MARKETPLACE.md, `marketplace.js`, 2026-10-07): plugins anyone with an
+  account publishes, every version reviewed by an admin (`LSUITE_ADMIN_EMAILS`; an admin's own are
+  approved at once and marked "by lsuite"), installed with a paid plan. Bundles in
+  `<data>/marketplace/` (or the cloud's object store), 15 MB each and 80 MB in all in the demo.
+  `/marketplace` lists the approved plugins server-side; `/account` has "Your plugins" and, for
+  admins, "Review". The launcher's Marketplace area and `lsuite-cli market.*` are being built.
 - The site wears **design system v2** (`design/DESIGN.md`). All app names are lowercase.
   Real native-app captures are in `assets/img/<app>/`; each hero uses light and dark images.
   All five marks come from the app repositories' own generated icons. App capabilities and
   command counts describe the new beta builds; public download versions follow GitHub Releases.
-  nori and folio have local macOS builds but no public release yet.
 - **lsuite launcher** (`launcher/`, 2026-10-07, see its README): a Rust/GPUI app that installs and
-  updates the five apps from their signed releases, manages the lsuite AI account and **lsuite
+  updates the five apps from their signed releases, manages the lsuite account (lsuite Pass) and **lsuite
   Cloud** (CLOUD.md, `cloud.js`, `/api/cloud`, two-way synced folders; storage per plan decided:
   50 GB / 250 GB / 1 TB, demo 100 MB per account; an S3-compatible store is supported for
   production). Its page is
   `/launcher` (`pages/launcher.html`), downloads from `launcher-v*` releases of this repository
-  (0.1.0 published 2026-10-07; `launcher/CHANGELOG.md`),
+  (0.1.0 and 0.1.1 published 2026-10-07, 0.1.1 the latest; `launcher/CHANGELOG.md`),
   built by kimchi's suite release workflow (launcher/README.md, Releasing).
 - The favicon and the nav keep the plain lsuite grain tile (no lsuite logo).
 - Earlier completed notes below describe the previous pages; keep the current availability

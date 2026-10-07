@@ -28,7 +28,8 @@ export const MAX_FILE = 5 * GB;
 /** Files and folders one account can hold, whatever their size (each change rewrites the index). */
 export const MAX_ENTRIES = 100000;
 
-const bytesFrom = (v, fallback) => (/^\d+$/.test(String(v ?? '').trim()) && Number(v) > 0 ? Number(v) : fallback);
+/** A byte count from the environment: a positive integer, else `fallback`. */
+export const bytesFrom = (v, fallback) => (/^\d+$/.test(String(v ?? '').trim()) && Number(v) > 0 ? Number(v) : fallback);
 
 /**
  * Demo caps (CLOUD.md), from `LSUITE_CLOUD_DEMO_QUOTA`, `…_MAX_FILE` and `…_TOTAL` (bytes): sized
@@ -148,8 +149,11 @@ function allFolders(index) {
 
 const fileEntry = (path, f) => ({ path, size: f.size, sha256: f.sha256, modifiedAt: f.modifiedAt });
 
-/** Writes the body to `file` while hashing it; refuses a body that isn't exactly `length` bytes. */
-function receive(req, file, length) {
+/**
+ * Writes the body to `file` while hashing it; refuses a body that isn't exactly `length` bytes.
+ * Also used by the marketplace (`marketplace.js`). → `{size, sha256}`.
+ */
+export function receive(req, file, length) {
   return new Promise((resolve, reject) => {
     const hash = createHash('sha256');
     const out = createWriteStream(file, { flags: 'wx', mode: 0o600 });
@@ -323,6 +327,24 @@ function hookExit() {
   }
 }
 
+/** A temporary folder removed when the process ends (exit, SIGINT, SIGTERM): the root without a data dir. */
+export async function temporaryDir(prefix) {
+  const dir = await mkdtemp(join(tmpdir(), prefix));
+  temporary.add(dir);
+  hookExit();
+  return dir;
+}
+
+/** Free bytes on the disk holding `dir`, or null when the system can't tell. */
+export async function freeSpace(dir, statfsImpl = statfs) {
+  try {
+    const fs = await statfsImpl(dir);
+    return Number(fs.bavail) * Number(fs.bsize);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * The cloud store. Options: `dataDir` (else a temporary folder), `production`, `caps`
  * (`{quota, maxFile, total}`, `demoCaps()` by default), `diskReserve` (bytes, `diskReserve()` by
@@ -347,11 +369,7 @@ export function createCloud(options = {}) {
   /** The root folder, made (and every account's total counted) on first use. */
   function root() {
     base ??= (async () => {
-      const dir = options.dataDir ? join(options.dataDir, area) : await mkdtemp(join(tmpdir(), 'lsuite-cloud-'));
-      if (!options.dataDir) {
-        temporary.add(dir);
-        hookExit();
-      }
+      const dir = options.dataDir ? join(options.dataDir, area) : await temporaryDir('lsuite-cloud-');
       await mkdir(dir, { recursive: true, mode: 0o700 });
       await rm(join(dir, '.tmp'), { recursive: true, force: true });
       await mkdir(join(dir, '.tmp'), { mode: 0o700 });
@@ -457,13 +475,8 @@ export function createCloud(options = {}) {
    */
   async function checkDisk(size) {
     const reserve = options.diskReserve ?? diskReserve();
-    let free;
-    try {
-      const fs = await (options.statfs ?? statfs)(await root());
-      free = Number(fs.bavail) * Number(fs.bsize);
-    } catch {
-      return;
-    }
+    const free = await freeSpace(await root(), options.statfs);
+    if (free === null) return;
     if (free - reservedTotal - size < reserve) {
       throw new CloudError(507, 'storage_full', 'lsuite Cloud has no room left on this server for now. Delete files, or try again later.', {});
     }

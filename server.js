@@ -1,8 +1,9 @@
 // Dependency-free server for lsuite.xyz. Railway runs `npm start`.
 //
 // Pages are plain HTML (`index.html`, `<app>/index.html`) with two includes, `<!-- include:nav -->`
-// and `<!-- include:foot -->`, filled from `partials/` when served. Everything static lives in
-// `assets/`. Old app domains (ryolune.com) answer with a 301 to the app's page here.
+// and `<!-- include:foot -->`, filled from `partials/` when served (and `<!-- include:plans -->`,
+// `<!-- include:marketplace -->` from the API's data). Everything static lives in `assets/`. Old
+// app domains (ryolune.com) answer with a 301 to the app's page here.
 import { createServer } from 'node:http';
 import { createReadStream } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
@@ -13,6 +14,7 @@ import { createHash } from 'node:crypto';
 import { liveConfig } from './live.js';
 import { createAccounts, plansDocument } from './ai.js';
 import { objectStoreConfig } from './cloud.js';
+import { MARKET_APPS, PLATFORMS } from './marketplace.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
@@ -45,7 +47,8 @@ export const PAGES = {
   '/nori': 'nori/index.html',
   '/folio': 'folio/index.html',
   '/launcher': 'pages/launcher.html',
-  '/ai': 'ai/index.html',
+  '/pass': 'pass/index.html',
+  '/marketplace': 'marketplace/index.html',
   '/account': 'account/index.html',
   '/account/connect': 'account/connect.html',
   '/account/checkout': 'account/checkout.html',
@@ -56,20 +59,52 @@ const UNLISTED = new Set(['/account/connect', '/account/checkout']);
 
 const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
-/** The plans of `/api/ai/plans` as cards (`<!-- include:plans -->`). */
+/**
+ * The plans of lsuite Pass (`/api/ai/plans`) as cards (`<!-- include:plans -->`): per paid plan,
+ * lsuite AI's credits and models, lsuite Cloud's storage and the lsuite Marketplace.
+ */
 export function plansHtml() {
   const { plans } = plansDocument();
   const cards = plans.map((p) => {
     const free = p.id === 'free';
     const items = free
-      ? ['Every feature of every app', 'Your subscriptions and keys, as they are', 'Nothing to pay, ever']
-      : [`<b>${p.credits.toLocaleString('en-US')} credits</b> a month`, escapeHtml(p.families.join(', ')), ...(p.storage ? [`<b>${escapeHtml(p.storageLabel)}</b> lsuite Cloud`] : []), ...(p.priority ? ['Priority when it’s busy'] : [])];
+      ? ['Every feature of every app', 'Your subscriptions and keys, as they are', 'Browse the marketplace', 'Nothing to pay, ever']
+      : [
+          `<b>${p.credits.toLocaleString('en-US')} credits</b> a month of lsuite AI`,
+          escapeHtml(p.families.join(', ')),
+          ...(p.storage ? [`<b>${escapeHtml(p.storageLabel)}</b> lsuite Cloud`] : []),
+          ...(p.marketplace ? ['The lsuite Marketplace'] : []),
+          ...(p.priority ? ['Priority when it’s busy'] : []),
+        ];
     const action = free
       ? `<a class="btn" href="/account">Create a free account</a>`
       : `<a class="btn${p.id === 'pro' ? ' btn--primary' : ''}" href="/account/checkout?plan=${p.id}">Choose ${escapeHtml(p.name)}</a>`;
     return `<div class="plan${p.id === 'pro' ? ' plan--lit' : ''}" data-plan="${p.id}"><div class="plan__head"><h3>${escapeHtml(p.name)}</h3><span class="plan__price">${free ? '<b>$0</b>' : `<b>$${p.price}</b> / month`}</span></div><p class="plan__say">${escapeHtml(p.summary)}</p><ul class="plan__list">${items.map((i) => `<li><span>${i}</span></li>`).join('')}</ul>${action}</div>`;
   });
   return `<div class="plans">${cards.join('')}</div>`;
+}
+
+const PLATFORM_NAMES = { 'macos-arm64': 'macOS Apple silicon', 'macos-x86_64': 'macOS Intel', 'linux-x86_64': 'Linux', 'windows-x86_64': 'Windows' };
+
+/**
+ * The marketplace's approved plugins (`GET /api/marketplace`'s `plugins`) as cards, with links
+ * filtering by app (`/marketplace?app=<app>`, no script) and an empty state
+ * (`<!-- include:marketplace -->`). `app`: the filter, or null for every app.
+ */
+export function marketplaceHtml(plugins, app = null) {
+  const link = (id, label, icon) =>
+    `<a href="/marketplace${id ? `?app=${id}` : ''}#plugins"${(id ?? null) === app ? ' aria-current="page"' : ''}>${icon ? `<img src="/assets/img/icons/${id}.webp" width="18" height="18" alt="">` : ''}${label}</a>`;
+  const filters = `<nav class="filters" aria-label="Plugins by app">${link(null, 'Every app')}${MARKET_APPS.map((id) => link(id, id, true)).join('')}</nav>`;
+  if (!plugins.length) {
+    const what = app ? `No ${escapeHtml(app)} plugins yet.` : 'No plugins yet.';
+    return `${filters}<div class="empty"><p class="empty__title">The first plugins are on their way — publish yours</p><p class="muted">${what} Build one with your app's agent and publish it: every version is reviewed before anyone can install it.</p><a class="btn" href="#publish">Publish a plugin</a></div>`;
+  }
+  const cards = plugins.map((p) => {
+    const platforms = Object.keys(PLATFORMS).filter((k) => p.platforms[k]).map((k) => PLATFORM_NAMES[k]);
+    const author = p.author.verified ? `lsuite <span class="badge badge--sm">by lsuite</span>` : escapeHtml(p.author.name);
+    return `<article class="plugin" data-plugin="${escapeHtml(p.id)}"><div class="plugin__top"><img src="/assets/img/icons/${escapeHtml(p.app)}.webp" width="28" height="28" alt=""><span class="plugin__app">${escapeHtml(p.app)}</span><span class="plugin__kind">${escapeHtml(p.kind)}</span></div><h3 class="plugin__name">${escapeHtml(p.name)}</h3><p class="plugin__by">by ${author}</p><p class="plugin__say">${escapeHtml(p.description)}</p><dl class="plugin__meta"><dt>Version</dt><dd>${escapeHtml(p.version)}</dd><dt>Platforms</dt><dd>${platforms.map(escapeHtml).join(', ')}</dd><dt>Downloads</dt><dd>${Number(p.downloads).toLocaleString('en-US')}</dd></dl><p class="plugin__id"><code>${escapeHtml(p.id)}</code></p></article>`;
+  });
+  return `${filters}<div class="plugins">${cards.join('')}</div>`;
 }
 
 /** The design system's files, served as they are (design/DESIGN.md explains them). */
@@ -356,8 +391,11 @@ async function stampOf(path) {
   }
 }
 
-/** A page as served: includes filled, its app marked current in the nav, versions stamped. */
-export async function renderPage(file, origin, versions, production = process.env.LSUITE_MODE === 'production') {
+/**
+ * A page as served: includes filled, its app marked current in the nav, versions stamped. `query`:
+ * the request's search parameters (the marketplace's `?app=` filter).
+ */
+export async function renderPage(file, origin, versions, production = process.env.LSUITE_MODE === 'production', query = new URLSearchParams()) {
   let html = await readFile(join(ROOT, file), 'utf8');
   html = html.replace(/<!-- demo:start -->([\s\S]*?)<!-- demo:end -->/g, (_, content) => production ? '' : content)
     .replace(/<!-- live:start -->([\s\S]*?)<!-- live:end -->/g, (_, content) => production ? content : '');
@@ -367,6 +405,11 @@ export async function renderPage(file, origin, versions, production = process.en
     }
   }
   if (html.includes('<!-- include:plans -->')) html = html.replace('<!-- include:plans -->', plansHtml());
+  if (html.includes('<!-- include:marketplace -->')) {
+    const app = MARKET_APPS.includes(query.get('app')) ? query.get('app') : null;
+    const { plugins } = await accounts.marketplace.catalogue(app);
+    html = html.replace('<!-- include:marketplace -->', () => marketplaceHtml(plugins, app));
+  }
   // The page's app is its path's first segment (`/kimchi`, `/launcher`, `/account/connect`).
   const route = Object.keys(PAGES).find((path) => PAGES[path] === file);
   const app = route ? route.split('/')[1] || null : file.includes('/') ? file.split('/')[0] : null;
@@ -429,9 +472,9 @@ async function notFound(req, res) {
 }
 
 /**
- * lsuite accounts and lsuite AI (AI.md, `ai.js`): accounts in `LSUITE_DATA_DIR/accounts.json`
- * (memory when unset), model requests forwarded with `LSUITE_ANTHROPIC_API_KEY` (a demo answer
- * without it).
+ * lsuite accounts and lsuite Pass (PASS.md, `ai.js`): accounts in `LSUITE_DATA_DIR/accounts.json`
+ * (memory when unset), lsuite AI's model requests forwarded in production, lsuite Cloud and the
+ * lsuite Marketplace's files in the data dir (or an object store), admins from `LSUITE_ADMIN_EMAILS`.
  */
 export const accounts = createAccounts({
   mode: process.env.LSUITE_MODE || 'demo',
@@ -475,13 +518,16 @@ export async function handle(req, res) {
   const bare = pathname.replace(/\/index\.html$/, '/').replace(/(.)\/+$/, '$1');
   if (bare !== pathname && PAGES[bare]) return redirect(res, 301, bare + url.search, 'public, max-age=3600');
 
+  // The subscription's page was /ai until it became lsuite Pass (2026-10-07).
+  if (/^\/ai(\/|\/index\.html)?$/.test(pathname)) return redirect(res, 301, '/pass' + url.search, 'public, max-age=86400');
+
   // ryolune was called Ondera until 0.11.
   if (pathname === '/ondera' || pathname.startsWith('/ondera/')) {
     return redirect(res, 301, '/ryolune' + pathname.slice('/ondera'.length) + url.search, 'public, max-age=86400');
   }
 
   if (PAGES[pathname]) {
-    const html = await renderPage(PAGES[pathname], originOf(req));
+    const html = await renderPage(PAGES[pathname], originOf(req), undefined, undefined, url.searchParams);
     return send(res, 200, html, TYPES['.html'], 'no-cache', req);
   }
 
