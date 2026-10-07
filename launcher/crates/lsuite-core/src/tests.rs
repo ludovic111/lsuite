@@ -109,6 +109,9 @@ async fn installs_updates_and_removes_from_signed_releases() {
     {
         use std::os::unix::fs::PermissionsExt;
         assert_eq!(std::fs::metadata(&rec.executable).unwrap().permissions().mode() & 0o777, 0o755);
+    }
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
         let entry = std::fs::read_to_string(home.path().join("apps/applications/xyz.lsuite.folio.desktop")).unwrap();
         assert!(entry.contains("Exec=\"") && entry.contains("folio.AppImage"));
     }
@@ -227,6 +230,7 @@ async fn installs_updates_and_removes_from_signed_releases() {
 
 #[test]
 fn commands_doc_is_current() {
-    let doc = include_str!("../../../docs/COMMANDS.md");
+    // Git on Windows may check the file out with CRLF line ends.
+    let doc = include_str!("../../../docs/COMMANDS.md").replace("\r\n", "\n");
     assert_eq!(doc, crate::registry::markdown(), "run `cargo run -p lsuite-cli -- docs`");
 }

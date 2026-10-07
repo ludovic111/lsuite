@@ -54,10 +54,7 @@ pub fn apps_dir() -> PathBuf {
     #[cfg(target_os = "macos")]
     {
         let system = PathBuf::from("/Applications");
-        if writable(&system) {
-            return system;
-        }
-        return dirs::home_dir().unwrap_or_else(std::env::temp_dir).join("Applications");
+        if writable(&system) { system } else { dirs::home_dir().unwrap_or_else(std::env::temp_dir).join("Applications") }
     }
     #[cfg(not(target_os = "macos"))]
     {
