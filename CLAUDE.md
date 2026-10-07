@@ -20,13 +20,11 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 - **lsuite AI** (AI.md) is live as a demo: `ai.js` serves the API, `/ai`, `/account`,
   `/account/connect`, `/account/checkout` (Demo — no payment is taken). The apps stay free;
   lsuite AI is the one optional thing sold. Footer and home say so; no telemetry still holds.
-- The site wears **design system v2** (`design/DESIGN.md`). Marks: ryolune's (its
-  `scripts/gen-mark.py`) and zenith's new Z (rendered from zenith's `scripts/gen-mark.py`, branch
-  `lsuite-night`) are in `assets/img/icons/`. **Placeholders** to swap when the app agents deliver:
-  `assets/img/icons/nori.webp` and `folio.webp` (the lsuite grain tile), the hero figures marked
-  `shot--soon` / `data-capture` on ryolune, nori and folio (and the home cards marked
-  `card__shot--soon`), zenith's hero (the `zmock` illustration until real captures). Open Graph
-  images of the four new pages are `og/lsuite.png` for now.
+- The site wears **design system v2** (`design/DESIGN.md`). All app names are lowercase.
+  Real native-app captures are in `assets/img/<app>/`; each hero uses light and dark images.
+  All five marks come from the app repositories' own generated icons. App capabilities and
+  command counts describe the new beta builds; public download versions follow GitHub Releases.
+  nori and folio have local macOS builds but no public release yet.
 - The favicon and the nav keep the plain lsuite grain tile (no lsuite logo).
 - Earlier completed notes below describe the previous pages; keep the current availability
   above unless explicitly asked to change it.

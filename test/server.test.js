@@ -39,7 +39,7 @@ test('download routes of every app: released apps to GitHub, unreleased ones to 
       assert.equal(await downloadTarget(app, platform, 'Macintosh'), `/${app}`);
     }
     const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', {});
-    assert.ok(html.includes('First build coming'), app);
+    assert.ok(html.includes('First public build coming'), app);
     assert.ok(!/data-download|softwareVersion|%VERSION/.test(html), `${app}: no version, no download yet`);
   }
   // The route table is ready for each app's repository.

@@ -5,7 +5,7 @@ rounded, surfaces that cast hard shadows, and a page of film grain and dithered 
 chrome. The apps are told apart by their names and their work, not by a color. See it live at
 **lsuite.xyz/design** (`design/index.html`).
 
-kimchi (0.9) and ryolune (0.14) wear v2; zenith moves to it in 0.4; nori and folio are born in it.
+All five apps wear v2: ryolune, kimchi, zenith, nori and folio. App names are always lowercase, including at the start of a sentence and in headings.
 
 - **Source**: `design/tokens.json`. **Generated**: `design/tokens.css` (`node design/build.mjs`).
   Web UIs copy `tokens.css` and use the `--ls-*` variables; Rust or native code reads

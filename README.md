@@ -9,8 +9,8 @@ in beta:
 | ryolune | music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) (0.14.x) |
 | kimchi | video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) (0.9.x) |
 | zenith | code | `/zenith` | [ludovic111/zenith](https://github.com/ludovic111/zenith) (0.3.x) |
-| nori | image and design (Photoshop + Illustrator + InDesign in one document) | `/nori` | not on GitHub yet: "First build coming" |
-| folio | office (documents, spreadsheets, presentations) | `/folio` | not on GitHub yet: "First build coming" |
+| nori | image and design (Photoshop + Illustrator + InDesign in one document) | `/nori` | local 0.1.0 build; first public release pending |
+| folio | office (documents, spreadsheets, presentations) | `/folio` | local 0.1.0 build; first public release pending |
 
 The apps are free and MIT licensed. The one thing lsuite sells is optional: **lsuite AI**
 ([AI.md](AI.md)), agents that work in every app without setup, a demo for now (no payment is
@@ -32,10 +32,11 @@ npm test
   `<!-- include:nav -->` / `<!-- include:foot -->`; the nav link of the page's app gets
   `aria-current="page"`. `%ORIGIN%` becomes the request's origin (Open Graph, canonical).
 - `assets/` is the only static folder: `styles.css` (every page, built on the design system's
-  `/design/tokens.css`, loaded first; `data-app` on `<html>` picks the app's color, light and dark
+  `/design/tokens.css`, loaded first; all apps use monochrome v2 chrome, light and dark
   follow the system), `main.js` (reveals, "Download for your OS", copy buttons, and the ryolune
   theme gallery, unused for now), fonts (Chakra Petch, IBM Plex Mono, OFL)
-  and images.
+  and real native-app captures in `assets/img/<app>/` (both themes). Image credits are in
+  `assets/img/SOURCES.md`.
 - `ai/index.html` is `/ai`; `account/index.html`, `account/connect.html` and
   `account/checkout.html` are the account pages (`assets/account.js`, the only script they run;
   `<!-- include:plans -->` is filled from the plans of `ai.js`). `/account/connect` and

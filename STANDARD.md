@@ -136,16 +136,13 @@ otherwise.
 
 | | ryolune | kimchi | zenith | nori | folio |
 | --- | --- | --- | --- | --- | --- |
-| Command registry, one undo | ✅ 224 commands | ✅ 229 commands, one undo history | ✅ 64 `family.verb` commands shared by the window, CLI and MCP; undo is per turn (`thread.revert`) | being built (`nori-control`) | being built |
-| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` (running app or `--file`) | ✅ `zenith-cli` | being built (`nori-cli`) | being built |
-| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live`, and `/mcp` handed to each thread's agent | being built (`nori-mcp`) | being built |
-| Built-in agent | ✅ 14 providers, Zenith · lsuite | ✅ Agent panel (Claude Code, Codex, API keys, Gemini, Bedrock, Ollama…) | ✅ Claude Code and Codex threads | being built (`nori-agent`) | being built |
-| Signed auto-update | ✅ Ed25519-signed `SHA256SUMS` | ✅ own updater (same key and `latest.json` as the Tauri builds) | ✅ Ed25519-signed `SHA256SUMS` | to do | to do |
-| Release binaries | ✅ notarized macOS, Windows, Linux | ✅ notarized macOS (Apple silicon, Intel), Windows, Linux | ✅ notarized macOS (Apple silicon, Intel), Linux | first build coming | first build coming |
-| Rust core | ✅ native window (GPUI) | ✅ native window (GPUI), no web UI | ✅ server and native window (GPUI); React interface kept for the browser | GPUI, tiled renderer | GPUI |
-| Discovery (`~/.lsuite/apps`) | ✅ format 1 | ✅ writes `kimchi.json` (format 1) | ✅ writes `zenith.json`, reads the others | to do | to do |
-| Hand-offs | ✅ to and from kimchi | ✅ ryolune songs, stems and sessions | partly: `lsuite.run`, the other apps' MCP servers for its agents | to do | to do |
-| Plugins (PLUGINS.md) | 35 stock, CLAP, VST3, AU, native SDK `ryolune-plugin`; Plugins area and agent recipe in 0.15 | ryolune's audio plugins, LUTs; `kimchi-plugin` and the agent recipe in 0.10 | `zenith-plugin` in 0.4 | `nori-plugin` (filters on RGBA f32 tiles) | to do |
-| lsuite AI (AI.md) | in 0.15 | in 0.10 | in 0.4 | in 0.1 | in 0.1 |
-| Site page | ✅ beta, download | ✅ beta, download | ✅ beta, download | ✅ beta, "First build coming" | ✅ beta, "First build coming" |
-| Design system v2 | ✅ since 0.14 | ✅ since 0.9 | in 0.4 (new Z mark) | ✅ from the start | ✅ from the start |
+| Command registry, one undo | ✅ 239 commands | ✅ 250 commands | ✅ 82 commands; undo per turn | ✅ 147 commands | ✅ 150 commands |
+| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` | ✅ `zenith-cli` | ✅ `nori-cli` | ✅ `folio-cli` |
+| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live` | ✅ `nori-mcp --live` | ✅ `folio-mcp --live` |
+| Built-in agent | ✅ Agent panel | ✅ Agent panel | ✅ Claude Code and Codex threads | ✅ Agent panel | ✅ Agent panel |
+| Discovery | ✅ `~/.lsuite/apps/ryolune.json` | ✅ `~/.lsuite/apps/kimchi.json` | ✅ `~/.lsuite/apps/zenith.json` | ✅ `~/.lsuite/apps/nori.json` | ✅ `~/.lsuite/apps/folio.json` |
+| Open files | ✅ JSON, DAWproject | ✅ JSON projects | ✅ Git repositories | ✅ `.nori` ZIP, PSD, OpenRaster, SVG | ✅ `.folio` ZIP, Office and OpenDocument |
+| Design v2 | ✅ | ✅ | ✅ native and web | ✅ | ✅ |
+| Plugins | ✅ 35 stock, CLAP, VST3, AU, Rust SDK | ✅ audio, frei0r, LUTs, Rust SDK | ✅ Rust MCP tools | ✅ tile filters, Rust SDK | ✅ spreadsheet functions, Rust SDK |
+| lsuite AI | ✅ demo | ✅ demo | ✅ demo through Claude Code | ✅ demo | ✅ demo |
+| Updates | Release updater | Release updater | Release updater | Check and download; in-place updates pending | Check and download; in-place updates pending |

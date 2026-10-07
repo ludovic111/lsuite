@@ -65,7 +65,7 @@
       <div class="section__head">
         <span class="eyebrow eyebrow--plain">The apps</span>
         <h2 class="h2 reveal" id="apps-title">Five apps. One way of working.</h2>
-        <p class="lede reveal" style="--d:1">Each app does the work of the tools you'd pay for, in the open, and each one is drivable end to end by your agent. All five are in beta: ryolune, kimchi and zenith are out, nori and folio are being built.</p>
+        <p class="lede reveal" style="--d:1">Each app does the work of the tools you'd pay for, in the open, and each one is drivable end to end by your agent. All five are in beta: ryolune, kimchi and zenith have public downloads; nori and folio have their first local builds.</p>
       </div>
 
       <div class="apps">
@@ -89,8 +89,7 @@
           </div>
           <p class="card__say">The DAW your AI can drive.</p>
           <p class="card__text">Record, arrange, edit MIDI, mix and export stems, with 35 stock instruments and effects and your own CLAP, VST3 and Audio Units. Opens DAWproject songs.</p>
-          <!-- Placeholder until the v2 capture arrives: assets/img/ryolune/arrangement.webp -->
-          <div class="card__shot card__shot--soon" aria-hidden="true"><span>New captures on the way</span></div>
+          <div class="card__shot"><picture><source srcset="/assets/img/ryolune/arrangement-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/ryolune/arrangement.webp" width="1600" height="1000" alt="Tracks, waveforms and the piano roll in ryolune." loading="lazy"></picture></div>
           <div class="card__foot"><span>Beta · v%VERSION:ryolune% · macOS · Windows · Linux</span><span class="link">Open <span class="arrow" aria-hidden="true">→</span></span></div>
         </a>
 
@@ -102,17 +101,7 @@
           </div>
           <p class="card__say">An app for coding with agents.</p>
           <p class="card__text">Claude Code and Codex threads you follow and steer: approvals, diffs, checkpoints, worktrees, terminals, pull requests and what every session costs.</p>
-          <div class="card__shot" aria-hidden="true">
-            <div class="zmock zmock--mini">
-              <div class="zmock__main">
-                <div class="zmock__head"><b>Fix the flaky upload test</b><span class="zmock__diff"><ins>+42</ins> <del>−7</del></span><span class="zmock__btn">Commit &amp; PR</span></div>
-                <div class="zmock__log">
-                  <div class="zmock__agent"><div class="zmock__who"><i></i>Claude Code</div><p>The test checks the file before the write is flushed. Fixed, 24 tests pass.</p></div>
-                  <div class="zmock__card zmock__card--ask"><code>git push -u origin fix-upload</code><div class="zmock__acts"><span class="zmock__btn">Approve</span><span class="zmock__btn zmock__btn--ghost">Decline</span></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="card__shot"><picture><source srcset="/assets/img/zenith/thread-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/zenith/thread.webp" width="1600" height="1000" alt="A thread using the lsuite AI demo in zenith." loading="lazy"></picture></div>
           <div class="card__foot"><span>Beta · v%VERSION:zenith% · macOS · Linux</span><span class="link">Open <span class="arrow" aria-hidden="true">→</span></span></div>
         </a>
 
@@ -124,9 +113,8 @@
           </div>
           <p class="card__say">Pixels, vectors and pages in one document.</p>
           <p class="card__text">Photo editing, vector illustration and page layout together, the work of Photoshop, Illustrator and InDesign in one app, built to open PSD layers.</p>
-          <!-- Placeholder until nori's first capture arrives: assets/img/nori/editor.webp -->
-          <div class="card__shot card__shot--soon" aria-hidden="true"><span>First build coming</span></div>
-          <div class="card__foot"><span>Beta · 0.1 in the works</span><span class="link">Preview <span class="arrow" aria-hidden="true">→</span></span></div>
+          <div class="card__shot"><picture><source srcset="/assets/img/nori/editor-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/nori/editor.webp" width="1600" height="1000" alt="A photograph, vector artwork and text layers in nori." loading="lazy"></picture></div>
+          <div class="card__foot"><span>Beta · 0.1</span><span class="link">Explore <span class="arrow" aria-hidden="true">→</span></span></div>
         </a>
 
         <a class="card app-folio reveal" href="/folio">
@@ -137,9 +125,8 @@
           </div>
           <p class="card__say">Documents, spreadsheets and slides in one app.</p>
           <p class="card__text">Write, calculate and present without switching apps: the work of Word, Excel and PowerPoint, combined, with an agent that can do the paperwork.</p>
-          <!-- Placeholder until folio's first capture arrives: assets/img/folio/document.webp -->
-          <div class="card__shot card__shot--soon" aria-hidden="true"><span>First build coming</span></div>
-          <div class="card__foot"><span>Beta · 0.1 in the works</span><span class="link">Preview <span class="arrow" aria-hidden="true">→</span></span></div>
+          <div class="card__shot"><picture><source srcset="/assets/img/folio/document-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/folio/document.webp" width="1600" height="1000" alt="A report with a live spreadsheet table and chart in folio." loading="lazy"></picture></div>
+          <div class="card__foot"><span>Beta · 0.1</span><span class="link">Explore <span class="arrow" aria-hidden="true">→</span></span></div>
         </a>
 
         <a class="card card--ai reveal" style="--d:1" href="/ai">
@@ -206,48 +193,48 @@
               <td><span class="yes">Yes</span><small>Agent panel, 14 providers, Changes with undo</small></td>
               <td><span class="yes">Yes</span><small>Agent panel with one card per command and Revert</small></td>
               <td><span class="yes">Yes</span><small>Claude Code and Codex threads</small></td>
-              <td><span class="soon">Coming</span><small>0.1</small></td>
-              <td><span class="soon">Coming</span><small>0.1</small></td>
+              <td><span class="yes">Yes</span><small>Agent panel with shared undo</small></td>
+              <td><span class="yes">Yes</span><small>Agent panel with shared undo</small></td>
             </tr>
             <tr>
               <th scope="row">Command line</th>
-              <td><span class="yes">Yes</span><small><code>ryolune-cli</code>, 224 commands</small></td>
-              <td><span class="yes">Yes</span><small><code>kimchi-cli</code>, 229 commands</small></td>
-              <td><span class="yes">Yes</span><small><code>zenith-cli</code>, 64 commands</small></td>
-              <td><span class="soon">Coming</span><small><code>nori-cli</code></small></td>
-              <td><span class="soon">Coming</span><small><code>folio-cli</code></small></td>
+              <td><span class="yes">Yes</span><small><code>ryolune-cli</code>, 239 commands</small></td>
+              <td><span class="yes">Yes</span><small><code>kimchi-cli</code>, 250 commands</small></td>
+              <td><span class="yes">Yes</span><small><code>zenith-cli</code>, 82 commands</small></td>
+              <td><span class="yes">Yes</span><small><code>nori-cli</code>, 147 commands</small></td>
+              <td><span class="yes">Yes</span><small><code>folio-cli</code>, 150 commands</small></td>
             </tr>
             <tr>
               <th scope="row">MCP server</th>
               <td><span class="yes">Yes</span><small><code>ryolune-mcp --live</code></small></td>
               <td><span class="yes">Yes</span><small><code>kimchi-mcp --live</code></small></td>
               <td><span class="yes">Yes</span><small><code>zenith-mcp --live</code>, handed to every thread</small></td>
-              <td><span class="soon">Coming</span><small><code>nori-mcp</code></small></td>
-              <td><span class="soon">Coming</span><small><code>folio-mcp</code></small></td>
+              <td><span class="yes">Yes</span><small><code>nori-mcp</code></small></td>
+              <td><span class="yes">Yes</span><small><code>folio-mcp</code></small></td>
             </tr>
             <tr>
               <th scope="row">Open files</th>
               <td><span class="yes">Yes</span><small><code>.ryolune</code> JSON, DAWproject</small></td>
               <td><span class="yes">Yes</span><small>Projects are plain JSON</small></td>
               <td><span class="yes">Yes</span><small>Your repositories; threads on disk</small></td>
-              <td><span class="soon">Coming</span><small><code>.nori</code>, PSD layers in</small></td>
-              <td><span class="soon">Coming</span><small>Documents, sheets and slides on disk</small></td>
+              <td><span class="yes">Yes</span><small><code>.nori</code>, PSD layers in</small></td>
+              <td><span class="yes">Yes</span><small>Documents, sheets and slides on disk</small></td>
             </tr>
             <tr>
               <th scope="row">Plugins</th>
-              <td><span class="yes">Yes</span><small>35 stock, CLAP, VST3, AU, Rust SDK; built by your agent next</small></td>
-              <td><span class="yes">Yes</span><small>ryolune effects, CLAP, VST3, AU, LUTs; built by your agent next</small></td>
-              <td><span class="soon">Coming</span><small>0.4, built by your agent</small></td>
-              <td><span class="soon">Coming</span><small>Filters in Rust, built by your agent</small></td>
-              <td><span class="soon">Coming</span><small>Built by your agent</small></td>
+              <td><span class="yes">Yes</span><small>35 stock, CLAP, VST3, AU, Rust SDK; built by your agent</small></td>
+              <td><span class="yes">Yes</span><small>ryolune effects, CLAP, VST3, AU, LUTs; built by your agent</small></td>
+              <td><span class="yes">Yes</span><small>Rust tools, built by your agent</small></td>
+              <td><span class="yes">Yes</span><small>Filters in Rust, built by your agent</small></td>
+              <td><span class="yes">Yes</span><small>Built by your agent</small></td>
             </tr>
             <tr>
               <th scope="row">lsuite AI</th>
-              <td><span class="soon">Coming</span><small>0.15</small></td>
-              <td><span class="soon">Coming</span><small>0.10</small></td>
-              <td><span class="soon">Coming</span><small>0.4</small></td>
-              <td><span class="soon">Coming</span><small>0.1</small></td>
-              <td><span class="soon">Coming</span><small>0.1</small></td>
+              <td><span class="yes">Demo</span><small>One shared account</small></td>
+              <td><span class="yes">Demo</span><small>One shared account</small></td>
+              <td><span class="yes">Demo</span><small>One shared account</small></td>
+              <td><span class="yes">Demo</span><small>One shared account</small></td>
+              <td><span class="yes">Demo</span><small>One shared account</small></td>
             </tr>
           </tbody>
         </table>

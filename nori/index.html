@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>nori beta — images, vectors and page layout in one app your AI can drive · lsuite</title>
-  <meta name="description" content="nori is lsuite's image and design app, in beta and written in Rust: photo editing, vector illustration and page layout in one document, the work of Photoshop, Illustrator and InDesign combined, with every action a command your AI can run. Free and MIT licensed. First build coming.">
+  <meta name="description" content="nori is lsuite's image and design app, in beta and written in Rust: photo editing, vector illustration and page layout in one document, the work of Photoshop, Illustrator and InDesign combined, with every action a command your AI can run. Free and MIT licensed. First public build coming.">
   <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/nori">
@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="lsuite">
   <meta property="og:title" content="nori beta — images, vectors and pages in one app your AI can drive">
-  <meta property="og:description" content="Photo editing, vector illustration and page layout in one document, in Rust, with every action a command your AI can run. Free and MIT licensed. First build coming.">
+  <meta property="og:description" content="Photo editing, vector illustration and page layout in one document, in Rust, with every action a command your AI can run. Free and MIT licensed. First public build coming.">
   <meta property="og:url" content="%ORIGIN%/nori">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -30,25 +30,21 @@
     <div class="hero__grid"></div>
     <div class="wrap hero__in">
       <div class="appid reveal">
-        <!-- Placeholder icon (the lsuite grain tile): replace assets/img/icons/nori.webp with nori's icon, 256x256, rendered from its gen-mark.py. -->
         <img class="appid__mark" src="/assets/img/icons/nori.webp" width="56" height="56" alt="">
         <div><div class="appid__name">nori</div><div class="appid__kind">lsuite · image and design</div></div>
         <span class="badge">Beta</span>
       </div>
       <h1 class="display reveal" style="--d:1">Pixels, vectors, pages.<br><span class="neg">One document</span>.</h1>
-      <p class="lede reveal" style="--d:2">nori is lsuite's image and design app, joining the suite in beta: retouch a photo, draw a logo and lay out the poster it goes on, in the same document, the work of Photoshop, Illustrator and InDesign in one app. A Rust engine draws it all; like every lsuite app, everything you can click is a command, so you, a script or an AI agent can make the same edits, with one undo.</p>
+      <p class="lede reveal" style="--d:2">nori is lsuite's image and design app, in beta: retouch a photo, draw a logo and lay out the poster it goes on, in the same document, the work of Photoshop, Illustrator and InDesign in one app. A Rust engine draws it all; like every lsuite app, everything you can click is a command, so you, a script or an AI agent can make the same edits, with one undo.</p>
       <div class="hero__actions reveal" style="--d:3">
-        <a class="btn btn--primary" href="#downloads">First build coming</a>
+        <a class="btn btn--primary" href="#downloads">First public build coming</a>
         <a class="btn" href="#what">What it does</a>
       </div>
-      <p class="fine hero__fine reveal" style="--d:4">Beta · 0.1 in the works · free and MIT licensed · macOS, Windows, Linux · native Rust app · drivable by your AI · no telemetry</p>
+      <p class="fine hero__fine reveal" style="--d:4">Beta · 0.1 · free and MIT licensed · macOS, Windows, Linux · native Rust app · drivable by your AI · no telemetry</p>
     </div>
     <div class="wrap">
-      <!-- Placeholder: replace with <picture> of assets/img/nori/editor.webp and editor-light.webp (2000x1250) when the nori agent's captures arrive. -->
-      <figure class="shot shot--hero shot--soon reveal" style="--d:3" data-capture="nori/editor">
-        <img src="/assets/img/icons/nori.webp" width="140" height="140" alt="">
-        <span>nori 0.1 · first captures on the way</span>
-      </figure>
+      <figure class="shot shot--hero reveal" style="--d:3"><picture><source srcset="/assets/img/nori/editor-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/nori/editor.webp" width="1600" height="1000" alt="A photograph, vector artwork and text layers in nori." loading="lazy"></picture></figure>
+      <p class="fine">Photo: <a href="https://www.flickr.com/photos/mendhak/54872031489/">Red Acer by mendhak</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. Cropped and combined with text and vector layers.</p>
     </div>
   </section>
 
@@ -57,7 +53,7 @@
       <div class="section__head">
         <span class="eyebrow">What it does</span>
         <h2 class="h2 reveal" id="what-title">Three tools, one document.</h2>
-        <p class="lede reveal" style="--d:1">Raster layers, vector shapes and pages live side by side in one <code>.nori</code> file: plain data in Rust, drawn on the GPU in lsuite's black-and-white look. This is what nori 0.1 is being built to do.</p>
+        <p class="lede reveal" style="--d:1">Raster layers, vector shapes and pages live side by side in one <code>.nori</code> file: plain data in Rust, drawn on the GPU in lsuite's black-and-white look. All three share one canvas and one undo history.</p>
       </div>
       <div class="grid grid--3">
         <div class="cell reveal"><span class="cell__k">Photo</span><h3>Layers and masks</h3><p>Pixel and adjustment layers with masks, blend modes and opacity, grouped and reordered like you expect.</p></div>
@@ -75,7 +71,7 @@
       <div class="stack">
         <span class="eyebrow">Coming from another editor</span>
         <h2 class="h2 reveal" id="from-title">Three apps you'd pay for, in one you don't.</h2>
-        <p class="lede reveal" style="--d:1">What you'd do in Photoshop, Illustrator and InDesign happens in one nori document. It's being built to open Photoshop documents with their layers, and GIMP brushes, so your work comes along.</p>
+        <p class="lede reveal" style="--d:1">What you'd do in Photoshop, Illustrator and InDesign happens in one nori document. It opens Photoshop documents with their layers and imports GIMP brushes, so your work comes along.</p>
       </div>
       <div class="logos reveal" style="--d:1">
         <div class="logo-tile"><img src="/assets/img/logos/photoshop.svg" width="32" height="32" alt=""><b>Adobe Photoshop</b><span>Photo editing · PSD documents, layers in</span></div>
@@ -111,7 +107,7 @@
       </div>
       <div class="grid grid--3">
         <div class="cell reveal"><span class="cell__k">Stock</span><h3>In the box</h3><p>The filters and adjustments nori ships with, listed with what they do.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Installed</span><h3>Yours, switchable</h3><p>Every plugin on the computer with its version and an on/off switch always in view. A plugin that crashes is turned off, not the app.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Installed</span><h3>Yours, switchable</h3><p>Every plugin on the computer with its version and an on/off switch always in view. A failing filter is switched off and its edit is discarded.</p></div>
         <div class="cell reveal" style="--d:2"><span class="cell__k">Build with your agent</span><h3>Ask, then use it</h3><p>Rust is offered if it's missing; building plugins is a permission you give the agent.</p></div>
       </div>
     </div>
@@ -133,11 +129,11 @@
       <div class="section__head">
         <span class="eyebrow">Changelog</span>
         <h2 class="h2 reveal" id="changelog-title">Every version, in plain words.</h2>
-        <p class="lede reveal" style="--d:1">nori's first version is being built. Its notes will be here and in the app after each update.</p>
+        <p class="lede reveal" style="--d:1">nori 0.1 brings pictures, drawings and pages into the suite.</p>
       </div>
       <ol class="releases reveal">
         <li class="release release--now">
-          <div class="release__meta"><span class="release__v">0.1</span><span class="release__date">In the works</span></div>
+          <div class="release__meta"><span class="release__v">0.1</span><span class="release__date">First beta</span></div>
           <div class="release__body">
             <h3>The first nori</h3>
             <ul>
@@ -156,8 +152,8 @@
     <div class="wrap">
       <div class="band reveal">
         <span class="eyebrow">Download</span>
-        <h2 class="h2" id="downloads-title">First build coming.</h2>
-        <p class="lede" style="margin-inline:auto">nori 0.1 for macOS, Windows and Linux will be here as soon as its first release is out, signed and updating itself like the other lsuite apps. Meanwhile, try <a href="/kimchi">kimchi</a>, <a href="/ryolune">ryolune</a> or <a href="/zenith">zenith</a>.</p>
+        <h2 class="h2" id="downloads-title">First public build coming.</h2>
+        <p class="lede" style="margin-inline:auto">nori 0.1 for macOS, Windows and Linux will be here as soon as its first release is out, packaged for download. Meanwhile, try <a href="/kimchi">kimchi</a>, <a href="/ryolune">ryolune</a> or <a href="/zenith">zenith</a>.</p>
       </div>
     </div>
   </section>

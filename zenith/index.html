@@ -47,62 +47,7 @@
     <div class="wrap">
       <!-- An illustration until the zenith agent's v2 captures arrive: then replace this figure with
            <picture> of assets/img/zenith/thread.webp and thread-light.webp (2000x1250). -->
-      <figure class="shot shot--hero reveal" style="--d:3" aria-label="Illustration of a zenith thread: projects and threads in the sidebar, an agent's answer and work, a diff summary, an approval, and the composer">
-        <div class="zmock" aria-hidden="true">
-          <div class="zmock__side">
-            <div class="zmock__lights"><i></i><i></i><i></i></div>
-            <div class="zmock__new"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New thread</div>
-            <small>Projects</small>
-            <div class="zmock__proj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>tide-notes</div>
-            <div class="zmock__thr on"><em>Fix the flaky upload test</em><i class="run"></i></div>
-            <div class="zmock__thr"><em>Add a dark mode toggle</em><i class="wait"></i></div>
-            <div class="zmock__thr"><em>Bump dependencies</em><i></i></div>
-            <div class="zmock__proj"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>pocket-api</div>
-            <div class="zmock__thr"><em>Review PR #31</em><i></i></div>
-            <div class="zmock__thr"><em>Rate limit the login route</em><i></i></div>
-            <div class="zmock__cost"><span>Sessions &amp; costs · today</span><b>$4.12</b><span>9 sessions · 1.8M tokens</span></div>
-          </div>
-          <div class="zmock__main">
-            <div class="zmock__head">
-              <b>Fix the flaky upload test</b>
-              <span class="zmock__chip">worktree · fix-upload</span>
-              <span class="zmock__diff"><ins>+42</ins> <del>−7</del></span>
-              <span class="zmock__btn">Commit &amp; PR</span>
-            </div>
-            <div class="zmock__log">
-              <div class="zmock__you">The upload test fails about one run in five. Find out why and fix it.</div>
-              <div class="zmock__agent">
-                <div class="zmock__who"><i></i>Claude Code</div>
-                <p>The test checks the file before the write is flushed. I now wait for the write to finish and assert on the stored file.</p>
-                <div class="zmock__work">
-                  <span>Read src/upload.ts, test/upload.test.ts</span>
-                  <span>Edited src/upload.ts</span>
-                  <span>Ran npm test -- upload <b class="ok">✓ 24 passed</b></span>
-                </div>
-              </div>
-              <div class="zmock__card">
-                <h4>3 files changed <span class="zmock__diff"><ins>+42</ins> <del>−7</del></span></h4>
-                <div class="zmock__file"><em>src/upload.ts</em><span class="zmock__diff"><ins>+18</ins> <del>−5</del></span></div>
-                <div class="zmock__file"><em>test/upload.test.ts</em><span class="zmock__diff"><ins>+21</ins> <del>−2</del></span></div>
-                <div class="zmock__file"><em>test/helpers/fs.ts</em><span class="zmock__diff"><ins>+3</ins></span></div>
-              </div>
-              <div class="zmock__card zmock__card--ask">
-                <h4>Approval needed</h4>
-                <code>git push -u origin fix-upload</code>
-                <div class="zmock__acts"><span class="zmock__btn">Approve</span><span class="zmock__btn zmock__btn--ghost">Decline</span></div>
-              </div>
-            </div>
-            <div class="zmock__compose">
-              <span>Ask for follow-up changes…</span>
-              <div class="zmock__bar">
-                <span class="zmock__chip">Claude Code</span>
-                <span class="zmock__chip">Plan</span>
-                <span class="zmock__send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </figure>
+      <figure class="shot shot--hero reveal" style="--d:3"><picture><source srcset="/assets/img/zenith/thread-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/zenith/thread.webp" width="1600" height="1000" alt="A thread using the lsuite AI demo in zenith." loading="lazy"></picture></figure>
       <p class="fine" style="margin-top: 14px;">An illustration with sample data. zenith only ever shows your own, on your own machine.</p>
     </div>
   </section>
@@ -110,7 +55,7 @@
   <section class="section" style="padding-top: 0; border-top: 0;">
     <div class="wrap">
       <div class="stats reveal">
-        <div><b>64</b><span>commands, for you and your agents</span></div>
+        <div><b>82</b><span>commands, for you and your agents</span></div>
         <div><b>2</b><span>coding agents: Claude Code and Codex</span></div>
         <div><b>2</b><span>systems: macOS and Linux</span></div>
         <div><b>0</b><span>telemetry. Local only</span></div>
