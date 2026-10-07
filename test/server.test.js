@@ -31,10 +31,10 @@ test('platform from the user agent', () => {
 });
 
 test('download routes of every app: released apps to GitHub, unreleased ones to their pages', async () => {
-  for (const app of ['ryolune', 'kimchi', 'zenith']) {
+  for (const app of ['ryolune', 'kimchi', 'zenith', 'folio']) {
     assert.equal(await downloadTarget(app, 'nope'), `https://github.com/ludovic111/${app}/releases/latest`, app);
   }
-  for (const app of ['nori', 'folio']) {
+  for (const app of ['nori']) {
     for (const platform of [undefined, 'macos-arm64', 'windows-x86_64', 'linux-x86_64', 'nope']) {
       assert.equal(await downloadTarget(app, platform, 'Macintosh'), `/${app}`);
     }
