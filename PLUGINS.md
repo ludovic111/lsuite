@@ -51,7 +51,7 @@ Agent permissions: building and installing plugins are a permission of their own
 - Installed lsuite plugins live in `~/.lsuite/plugins/<app>/<id>/` (`LSUITE_HOME` replaces
   `~/.lsuite`); sources the agent writes in `~/.lsuite/plugins-src/<app>/<name>/`.
 - The SDK is a crate in the app's repository (`ryolune-plugin` in `sdk/`, `kimchi-plugin`,
-  `zenith-plugin`, `nori-plugin`) with a frozen `repr(C)` ABI (an ABI version in the entry point,
+  `zenith-plugin`, `nori-plugin`, `folio-plugin`) with a frozen `repr(C)` ABI (an ABI version in the entry point,
   checked before anything is called, calls panic-guarded) — ryolune's `sdk/src/ffi.rs` is the
   reference. The template's `Cargo.toml` points at the SDK by git URL and tag, so a plugin builds
   without the app's sources.

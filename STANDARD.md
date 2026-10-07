@@ -130,19 +130,26 @@ now: no payment is taken. The contract: [AI.md](AI.md).
 
 ## Status (2026-10-07)
 
-All five apps are in beta on the site. nori and folio are being built (first builds coming); the
-plugin and lsuite AI rows describe tonight's work in progress until each app's release says
-otherwise.
+All five apps have public beta releases: ryolune 0.15.3, kimchi 0.10.0, zenith 0.4.0,
+nori 0.1.0 and folio 0.1.0. Plugins and the shared account flows ship in those releases.
+lsuite AI remains an explicit demo until the owner creates and connects billing, model-provider
+and verified-email accounts; the approved monthly prices are $12 / $29 / $79 USD.
 
 | | ryolune | kimchi | zenith | nori | folio |
 | --- | --- | --- | --- | --- | --- |
-| Command registry, one undo | ✅ 239 commands | ✅ 250 commands | ✅ 82 commands; undo per turn | ✅ 147 commands | ✅ 150 commands |
+| Command registry, one undo | ✅ 239 commands | ✅ 250 commands | ✅ 82 commands; undo per turn | ✅ 156 commands | ✅ 150 commands |
 | CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` | ✅ `zenith-cli` | ✅ `nori-cli` | ✅ `folio-cli` |
 | MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live` | ✅ `nori-mcp --live` | ✅ `folio-mcp --live` |
 | Built-in agent | ✅ Agent panel | ✅ Agent panel | ✅ Claude Code and Codex threads | ✅ Agent panel | ✅ Agent panel |
 | Discovery | ✅ `~/.lsuite/apps/ryolune.json` | ✅ `~/.lsuite/apps/kimchi.json` | ✅ `~/.lsuite/apps/zenith.json` | ✅ `~/.lsuite/apps/nori.json` | ✅ `~/.lsuite/apps/folio.json` |
-| Open files | ✅ JSON, DAWproject | ✅ JSON projects | ✅ Git repositories | ✅ `.nori` ZIP, PSD, OpenRaster, SVG | ✅ `.folio` ZIP, Office and OpenDocument |
+| Open files | ✅ JSON, DAWproject | ✅ JSON projects | ✅ Git repositories | ✅ `.nori` ZIP, PSD, OpenRaster, SVG, IDML, PDF-compatible AI, 8-bit XCF | ✅ `.folio` ZIP, Office and OpenDocument |
 | Design v2 | ✅ | ✅ | ✅ native and web | ✅ | ✅ |
 | Plugins | ✅ 35 stock, CLAP, VST3, AU, Rust SDK | ✅ audio, frei0r, LUTs, Rust SDK | ✅ Rust MCP tools | ✅ tile filters, Rust SDK | ✅ spreadsheet functions, Rust SDK |
 | lsuite AI | ✅ demo | ✅ demo | ✅ demo through Claude Code | ✅ demo | ✅ demo |
-| Updates | Release updater | Release updater | Release updater | Check and download; in-place updates pending | Check and download; in-place updates pending |
+| Updates | Release updater | Release updater | Release updater | Signed release updater | Signed release updater |
+
+For nori and folio, in-place updates cover macOS bundles, Linux AppImages and installed Windows
+copies. Portable Windows copies and Linux system packages link to verified release downloads.
+Mac packages are signed and notarized; installing this rollout on the owner’s Macs is still
+blocked by unavailable SSH access. nori’s physical tablet and Adobe interoperability checks
+remain beta validation limits, detailed in its release notes.

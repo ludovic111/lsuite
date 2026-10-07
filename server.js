@@ -114,7 +114,7 @@ export function osFor(userAgent = '') {
  * app's route table ready before its first release (the route lands on the app's page).
  */
 export const DOWNLOADS = {
-  // ryolune's and zenith's file names are stable (no version), kimchi's carry it (Tauri bundles).
+  // Release filenames are stable; the GitHub release tag carries the version.
   ryolune: {
     repo: 'ludovic111/ryolune',
     patterns: {
@@ -148,7 +148,7 @@ export const DOWNLOADS = {
     },
     byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
   },
-  // Source is public; enable downloads after the first signed release completes.
+  // Published image and design app builds.
   nori: {
     repo: 'ludovic111/nori',
     published: true,
