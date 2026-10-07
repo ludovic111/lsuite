@@ -84,6 +84,29 @@ of the latest `launcher-v*` release, files signed with the launcher's minisign k
 installer runs once the launcher quits; portable copies (Windows zip, Linux tar.gz) link to the
 new file.
 
+## The lsuite agent
+
+The **Agent** area (and `lsuite-cli agent.run prompt=…`) runs one agent across the apps
+(HARNESS.md, part 8, `crates/lsuite-core/src/agent.rs`). It reads each app's expert brief and
+skills (`harness.*`, or the app's MCP instructions and prompts on older versions), looks up the
+commands it needs, does the work, looks at the result (`harness.look`) and fixes it before it
+reports. It runs on **Claude Code** (every installed app's MCP server plus `lsuite mcp`, the suite
+brief appended; no key needed), on **lsuite AI** (a Pass plan) or on the **Anthropic API**
+(`ANTHROPIC_API_KEY`); with the last two the launcher runs the loop itself through MCP clients.
+An app can still refuse an action for its own agent permissions; the agent says which setting.
+
+## The marketplace
+
+The **Marketplace** area and `market.*` (MARKETPLACE.md): browse, install and update plugins
+(with lsuite Pass; files checked against the listing's SHA-256, unpacked into
+`~/.lsuite/plugins/<app>/<id>/`, a running app asked to `plugin.rescan`), and publish a bundle
+folder for review (`market.publish`, `agent.publish` for agents, off by default).
+
+## Getting the apps
+
+Since 0.2.0 the apps come through lsuite.xyz with the account (DISTRIBUTION.md): `apps.*` need a
+free lsuite account; files are checked against the keys built into the launcher as before.
+
 ## Releasing
 
 1. Set the version in `Cargo.toml` (`[workspace.package]`), `cargo run -p lsuite-cli -- docs`,

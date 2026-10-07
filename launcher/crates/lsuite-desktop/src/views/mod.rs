@@ -1,8 +1,10 @@
 //! The pages (one module each) and what floats above them.
 
 pub mod account;
+pub mod agent;
 pub mod apps;
 pub mod cloud;
+pub mod market;
 pub mod overlays;
 pub mod settings;
 
@@ -66,7 +68,7 @@ pub fn empty(title: impl Into<SharedString>, text: impl Into<SharedString>, acti
         .px(px(24.))
         .py(px(48.))
         .overflow_hidden()
-        .child(div().absolute().top_0().left_0().right_0().flex().justify_center().child(crate::ui::grain::dither(720., 160., 0.5, window, cx)))
+        .child(div().absolute().top_0().left_0().right_0().flex().justify_center().child(crate::ui::grain::dither(720., 70., 0.35, window, cx)))
         .child(div().text_size(px(sz::XL)).font_weight(FontWeight::BOLD).child(title.into()))
         .child(div().max_w(px(520.)).text_color(t.text_2).text_center().child(text.into()))
         .child(div().flex().gap(px(8.)).mt(px(6.)).children(actions))

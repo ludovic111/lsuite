@@ -17,7 +17,9 @@ use serde_json::{Value, json};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Page {
+    Agent,
     Apps,
+    Marketplace,
     Cloud,
     Account,
     Settings,
@@ -26,7 +28,9 @@ pub enum Page {
 impl Page {
     pub fn title(self) -> &'static str {
         match self {
+            Page::Agent => "Agent",
             Page::Apps => "Apps",
+            Page::Marketplace => "Marketplace",
             Page::Cloud => "Cloud",
             Page::Account => "Account",
             Page::Settings => "Settings",
@@ -46,6 +50,8 @@ pub enum Dialog {
     UploadPath,
     /// No system file picker: type the path of the folder to sync.
     SyncPath,
+    /// No system file picker: type the path of a plugin bundle to publish.
+    PublishPath,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -104,6 +110,15 @@ pub struct Store {
     pub update: Value,
     /// `cloud.syncList`.
     pub syncs: Value,
+    /// `market.list` (all apps), `market.mine`, and the app the list is narrowed to.
+    pub market: Value,
+    pub market_mine: Value,
+    pub market_app: Option<String>,
+    pub market_error: Option<String>,
+    /// The lsuite agent: `agent.log`, `agent.providers` and the provider chosen.
+    pub agent: Value,
+    pub agent_providers: Value,
+    pub agent_provider: Option<String>,
     next_toast: u64,
 }
 
@@ -144,6 +159,13 @@ impl Store {
             checking: false,
             update: Value::Null,
             syncs: Value::Null,
+            market: Value::Null,
+            market_mine: Value::Null,
+            market_app: None,
+            market_error: None,
+            agent: Value::Null,
+            agent_providers: Value::Null,
+            agent_provider: None,
             next_toast: 0,
         };
         s.syncs = lsuite_core::sync::list(&s.launcher);
@@ -226,6 +248,8 @@ impl Store {
                 "account" => self.refresh_account(cx),
                 "cloud" => self.refresh_cloud(cx),
                 "sync" => self.syncs = lsuite_core::sync::list(&self.launcher),
+                "market" => self.refresh_market(cx),
+                "agent" => self.agent = lsuite_core::agent::log(&self.launcher),
                 "update" => self.update = lsuite_core::selfupdate::to_value(&lsuite_core::selfupdate::status(&self.launcher)),
                 "settings" => {
                     self.settings = lsuite_core::settings::load();
@@ -321,6 +345,25 @@ impl Store {
         });
     }
 
+    /// The marketplace's listings and, signed in, the account's own submissions.
+    pub fn refresh_market(&mut self, cx: &mut Context<Self>) {
+        self.run_result("market.list", json!({}), cx, |s, r, _| match r {
+            Ok(v) => {
+                s.market = v;
+                s.market_error = None;
+            }
+            Err(e) => s.market_error = Some(e),
+        });
+        if self.signed_in() {
+            self.run_result("market.mine", json!({}), cx, |s, r, _| s.market_mine = r.unwrap_or(Value::Null));
+        }
+    }
+
+    /// Whether the account has a paid Pass plan (the marketplace and lsuite Cloud come with it).
+    pub fn has_pass(&self) -> bool {
+        self.signed_in() && self.account["plan"].as_str().is_some_and(|p| p != "free")
+    }
+
     pub fn refresh_plans(&mut self, cx: &mut Context<Self>) {
         self.run_then("account.plans", json!({}), cx, |s, v, _| s.plans = v);
     }
@@ -394,6 +437,11 @@ impl Store {
                 }
             }
             Page::Cloud => self.refresh_cloud(cx),
+            Page::Marketplace => self.refresh_market(cx),
+            Page::Agent => {
+                self.agent = lsuite_core::agent::log(&self.launcher);
+                self.agent_providers = lsuite_core::agent::providers(&self.launcher);
+            }
             _ => {}
         }
         cx.notify();

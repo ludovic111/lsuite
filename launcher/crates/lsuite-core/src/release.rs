@@ -1,10 +1,13 @@
 //! Finding an app's latest release for this computer, and downloading it verified.
 //!
-//! Nothing is installed unless its signature checks against the key built into the launcher
-//! (`catalog::APPS`): the minisign signature of the file itself for release-manifest apps (whose
-//! trusted comment must name the release's version), or the Ed25519 signature of `SHA256SUMS`
-//! plus the file's SHA-256 for checksum apps. Release URLs must be this app's own GitHub
-//! releases. `LSUITE_GITHUB` points everything at another host (tests).
+//! The builds aren't public (lsuite's DISTRIBUTION.md): they come through lsuite.xyz with the
+//! account's token (`GET <server>/api/apps/<app>/latest`, then the file route, which sends the
+//! download on to a short-lived address). Nothing is installed unless its signature checks
+//! against the key built into the launcher (`catalog::APPS`): the minisign signature of the file
+//! itself for release-manifest apps (whose trusted comment must name the release's version), or
+//! the Ed25519 signature of `SHA256SUMS` plus the file's SHA-256 for checksum apps, so the server
+//! can't change a build unnoticed. File URLs must be the server's own file route for that app.
+//! `github()` (the launcher's own public releases) honours `LSUITE_GITHUB` for tests.
 
 use std::path::Path;
 use std::time::Duration;
@@ -99,42 +102,53 @@ pub fn is_newer(latest: &str, installed: &str) -> bool {
     }
 }
 
-/// Finds the latest release of `app` for `p`.
+/// Said when the apps are asked for while signed out.
+pub const SIGN_IN: &str = "Sign in to lsuite to get the apps: the account is free.";
+
+/// Finds the latest release of `app` for `p`, through lsuite.xyz.
 pub async fn latest(app: &App, p: Platform) -> CmdResult<Release> {
     if !app.supports(p) {
         return Err(format!("{} has no {} build yet.", app.name, p.os_name()));
     }
+    let acc = crate::account::read().ok_or(SIGN_IN)?;
+    let server = crate::account::server();
+    let r = util::client()
+        .get(format!("{server}/api/apps/{}/latest", app.id))
+        .bearer_auth(&acc.token)
+        .send()
+        .await
+        .map_err(|e| format!("Couldn't reach {server} for {}'s latest release ({e}).", app.name))?;
+    let status = r.status().as_u16();
+    let v: Value = r.json().await.unwrap_or(Value::Null);
+    if status == 401 {
+        return Err(SIGN_IN.into());
+    }
+    if status != 200 {
+        return Err(crate::account::error_line(status, &v));
+    }
+    let version = v["version"].as_str().ok_or_else(|| format!("{}'s release has no version.", app.name))?.trim_start_matches('v').to_string();
+    let tag = v["tag"].as_str().unwrap_or("").to_string();
+    let files = format!("{server}/api/apps/{}/files/", app.id);
     match app.signing {
-        Signing::Manifest { public_key } => from_manifest(app, p, public_key).await,
-        Signing::Checksums { public_key_hex, prefix } => from_checksums(app, p, public_key_hex, prefix).await,
+        Signing::Manifest { public_key } => from_manifest(app, p, &v["manifest"], &version, public_key, &files),
+        Signing::Checksums { public_key_hex, prefix } => {
+            let sums = v["sha256sums"].as_str().ok_or_else(|| format!("{} {version} has no signed checksums; nothing was downloaded.", app.name))?;
+            let sig = v["sha256sumsSig"].as_str().ok_or_else(|| format!("{} {version} has no checksums signature; nothing was downloaded.", app.name))?;
+            from_checksums(app, p, &version, &tag, sums, sig, public_key_hex, prefix, &files)
+        }
     }
 }
 
-fn download_prefix(app: &App) -> String {
-    format!("{}/{}/releases/download/", github(), app.repo)
-}
-
-async fn get_text(url: &str, what: &str) -> CmdResult<String> {
-    let r = util::client().get(url).send().await.map_err(|e| format!("Couldn't reach GitHub for {what} ({e})."))?;
-    if !r.status().is_success() {
-        return Err(format!("GitHub answered {} for {what}.", r.status().as_u16()));
+fn from_manifest(app: &App, p: Platform, m: &Value, version: &str, public_key: &str, files: &str) -> CmdResult<Release> {
+    if m.is_null() {
+        return Err(format!("{} {version} has no release manifest; nothing was downloaded.", app.name));
     }
-    r.text().await.map_err(|e| format!("Couldn't read {what} ({e})."))
-}
-
-async fn from_manifest(app: &App, p: Platform, public_key: &str) -> CmdResult<Release> {
-    let url = format!("{}/{}/releases/latest/download/latest.json", github(), app.repo);
-    let text = get_text(&url, &format!("{}'s latest release", app.name)).await?;
-    let m: Value = serde_json::from_str(&text).map_err(|_| format!("{}'s release manifest isn't valid JSON.", app.name))?;
-    let version = m["version"].as_str().ok_or_else(|| format!("{}'s release manifest has no version.", app.name))?.trim_start_matches('v').to_string();
-    let entry = manifest_keys(p)
-        .iter()
-        .find_map(|k| m["platforms"].get(*k))
-        .ok_or_else(|| format!("{} {version} has no {} build.", app.name, p.os_name()))?;
+    let signed_version = m["version"].as_str().map(|v| v.trim_start_matches('v').to_string()).unwrap_or_else(|| version.to_string());
+    let entry = manifest_keys(p).iter().find_map(|k| m["platforms"].get(*k)).ok_or_else(|| format!("{} {version} has no {} build.", app.name, p.os_name()))?;
     let file_url = entry["url"].as_str().unwrap_or_default().to_string();
     let signature = entry["signature"].as_str().unwrap_or_default().to_string();
-    if !file_url.starts_with(&download_prefix(app)) {
-        return Err(format!("{}'s release manifest points outside its own releases; nothing was downloaded.", app.name));
+    if !file_url.starts_with(files) {
+        return Err(format!("{}'s release manifest points outside lsuite's downloads; nothing was downloaded.", app.name));
     }
     if signature.is_empty() {
         return Err(format!("{} {version} isn't signed for {}; nothing was downloaded.", app.name, p.os_name()));
@@ -142,38 +156,26 @@ async fn from_manifest(app: &App, p: Platform, public_key: &str) -> CmdResult<Re
     let file = file_url.rsplit('/').next().unwrap_or_default().to_string();
     let kind = FileKind::of(&file, p.os).ok_or_else(|| format!("The launcher can't install {file}."))?;
     // Refuse a signature made for another version before downloading anything.
-    check_signed_version(&decode_signature(&signature)?, &version)?;
-    Ok(Release { app: app.id.into(), version, file, url: file_url, kind, notes: m["notes"].as_str().map(str::to_string), check: Check::Minisign { signature, public_key: public_key.into() } })
+    check_signed_version(&decode_signature(&signature)?, &signed_version)?;
+    Ok(Release { app: app.id.into(), version: signed_version, file, url: file_url, kind, notes: m["notes"].as_str().map(str::to_string), check: Check::Minisign { signature, public_key: public_key.into() } })
 }
 
-/// The tag GitHub's `releases/latest` redirects to.
-async fn latest_tag(app: &App) -> CmdResult<String> {
-    let client = reqwest::Client::builder().user_agent(util::USER_AGENT).timeout(Duration::from_secs(20)).redirect(reqwest::redirect::Policy::none()).build().map_err(|e| e.to_string())?;
-    let r = client.get(format!("{}/{}/releases/latest", github(), app.repo)).send().await.map_err(|e| format!("Couldn't reach GitHub for {}'s latest release ({e}).", app.name))?;
-    let location = r.headers().get(reqwest::header::LOCATION).and_then(|v| v.to_str().ok()).unwrap_or_default().to_string();
-    let tag = location.rsplit_once("/releases/tag/").map(|(_, t)| t.trim_end_matches('/').to_string()).filter(|t| !t.is_empty() && !t.contains(['/', '?', '#']));
-    tag.ok_or_else(|| format!("{} has no published release yet.", app.name))
-}
-
-async fn from_checksums(app: &App, p: Platform, key_hex: &str, prefix: &str) -> CmdResult<Release> {
+#[allow(clippy::too_many_arguments)]
+fn from_checksums(app: &App, p: Platform, version: &str, tag: &str, sums: &str, sig: &str, key_hex: &str, prefix: &str, files: &str) -> CmdResult<Release> {
     let file = app.files.iter().find(|(k, _)| *k == p.key()).map(|(_, f)| f.to_string()).ok_or_else(|| format!("{} has no {} build yet.", app.name, p.os_name()))?;
-    let tag = latest_tag(app).await?;
-    let base = format!("{}{tag}/", download_prefix(app));
-    let sums = get_text(&format!("{base}SHA256SUMS"), &format!("{}'s checksums", app.name)).await?;
-    let sig = get_text(&format!("{base}SHA256SUMS.sig"), &format!("{}'s checksums signature", app.name)).await?;
-    verify_checksums(sums.as_bytes(), &sig, key_hex, prefix).map_err(|e| format!("{}: {e}", app.name))?;
+    verify_checksums(sums.as_bytes(), sig, key_hex, prefix).map_err(|e| format!("{}: {e}", app.name))?;
     let sha = sums
         .lines()
         .find_map(|l| {
             let (hash, name) = l.trim().split_once(char::is_whitespace)?;
             (name.trim().trim_start_matches('*') == file).then(|| hash.to_ascii_lowercase())
         })
-        .ok_or_else(|| format!("{} {tag}'s checksums don't list {file}; nothing was downloaded.", app.name))?;
+        .ok_or_else(|| format!("{} {version}'s checksums don't list {file}; nothing was downloaded.", app.name))?;
     if sha.len() != 64 || !sha.bytes().all(|b| b.is_ascii_hexdigit()) {
         return Err(format!("{}'s checksum for {file} is malformed.", app.name));
     }
     let kind = FileKind::of(&file, p.os).ok_or_else(|| format!("The launcher can't install {file}."))?;
-    Ok(Release { app: app.id.into(), version: tag.trim_start_matches('v').to_string(), url: format!("{base}{file}"), file, kind, notes: None, check: Check::Sha256(sha) })
+    Ok(Release { app: app.id.into(), version: version.to_string(), url: format!("{files}{tag}/{file}"), file, kind, notes: None, check: Check::Sha256(sha) })
 }
 
 /// Checks `SHA256SUMS.sig` (`<prefix> <base64 signature>`) against the hex Ed25519 key.
@@ -254,9 +256,21 @@ async fn download_inner(r: &Release, dest: &Path, progress: &mut Progress) -> Cm
         (Check::Minisign { .. }, None) => unreachable!(),
     };
     let failed = |e: reqwest::Error| format!("The download failed ({e}).");
-    let res = util::transfer_client().get(&r.url).header(reqwest::header::ACCEPT, "application/octet-stream").send().await.map_err(failed)?;
+    let mut req = util::transfer_client().get(&r.url).header(reqwest::header::ACCEPT, "application/octet-stream");
+    // lsuite's file route needs the account; the address it sends on to doesn't (and the token
+    // isn't sent across the redirect).
+    if r.url.starts_with(&crate::account::server())
+        && let Some(acc) = crate::account::read()
+    {
+        req = req.bearer_auth(acc.token);
+    }
+    let res = req.send().await.map_err(failed)?;
     if !res.status().is_success() {
-        return Err(format!("The download failed: GitHub answered {}.", res.status().as_u16()));
+        let status = res.status().as_u16();
+        if status == 401 {
+            return Err(SIGN_IN.into());
+        }
+        return Err(format!("The download failed: the server answered {status}."));
     }
     let total = res.content_length().filter(|&n| n > 0);
     if total.is_some_and(|n| n > MAX_DOWNLOAD) {

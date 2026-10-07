@@ -1,4 +1,4 @@
-//! Account: the lsuite AI account every app on this computer shares: sign in (browser or key),
+//! Account: the lsuite account every app on this computer shares, and its lsuite Pass: sign in (browser or key),
 //! the plan, the month's allowance, cloud storage, and the plans.
 
 use gpui::{AnyElement, App, Context, FontWeight, SharedString, Window, div, prelude::*, px};
@@ -38,7 +38,7 @@ pub fn chip(signed_in: bool, account: &Value, cx: &App) -> AnyElement {
             .child(div().size(px(30.)).flex_none().flex().items_center().justify_center().bg(t.accent).text_color(t.text_on_accent).font_weight(FontWeight::BOLD).child(initial))
             .child(div().flex_1().min_w_0().flex().flex_col().child(div().truncate().font_weight(FontWeight::MEDIUM).child(name)).child(div().truncate().font_family(MONO).text_size(px(sz::XS)).text_color(t.text_3).child(line)))
     } else {
-        div().flex().items_center().gap(px(10.)).child(div().size(px(30.)).flex_none().flex().items_center().justify_center().border_1().border_color(t.line_strong).child(icon("user"))).child(div().flex().flex_col().child(div().font_weight(FontWeight::MEDIUM).child("Sign in to lsuite")).child(div().text_size(px(sz::XS)).text_color(t.text_3).child("AI and cloud for every app")))
+        div().flex().items_center().gap(px(10.)).child(div().size(px(30.)).flex_none().flex().items_center().justify_center().border_1().border_color(t.line_strong).child(icon("user"))).child(div().flex().flex_col().child(div().font_weight(FontWeight::MEDIUM).child("Sign in to lsuite")).child(div().text_size(px(sz::XS)).text_color(t.text_3).child("lsuite Pass: AI, cloud, plugins")))
     };
     div()
         .id("account-chip")
@@ -75,7 +75,7 @@ pub fn page(ws: &Workspace, window: &mut Window, cx: &mut Context<Workspace>) ->
             .gap(px(26.))
             .child(lede(
                 "One account for every lsuite app.",
-                "The apps are free, with every feature, and need no account. lsuite AI is the one thing sold: agents that work in every app with nothing to set up, and cloud storage for your projects. Bring your own model instead whenever you like.",
+                "The apps are free, with every feature, and need no account. lsuite Pass is the one thing sold: AI agents in every app with nothing to set up, cloud storage for your projects, and the plugin marketplace. Bring your own model instead whenever you like.",
                 cx,
             ))
             .child(top)

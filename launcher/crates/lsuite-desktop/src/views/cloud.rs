@@ -1,4 +1,4 @@
-//! Cloud: lsuite Cloud, the storage that comes with an lsuite AI plan. A folder at a time:
+//! Cloud: lsuite Cloud, the storage that comes with lsuite Pass. A folder at a time:
 //! upload files or folders (or drop them on the window), download, rename, move, delete.
 
 use std::path::PathBuf;
@@ -143,8 +143,8 @@ pub fn page(window: &mut Window, cx: &mut App) -> AnyElement {
             "cloud-scroll",
             1120.,
             empty(
-                "lsuite Cloud comes with lsuite AI",
-                "Every paid lsuite AI plan includes cloud storage for your projects: put them there from any computer, and take them back whenever you like. Your files stay plain files; the apps never need the cloud.",
+                "lsuite Cloud comes with lsuite Pass",
+                "Every lsuite Pass plan includes cloud storage for your projects: put them there from any computer, and take them back whenever you like. Your files stay plain files; the apps never need the cloud.",
                 vec![
                     Button::new("cloud-signin", "Sign in").with_icon("log-in").primary().on_click(|_, _, cx| cx.store().update(cx, |s, cx| s.run("account.signIn", json!({}), cx))).into_any_element(),
                     Button::new("cloud-plans", "See the plans").on_click(|_, _, cx| cx.store().update(cx, |s, cx| s.go(Page::Account, cx))).into_any_element(),
@@ -197,7 +197,7 @@ pub fn page(window: &mut Window, cx: &mut App) -> AnyElement {
         })
         .when(demo && quota > 0, |d| {
             let max_file = status["maxFile"].as_u64().unwrap_or(0);
-            d.child(div().text_size(px(sz::SM)).text_color(t.text_3).child(format!("Demo: {} per account and {} per file while lsuite AI takes no payments.", bytes(quota), bytes(max_file))))
+            d.child(div().text_size(px(sz::SM)).text_color(t.text_3).child(format!("Demo: {} per account and {} per file while lsuite Pass takes no payments.", bytes(quota), bytes(max_file))))
         });
 
     // The path: Cloud › Projects › My Project, each part a link.

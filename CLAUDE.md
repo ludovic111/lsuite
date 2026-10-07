@@ -12,9 +12,19 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   kimchi (video), zenith (code), nori (image and design: Photoshop + Illustrator + InDesign in one
   document) and folio (office: documents, spreadsheets and presentations). The suite's line: every
   kind of creative and office tool, combined, free and open source, driven by your agent.
-- All five apps have full pages with downloads from their public GitHub releases (`DOWNLOADS`,
-  `REPOS` and `FALLBACK_VERSIONS` in `server.js`, `%VERSION:<app>%`): ryolune 0.15.3, kimchi
-  0.10.0, zenith 0.4.0, nori 0.1.0 and folio 0.1.0 (`ludovic111/<app>`, all `published`).
+- **The apps come only through the lsuite app** (DISTRIBUTION.md, owner's decision 2026-10-07,
+  like Creative Cloud): a free lsuite account gets every app; the source stays open. Each app page
+  has "Get <app> in the lsuite app" (`#downloads`, primary button `/launcher/download`, then
+  `/launcher`) instead of downloads, and `/<app>/download[/…]` is a 302 to `/launcher`. The builds
+  live in the private `ludovic111/lsuite-builds` (one release per version, tag `<app>-v<version>`),
+  served by `builds.js` (`/api/apps/<app>/latest`, `latest.json`, `releases/latest`,
+  `files/<tag>/<name>`: app token required, 302 to GitHub's signed address) with
+  `LSUITE_BUILDS_TOKEN` (Railway; 503 without it). `%VERSION:<app>%` and `/api/apps` read the
+  versions there when the token is set (else the public releases while they last, then
+  `FALLBACK_VERSIONS`): ryolune 0.15.3, kimchi 0.10.0, zenith 0.4.0, nori 0.1.0 and folio 0.1.0.
+  The apps' public GitHub releases become drafts once launcher 0.2.0 and each app's next version
+  (whose updater reads lsuite.xyz) are out; the changelog cards' "Full notes" links to them will
+  need another target then.
 - **lsuite Pass** (PASS.md, owner's decision 2026-10-07) is the paid subscription, renamed from
   "lsuite AI": one optional plan for everything extra, the apps staying free. It holds **lsuite AI**
   (AI.md: the agents; the apps' provider keeps that name, and the API paths `/api/ai/…`,

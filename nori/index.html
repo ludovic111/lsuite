@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>nori beta — images, vectors and page layout in one app your AI can drive · lsuite</title>
-  <meta name="description" content="nori is lsuite's image and design app, in beta and written in Rust: photo editing, vector illustration and page layout in one document, the work of Photoshop, Illustrator and InDesign combined, with every action a command your AI can run. Free and MIT licensed. Download for macOS, Windows and Linux.">
+  <meta name="description" content="nori is lsuite's image and design app, in beta and written in Rust: photo editing, vector illustration and page layout in one document, the work of Photoshop, Illustrator and InDesign combined, with every action a command your AI can run. Free and MIT licensed, in the lsuite app for macOS, Windows and Linux.">
   <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/nori">
@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="lsuite">
   <meta property="og:title" content="nori beta — images, vectors and pages in one app your AI can drive">
-  <meta property="og:description" content="Photo editing, vector illustration and page layout in one document, in Rust, with every action a command your AI can run. Free and MIT licensed. Download for macOS, Windows and Linux.">
+  <meta property="og:description" content="Photo editing, vector illustration and page layout in one document, in Rust, with every action a command your AI can run. Free and MIT licensed, in the lsuite app for macOS, Windows and Linux.">
   <meta property="og:url" content="%ORIGIN%/nori">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -37,10 +37,10 @@
       <h1 class="display reveal" style="--d:1">Pixels, vectors, pages.<br><span class="neg">One document</span>.</h1>
       <p class="lede reveal" style="--d:2">nori is lsuite's image and design app, in beta: retouch a photo, draw a logo and lay out the poster it goes on, in the same document, the work of Photoshop, Illustrator and InDesign in one app. A Rust engine draws it all; like every lsuite app, everything you can click is a command, so you, a script or an AI agent can make the same edits, with one undo.</p>
       <div class="hero__actions reveal" style="--d:3">
-        <a class="btn btn--primary" href="/nori/download" data-download="nori">Download nori</a>
+        <a class="btn btn--primary" href="#downloads">Get nori</a>
         <a class="btn" href="#what">What it does</a>
       </div>
-      <p class="fine hero__fine reveal" style="--d:4">Beta · 0.1 · free and MIT licensed · macOS, Windows, Linux · native Rust app · drivable by your AI · no telemetry</p>
+      <p class="fine hero__fine reveal" style="--d:4">Beta · Version %VERSION:nori% · in the lsuite app, with a free account · free and MIT licensed · macOS, Windows, Linux · native Rust app · drivable by your AI · no telemetry</p>
     </div>
     <div class="wrap">
       <figure class="shot shot--hero reveal" style="--d:3"><picture><source srcset="/assets/img/nori/editor-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/nori/editor.webp" width="1600" height="1000" alt="A photograph, vector artwork and text layers in nori." loading="lazy"></picture></figure>
@@ -152,15 +152,14 @@
   <section class="section" id="downloads" aria-labelledby="downloads-title">
     <div class="wrap">
       <div class="band reveal">
-        <span class="eyebrow">Download</span>
-        <h2 class="h2" id="downloads-title">Make something with nori.</h2>
-        <p class="lede" style="margin-inline:auto">The first public beta, free and open source. Download nori for your computer.</p>
+        <span class="eyebrow">Get nori</span>
+        <h2 class="h2" id="downloads-title">Get nori in the lsuite app.</h2>
+        <p class="lede" style="margin-inline:auto">nori comes through lsuite, the suite's own app. Sign in with a free lsuite account and every app is in one place: installed in a click, kept up to date, with its plugins. Free, for macOS, Windows and Linux.</p>
         <div class="hero__actions" style="justify-content:center">
-          <a class="btn btn--primary" href="/nori/download/macos-arm64">macOS · Apple Silicon</a>
-          <a class="btn" href="/nori/download/macos-x86_64">macOS · Intel</a>
-          <a class="btn" href="/nori/download/windows-x86_64">Windows</a>
-          <a class="btn" href="/nori/download/linux-x86_64">Linux</a>
+          <a class="btn btn--primary" href="/launcher/download" data-download="launcher" data-href-macos="/launcher/download/macos-arm64" data-href-windows="/launcher/download/windows-x86_64" data-href-linux="/launcher/download/linux-x86_64"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>Download lsuite</a>
+          <a class="btn" href="/launcher">About the lsuite app <span class="arrow" aria-hidden="true">→</span></a>
         </div>
+        <p class="fine" style="margin:18px auto 0;max-width:64ch">nori %VERSION:nori% · macOS, Windows and Linux. The first public beta, with signed updates. The source stays open (MIT): <a href="https://github.com/ludovic111/nori">build it yourself</a> any time.</p>
       </div>
     </div>
   </section>

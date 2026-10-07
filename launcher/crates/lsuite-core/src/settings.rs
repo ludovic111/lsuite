@@ -20,11 +20,13 @@ pub struct AgentPermissions {
     pub cloud_delete: bool,
     /// Sign in and out.
     pub account: bool,
+    /// Publish plugins on the lsuite Marketplace.
+    pub publish: bool,
 }
 
 impl Default for AgentPermissions {
     fn default() -> Self {
-        Self { install: true, remove: false, cloud_write: true, cloud_delete: false, account: false }
+        Self { install: true, remove: false, cloud_write: true, cloud_delete: false, account: false, publish: false }
     }
 }
 
