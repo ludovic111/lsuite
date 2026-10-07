@@ -56,12 +56,12 @@
         <p class="lede reveal" style="--d:1">Raster layers, vector shapes and pages live side by side in one <code>.nori</code> file: plain data in Rust, drawn on the GPU in lsuite's black-and-white look. All three share one canvas and one undo history.</p>
       </div>
       <div class="grid grid--3">
-        <div class="cell reveal"><span class="cell__k">Photo</span><h3>Layers and masks</h3><p>Pixel and adjustment layers with masks, blend modes and opacity, grouped and reordered like you expect.</p></div>
+        <div class="cell reveal"><span class="cell__k">Photo</span><h3>Layers and masks</h3><p>Pixel and adjustment layers, masks and blend modes. Embedded smart objects preserve their originals when resized, with separate document tabs and undo histories.</p></div>
         <div class="cell reveal" style="--d:1"><span class="cell__k">Vector</span><h3>Paths, shapes and type</h3><p>Pen paths, shapes, strokes and fills that stay sharp at any size, next to the pixels they sit on.</p></div>
         <div class="cell reveal" style="--d:2"><span class="cell__k">Layout</span><h3>Pages and text frames</h3><p>Pages, margins and grids, text that flows from frame to frame, and images placed from the same document.</p></div>
-        <div class="cell reveal"><span class="cell__k">Adjust</span><h3>Adjustments and filters</h3><p>Levels, curves, hue and saturation, colour balance, <code>.cube</code> LUTs, blurs and sharpening, worked out in tiles at full precision.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Paint</span><h3>A brush engine</h3><p>Pressure, spacing and hardness, an eraser and a smudge, and brushes from <code>.gbr</code> files; swatches from <code>.ase</code>.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Files</span><h3>Open formats</h3><p>PNG, JPEG, WebP, TIFF, BMP and GIF in and out, PSD and OpenRaster layers in, and the <code>.nori</code> document, a file you can read.</p></div>
+        <div class="cell reveal"><span class="cell__k">Adjust</span><h3>Adjustments and filters</h3><p>Levels, an interactive RGB/channel curves graph, hue and saturation, <code>.cube</code> LUTs, blurs and sharpening, worked out in tiles at full precision.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Paint</span><h3>A brush engine</h3><p>Size, flow, spacing, hardness and pressure controls, an eraser, and brushes from <code>.gbr</code> files; swatches from <code>.ase</code>.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Files</span><h3>Open formats</h3><p>PNG, JPEG, WebP, TIFF, BMP, layered PSD and OpenRaster export; PDF with selectable text; IDML in and out; PDF-compatible Illustrator and 8-bit GIMP XCF import; and the <code>.nori</code> document, a file you can read.</p></div>
       </div>
     </div>
   </section>
@@ -71,13 +71,13 @@
       <div class="stack">
         <span class="eyebrow">Coming from another editor</span>
         <h2 class="h2 reveal" id="from-title">Three apps you'd pay for, in one you don't.</h2>
-        <p class="lede reveal" style="--d:1">What you'd do in Photoshop, Illustrator and InDesign happens in one nori document. It opens Photoshop documents with their layers and imports GIMP brushes, so your work comes along.</p>
+        <p class="lede reveal" style="--d:1">What you'd do in Photoshop, Illustrator and InDesign happens in one nori document. It opens Photoshop documents with their layers and imports GIMP brushes, so your work comes along. Complex PSD and IDML content uses rendered fallbacks; Illustrator import needs PDF compatibility. <a href="https://github.com/ludovic111/nori#beta-interoperability-and-pressure">Format and tablet support details</a>.</p>
       </div>
       <div class="logos reveal" style="--d:1">
-        <div class="logo-tile"><img src="/assets/img/logos/photoshop.svg" width="32" height="32" alt=""><b>Adobe Photoshop</b><span>Photo editing · PSD documents, layers in</span></div>
-        <div class="logo-tile"><img src="/assets/img/logos/illustrator.svg" width="32" height="32" alt=""><b>Adobe Illustrator</b><span>Vector illustration, in the same document</span></div>
-        <div class="logo-tile"><img src="/assets/img/logos/indesign.svg" width="32" height="32" alt=""><b>Adobe InDesign</b><span>Page layout, in the same document</span></div>
-        <div class="logo-tile"><img src="/assets/img/logos/gimp.svg" width="32" height="32" alt=""><b>GIMP</b><span><code>.gbr</code> brushes, and OpenRaster layers</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/photoshop.svg" width="32" height="32" alt=""><b>Adobe Photoshop</b><span>PSD import and layered export</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/illustrator.svg" width="32" height="32" alt=""><b>Adobe Illustrator</b><span>PDF-compatible AI and SVG import</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/indesign.svg" width="32" height="32" alt=""><b>Adobe InDesign</b><span>IDML import and export</span></div>
+        <div class="logo-tile"><img src="/assets/img/logos/gimp.svg" width="32" height="32" alt=""><b>GIMP</b><span>8-bit XCF, OpenRaster and .gbr brushes</span></div>
       </div>
     </div>
   </section>
@@ -93,8 +93,8 @@
 <span class="line">claude mcp add nori -- /Applications/nori.app/Contents/MacOS/nori-mcp --live</span>
 <span class="line"></span>
 <span class="line"><span class="c"># or a script, on the app or a .nori file</span></span>
-<span class="line">nori-cli document.overview</span>
-<span class="line">nori-cli --file poster.nori export.png path=poster.png</span></pre></div>
+<span class="line">nori-cli doc.overview</span>
+<span class="line">nori-cli --file poster.nori export.file path=poster.png</span></pre></div>
     </div>
   </section>
 
