@@ -173,6 +173,22 @@ test('loopback sign-in: a code is good once, for five minutes, then a token work
   }
 });
 
+test('the lsuite launcher signs in like an app (`app=lsuite`)', async () => {
+  const t = await start();
+  try {
+    await t.site('/api/account/session', { email: 'ada@example.com', name: 'Ada' });
+    const res = await t.site('/api/account/connect', { app: 'lsuite' });
+    assert.equal(res.status, 200);
+    const { token } = await (await t.api('/api/account/token', null, { code: (await res.json()).code })).json();
+    assert.equal((await t.api('/api/cloud', token)).status, 200);
+    assert.equal((await (await t.site('/api/account/me')).json()).connections[0].app, 'lsuite');
+  } finally {
+    await t.close();
+  }
+  const script = await readFile(new URL('../assets/account.js', import.meta.url), 'utf8');
+  assert.match(script, /lsuite: 'the lsuite launcher'/, 'the connect page says "Connect the lsuite launcher"');
+});
+
 test('the paste key replaces the last one and works like an app token', async () => {
   const t = await start();
   try {

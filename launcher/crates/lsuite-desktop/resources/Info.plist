@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Template for lsuite.app/Contents/Info.plist (scripts/bundle-macos.sh fills in @VERSION@). -->
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key><string>en</string>
+  <key>CFBundleDisplayName</key><string>lsuite</string>
+  <key>CFBundleExecutable</key><string>lsuite</string>
+  <key>CFBundleIconFile</key><string>lsuite</string>
+  <key>CFBundleIdentifier</key><string>xyz.lsuite.launcher</string>
+  <key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+  <key>CFBundleName</key><string>lsuite</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>@VERSION@</string>
+  <key>CFBundleVersion</key><string>@VERSION@</string>
+  <key>CFBundleSupportedPlatforms</key><array><string>MacOSX</string></array>
+  <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
+  <!-- GPUI needs 10.15.7; 11 like the apps. -->
+  <key>LSMinimumSystemVersion</key><string>11.0</string>
+  <key>NSHighResolutionCapable</key><true/>
+  <key>NSSupportsAutomaticGraphicsSwitching</key><true/>
+  <key>NSRequiresAquaSystemAppearance</key><false/>
+  <key>NSPrincipalClass</key><string>NSApplication</string>
+  <key>NSHumanReadableCopyright</key><string>MIT licence. Part of lsuite.</string>
+  <key>NSDesktopFolderUsageDescription</key><string>lsuite uploads, downloads and syncs the folders you choose on your Desktop.</string>
+  <key>NSDocumentsFolderUsageDescription</key><string>lsuite uploads, downloads and syncs the folders you choose in Documents.</string>
+  <key>NSDownloadsFolderUsageDescription</key><string>lsuite saves the files you download from your cloud in Downloads.</string>
+  <key>NSRemovableVolumesUsageDescription</key><string>lsuite syncs the folders you choose on external drives.</string>
+  <key>NSNetworkVolumesUsageDescription</key><string>lsuite syncs the folders you choose on network drives.</string>
+</dict>
+</plist>

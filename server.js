@@ -12,6 +12,7 @@ import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { liveConfig } from './live.js';
 import { createAccounts, plansDocument } from './ai.js';
+import { objectStoreConfig } from './cloud.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
@@ -32,7 +33,10 @@ const TYPES = {
   '.mp4': 'video/mp4',
 };
 
-/** The pages, by path. Each app page is `<app>/index.html`. */
+/**
+ * The pages, by path. Each app page is `<app>/index.html`; the launcher's is `pages/launcher.html`,
+ * as `launcher/` holds its Rust workspace (never served: only `/assets/` is static).
+ */
 export const PAGES = {
   '/': 'index.html',
   '/ryolune': 'ryolune/index.html',
@@ -40,6 +44,7 @@ export const PAGES = {
   '/zenith': 'zenith/index.html',
   '/nori': 'nori/index.html',
   '/folio': 'folio/index.html',
+  '/launcher': 'pages/launcher.html',
   '/ai': 'ai/index.html',
   '/account': 'account/index.html',
   '/account/connect': 'account/connect.html',
@@ -58,7 +63,7 @@ export function plansHtml() {
     const free = p.id === 'free';
     const items = free
       ? ['Every feature of every app', 'Your subscriptions and keys, as they are', 'Nothing to pay, ever']
-      : [`<b>${p.credits.toLocaleString('en-US')} credits</b> a month`, escapeHtml(p.families.join(', ')), ...(p.priority ? ['Priority when it’s busy'] : [])];
+      : [`<b>${p.credits.toLocaleString('en-US')} credits</b> a month`, escapeHtml(p.families.join(', ')), ...(p.storage ? [`<b>${escapeHtml(p.storageLabel)}</b> lsuite Cloud`] : []), ...(p.priority ? ['Priority when it’s busy'] : [])];
     const action = free
       ? `<a class="btn" href="/account">Create a free account</a>`
       : `<a class="btn${p.id === 'pro' ? ' btn--primary' : ''}" href="/account/checkout?plan=${p.id}">Choose ${escapeHtml(p.name)}</a>`;
@@ -108,10 +113,11 @@ export function osFor(userAgent = '') {
 }
 
 /**
- * Each app's downloads: its repository, an asset pattern per platform, and the platform each OS
- * gets by default. `/<app>/download/<platform>` looks the asset up in the latest published
- * release; a platform with no matching asset goes to the release page. `published: false` keeps an
- * app's route table ready before its first release (the route lands on the app's page).
+ * Each app's downloads (and the launcher's): its repository, an asset pattern per platform, and the
+ * platform each OS gets by default. `/<app>/download/<platform>` looks the asset up in the latest
+ * published release; a platform with no matching asset goes to the release page. `published:
+ * false` keeps an app's route table ready before its first release (the route lands on the app's
+ * page). `tagPrefix`: the release tags (`v` by default), for a repository that releases more than one thing.
  */
 export const DOWNLOADS = {
   // Release filenames are stable; the GitHub release tag carries the version.
@@ -172,23 +178,45 @@ export const DOWNLOADS = {
     },
     byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
   },
+  // The lsuite launcher (`launcher/`), released from this site's repository as `launcher-vX.Y.Z`.
+  launcher: {
+    repo: 'ludovic111/lsuite',
+    tagPrefix: 'launcher-v',
+    patterns: {
+      'macos-arm64': /\/lsuite-macos-arm64\.dmg$/,
+      'macos-x86_64': /\/lsuite-macos-x86_64\.dmg$/,
+      'windows-x86_64': /\/lsuite-windows-x86_64-setup\.exe$/,
+      'windows-zip': /\/lsuite-windows-x86_64\.zip$/,
+      'linux-x86_64': /\/lsuite-linux-x86_64\.AppImage$/,
+      'linux-tar': /\/lsuite-linux-x86_64\.tar\.gz$/,
+    },
+    byOs: { macos: 'macos-arm64', windows: 'windows-x86_64', linux: 'linux-x86_64' },
+  },
 };
-export const APP_NAMES = Object.keys(DOWNLOADS);
+/** The five apps (`/api/apps`, `/<app>/support`). The launcher has downloads but isn't one of them. */
+export const APP_NAMES = ['ryolune', 'kimchi', 'zenith', 'nori', 'folio'];
 
 const releaseCache = new Map();
-/** A repository's latest published release (`tag`, asset `urls`), cached for ten minutes. */
-async function latestRelease(repo) {
-  const hit = releaseCache.get(repo);
+/**
+ * A repository's latest published release (`tag`, asset `urls`), cached for ten minutes. With a
+ * `prefix`, the newest published release whose tag starts with it (the repository's "latest" may
+ * be something else).
+ */
+async function latestRelease(repo, prefix = null) {
+  const key = prefix ? `${repo}#${prefix}` : repo;
+  const hit = releaseCache.get(key);
   if (hit && Date.now() - hit.at < 10 * 60 * 1000) return hit;
   try {
-    const res = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, {
+    const res = await fetch(`https://api.github.com/repos/${repo}/releases${prefix ? '?per_page=30' : '/latest'}`, {
       headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'lsuite-site' },
       signal: AbortSignal.timeout(4000),
     });
     if (!res.ok) throw new Error(String(res.status));
     const json = await res.json();
-    const release = { at: Date.now(), tag: json.tag_name, urls: json.assets.map((a) => a.browser_download_url) };
-    releaseCache.set(repo, release);
+    const found = prefix ? json.find((r) => !r.draft && !r.prerelease && String(r.tag_name).startsWith(prefix)) : json;
+    if (!found) throw new Error('no release');
+    const release = { at: Date.now(), tag: found.tag_name, urls: found.assets.map((a) => a.browser_download_url) };
+    releaseCache.set(key, release);
     return release;
   } catch {
     return hit ?? { tag: null, urls: [] };
@@ -197,20 +225,56 @@ async function latestRelease(repo) {
 
 // Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
 // latest published release, so the page never announces a version you cannot download yet.
-// All five apps have public releases.
-const FALLBACK_VERSIONS = { ryolune: '0.15.3', kimchi: '0.10.0', zenith: '0.4.0', nori: '0.1.0', folio: '0.1.0' };
-const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith', nori: 'ludovic111/nori', folio: 'ludovic111/folio' };
+// All five apps have public releases; the launcher's are tagged `launcher-vX.Y.Z` in ludovic111/lsuite.
+const FALLBACK_VERSIONS = { ryolune: '0.15.3', kimchi: '0.10.0', zenith: '0.4.0', nori: '0.1.0', folio: '0.1.0', launcher: '0.1.0' };
+const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith', nori: 'ludovic111/nori', folio: 'ludovic111/folio', launcher: 'ludovic111/lsuite' };
 
-/** `{ app: version }` for every app whose version a page asks for. */
+/** What `GET /api/apps` says of each app besides its downloads (the home page's cards). */
+const APP_INFO = {
+  ryolune: { kind: 'music', summary: 'The DAW your AI can drive.' },
+  kimchi: { kind: 'video', summary: 'A video editor where generation is part of the cut.' },
+  zenith: { kind: 'code', summary: 'An app for coding with agents.' },
+  nori: { kind: 'image', summary: 'Pixels, vectors and pages in one document.' },
+  folio: { kind: 'office', summary: 'Documents, spreadsheets and slides in one app.' },
+};
+
+/** The version a release tag names: `v0.15.3` → `0.15.3`, `launcher-v0.1.0` → `0.1.0` (prefix `launcher-v`). */
+export function versionOf(tag, prefix = 'v') {
+  return tag.startsWith(prefix) ? tag.slice(prefix.length) : tag.replace(/^v/, '');
+}
+
+/** `{ app: version }` for every app (or the launcher) whose version a page asks for. */
 export async function appVersions(apps) {
   const out = {};
   await Promise.all(
     apps.map(async (app) => {
-      const { tag } = REPOS[app] ? await latestRelease(REPOS[app]) : {};
-      out[app] = tag ? tag.replace(/^v/, '') : FALLBACK_VERSIONS[app] ?? '';
+      const prefix = DOWNLOADS[app]?.tagPrefix;
+      const { tag } = REPOS[app] ? await latestRelease(REPOS[app], prefix) : {};
+      out[app] = tag ? versionOf(tag, prefix) : FALLBACK_VERSIONS[app] ?? '';
     }),
   );
   return out;
+}
+
+/**
+ * `GET /api/apps`: the suite's apps for the lsuite launcher (CLOUD.md), with the version of each
+ * one's latest published release and the platforms `/<app>/download/<platform>` knows.
+ */
+export async function appsDocument(origin, versions) {
+  const known = versions ?? (await appVersions(APP_NAMES));
+  return {
+    apps: APP_NAMES.map((id) => ({
+      id,
+      name: id,
+      kind: APP_INFO[id].kind,
+      summary: APP_INFO[id].summary,
+      page: `${origin}/${id}`,
+      repo: REPOS[id] ?? DOWNLOADS[id].repo,
+      version: known[id] || null,
+      published: DOWNLOADS[id].published !== false,
+      platforms: Object.keys(DOWNLOADS[id].patterns),
+    })),
+  };
 }
 
 /** Where `/<app>/download[/<platform>]` sends the visitor. */
@@ -219,11 +283,12 @@ export async function downloadTarget(app, wanted, userAgent) {
   if (!d) return null;
   // Not released yet: the download link lands on the app's page ("First build coming").
   if (d.published === false) return `/${app}`;
-  const releases = `https://github.com/${d.repo}/releases/latest`;
+  // GitHub's "latest" is the repository's; a tag prefix needs that release's own page.
+  const releases = (tag) => (d.tagPrefix ? `https://github.com/${d.repo}/releases${tag ? `/tag/${tag}` : ''}` : `https://github.com/${d.repo}/releases/latest`);
   const pattern = d.patterns[wanted || d.byOs[osFor(userAgent)]];
-  if (!pattern) return releases;
-  const url = (await latestRelease(d.repo)).urls.find((u) => pattern.test(u));
-  return url ?? releases;
+  if (!pattern) return releases();
+  const release = await latestRelease(d.repo, d.tagPrefix);
+  return release.urls.find((u) => pattern.test(u)) ?? releases(release.tag);
 }
 
 /**
@@ -302,7 +367,9 @@ export async function renderPage(file, origin, versions, production = process.en
     }
   }
   if (html.includes('<!-- include:plans -->')) html = html.replace('<!-- include:plans -->', plansHtml());
-  const app = file.split('/').length > 1 ? file.split('/')[0] : null;
+  // The page's app is its path's first segment (`/kimchi`, `/launcher`, `/account/connect`).
+  const route = Object.keys(PAGES).find((path) => PAGES[path] === file);
+  const app = route ? route.split('/')[1] || null : file.includes('/') ? file.split('/')[0] : null;
   if (app) html = html.replaceAll(`data-app="${app}"`, `data-app="${app}" aria-current="page"`);
   for (const [whole, quote, path] of [...html.matchAll(/(["'])(\/(?:assets|design)\/[\w./-]+\.(?:js|css))\?v=[\w.-]*\1/g)]) {
     const stamp = await stampOf(path);
@@ -371,10 +438,20 @@ export const accounts = createAccounts({
   live: liveConfig(),
   dataDir: process.env.LSUITE_DATA_DIR || null,
   anthropicKey: process.env.LSUITE_ANTHROPIC_API_KEY || '',
+  // lsuite Cloud's blobs in an S3-compatible store (`LSUITE_CLOUD_S3_*`, CLOUD.md), else on the data dir.
+  cloudStore: objectStoreConfig(),
 });
+const DOWNLOAD_ROUTE = new RegExp(`^/(${Object.keys(DOWNLOADS).join('|')})/download(?:/([\\w-]+))?$`);
+const SUPPORT_ROUTE = new RegExp(`^/(?:(?:${APP_NAMES.join('|')})/)?support$`);
 
 export async function handle(req, res) {
   // The API answers on any host name: an app's POST must not be lost to a redirect.
+  if (/^\/api\/apps(?:\?|$)/.test(String(req.url ?? ''))) {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      return send(res, 405, JSON.stringify({ type: 'error', error: { type: 'invalid_request_error', message: 'Use GET.' } }), TYPES['.json'], 'no-store');
+    }
+    return send(res, 200, JSON.stringify(await appsDocument(originOf(req))), TYPES['.json'], 'public, max-age=300', req);
+  }
   if (String(req.url ?? '').startsWith('/api/')) {
     if (await accounts.handle(req, res, new URL(req.url, 'http://localhost'))) return;
   }
@@ -408,9 +485,9 @@ export async function handle(req, res) {
     return send(res, 200, html, TYPES['.html'], 'no-cache', req);
   }
 
-  const download = /^\/(ryolune|kimchi|zenith|nori|folio)\/download(?:\/([\w-]+))?$/.exec(pathname);
+  const download = DOWNLOAD_ROUTE.exec(pathname);
   if (download) return redirect(res, 302, await downloadTarget(download[1], download[2], req.headers['user-agent']));
-  if (/^\/(?:(?:ryolune|kimchi|zenith|nori|folio)\/)?support$/.test(pathname)) {
+  if (SUPPORT_ROUTE.test(pathname)) {
     return redirect(res, 302, supportTarget());
   }
   if (pathname === '/favicon.ico') return redirect(res, 301, '/assets/img/lsuite.svg', 'public, max-age=86400');

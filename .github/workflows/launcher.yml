@@ -1,0 +1,104 @@
+name: Launcher
+
+# The lsuite launcher (launcher/): tests on macOS, Windows and Linux, then real installs of the
+# apps from their signed releases with lsuite-cli on each system (the macOS .app.tar.gz and zip
+# paths, the Windows installer and portable zip, the Linux AppImage and tar.gz), into a scratch
+# folder. Releases are built by the suite release workflow (see launcher/README.md, Releasing).
+on:
+  push:
+    branches: [main]
+    paths: ['launcher/**', '.github/workflows/launcher.yml']
+  pull_request:
+    paths: ['launcher/**', '.github/workflows/launcher.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: launcher-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: Linux, os: ubuntu-22.04 }
+          - { name: macOS, os: macos-14 }
+          - { name: Windows, os: windows-latest }
+    defaults:
+      run:
+        shell: bash
+        working-directory: launcher
+    env:
+      LSUITE_HOME: ${{ github.workspace }}/scratch/home
+      LSUITE_APPS_DIR: ${{ github.workspace }}/scratch/apps
+      LSUITE_NO_UPDATE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        working-directory: .
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config clang libasound2-dev libdbus-1-dev libfontconfig-dev libfreetype-dev \
+            libssl-dev libvulkan-dev libwayland-dev libx11-xcb-dev libxcb1-dev libxkbcommon-dev libxkbcommon-x11-dev \
+            libzstd-dev libglib2.0-dev
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: launcher -> target
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Tests
+        run: cargo test --workspace --locked
+      - name: Build the CLI
+        run: cargo build --locked -p lsuite-cli
+
+      - name: Real installs (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cli=target/debug/lsuite-cli
+          $cli apps.install app=folio      # .app.tar.gz, minisign
+          $cli apps.install app=ryolune    # zip through ditto, signed SHA256SUMS
+          test -x "$LSUITE_APPS_DIR/folio.app/Contents/MacOS/folio"
+          test -x "$LSUITE_APPS_DIR/ryolune.app/Contents/MacOS/ryolune"
+          codesign --verify --deep --strict "$LSUITE_APPS_DIR/folio.app"
+          "$LSUITE_APPS_DIR/folio.app/Contents/MacOS/folio" --version
+          $cli apps.list | grep -q '"installed": 2'
+          $cli apps.uninstall app=ryolune
+          test ! -e "$LSUITE_APPS_DIR/ryolune.app"
+
+      - name: Real installs (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cli=target/debug/lsuite-cli.exe
+          $cli apps.install app=ryolune    # portable zip, signed SHA256SUMS
+          test -f "$LSUITE_APPS_DIR/ryolune/ryolune.exe"
+          $cli apps.install app=folio      # the NSIS installer, run silently (per user)
+          test -f "$LOCALAPPDATA/folio/folio.exe"
+          $cli apps.list > list.json
+          grep -q '"installed": 2' list.json
+          $cli apps.uninstall app=folio    # runs its uninstaller
+          sleep 5
+          test ! -f "$LOCALAPPDATA/folio/folio.exe"
+          $cli apps.uninstall app=ryolune
+          test ! -e "$LSUITE_APPS_DIR/ryolune"
+
+      - name: Real installs (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cli=target/debug/lsuite-cli
+          $cli apps.install app=zenith     # tar.gz, signed SHA256SUMS
+          $cli apps.install app=nori       # AppImage, minisign
+          "$LSUITE_APPS_DIR/zenith/zenith" --version
+          test -x "$LSUITE_APPS_DIR/nori/nori.AppImage"
+          $cli apps.uninstall app=zenith
+          test ! -e "$LSUITE_APPS_DIR/zenith"

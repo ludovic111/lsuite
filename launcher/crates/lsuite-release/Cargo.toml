@@ -1,0 +1,21 @@
+[package]
+name = "lsuite-release"
+description = "Release tooling: signs the launcher's update archives with its minisign key and writes latest.json"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[[bin]]
+name = "lsuite-release"
+path = "src/main.rs"
+
+[dependencies]
+lsuite-core.workspace = true
+base64.workspace = true
+minisign = "0.10"
+minisign-verify.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

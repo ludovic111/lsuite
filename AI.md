@@ -10,17 +10,24 @@ The owner approved these monthly prices on 2026-10-07: **$12 / $29 / $79 USD**.
 
 ## Plans
 
-| Plan | Monthly price (USD) | Models | Monthly allowance |
-| --- | --- | --- | --- |
-| **Free** | 0 | bring your own provider | — |
-| **Plus** | $12 / month | Claude Sonnet, Claude Haiku | 1,000 credits |
-| **Pro** | $29 / month | + Claude Opus | 4,000 credits |
-| **Studio** | $79 / month | everything, priority | 12,000 credits |
+| Plan | Monthly price (USD) | Models | Monthly allowance | lsuite Cloud |
+| --- | --- | --- | --- | --- |
+| **Free** | 0 | bring your own provider | — | — |
+| **Plus** | $12 / month | Claude Sonnet, Claude Haiku | 1,000 credits | 50 GB |
+| **Pro** | $29 / month | + Claude Opus | 4,000 credits | 250 GB |
+| **Studio** | $79 / month | everything, priority | 12,000 credits | 1 TB |
 
 A credit is a fixed amount of model usage (input and output tokens weighted by the model's price;
 for now half a US cent at the provider's list price, cache writes at 1.25× input, cache reads at
 their own price); `GET /api/ai/plans` is the source of truth the apps and the site read, never a
 copy in an app. The allowance resets on the first day of each month (UTC).
+
+## lsuite Cloud
+
+A paid plan also includes cloud storage (the sizes above, a proposal awaiting the owner; capped
+small in the demo), managed from the lsuite launcher: see [CLOUD.md](CLOUD.md) for the
+`/api/cloud` API, its errors and how files are stored. `GET /api/ai/plans` gives each plan's
+`storage`, `GET /api/account/me` adds `cloud: {used, quota, files}`.
 
 ## One account for the whole suite
 
@@ -35,7 +42,8 @@ copy in an app. The allowance resets on the first day of each month (UTC).
 ## Signing in (loopback, like native apps do OAuth)
 
 1. The app listens on `127.0.0.1:<random port>` and opens
-   `<server>/account/connect?app=<app>&port=<port>&state=<random>` in the browser.
+   `<server>/account/connect?app=<app>&port=<port>&state=<random>` in the browser (`<app>`: one of
+   the five, or `lsuite` for the launcher).
 2. The person signs in or creates the account there (demo: email and name), picks a plan if
    they have none (demo checkout), and presses **Connect <app>**.
 3. The page sends the browser to `http://127.0.0.1:<port>/callback?code=<code>&state=<state>`;
@@ -48,7 +56,7 @@ copy in an app. The allowance resets on the first day of each month (UTC).
 | Route | Does |
 | --- | --- |
 | `GET /api/ai/plans` | Plans, prices, models, allowances, `demo: true`. |
-| `GET /api/account/me` | With `Authorization: Bearer <token>`: `{email, name, plan, status, usage: {used, limit, resetsAt}, models}`. |
+| `GET /api/account/me` | With `Authorization: Bearer <token>`: `{email, name, plan, status, usage: {used, limit, resetsAt}, models, cloud: {used, quota, files}}`. |
 | `POST /api/account/token` | `{code}` → `{token, account}` (codes live 5 minutes, used once). |
 | `POST /api/account/signout` | Revokes the token. |
 | `POST /api/ai/v1/messages` | **The Anthropic Messages API**, streaming included, for the plan's models; auth by `x-api-key: <token>` or `Authorization: Bearer <token>`. In validated production mode, checks the paid subscription and remaining allowance, forwards to Anthropic with `LSUITE_ANTHROPIC_API_KEY`, and counts usage. Demo mode always returns a clearly marked simulated response; adding a provider key alone does not activate forwarding. |
@@ -125,6 +133,10 @@ provider accounts (do not put secret values in Git, issues or chat):
 | `LSUITE_STRIPE_PRICE_STUDIO` | Monthly USD Price, amount `7900` cents |
 | `LSUITE_RESEND_API_KEY` | Resend transactional email API key |
 | `LSUITE_EMAIL_FROM` | Sender on a domain verified in Resend, e.g. `lsuite <accounts@lsuite.xyz>` |
+
+lsuite Cloud: with only the volume, production keeps the demo storage caps. For the plans' sizes
+(up to 1 TB), create an object-store bucket and set the `LSUITE_CLOUD_S3_*` variables the same way
+(CLOUD.md, "The object store").
 
 Stripe: activate the account, create the three recurring prices, enable the customer portal for
 payment methods, invoices, plan changes and cancellation, and add an event destination for

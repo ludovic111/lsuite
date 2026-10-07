@@ -4,7 +4,9 @@
 
 const page = document.body.dataset.page;
 const params = new URLSearchParams(location.search);
-const APP_NAMES = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori', folio: 'folio' };
+const APP_NAMES = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori', folio: 'folio', lsuite: 'lsuite launcher' };
+/** How /account/connect names the app in its sentences ("Connect the lsuite launcher"). */
+const CONNECT_NAMES = { ...APP_NAMES, lsuite: 'the lsuite launcher' };
 let plans = [];
 let demo = true;
 
@@ -36,6 +38,11 @@ function bind(name, text) {
   document.querySelectorAll(`[data-bind="${name}"]`).forEach((el) => (el.textContent = text));
 }
 
+/** Bytes in decimal units, as lsuite Cloud counts them (1 GB = 1e9 bytes). */
+const bytes = (n) => {
+  const [size, unit] = [[1e12, 'TB'], [1e9, 'GB'], [1e6, 'MB'], [1e3, 'KB']].find(([u]) => n >= u) ?? [1, 'bytes'];
+  return `${Math.round((n / size) * 10) / 10} ${unit}`;
+};
 const credits = (n) => `${Math.round(n).toLocaleString('en-US')} credits`;
 const day = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
 const price = (p) => (p.price ? `$${p.price} / month` : 'Free');
@@ -135,13 +142,14 @@ async function accountPage() {
   document.querySelector('[data-when="free"]').hidden = paid;
   bind('period', paid ? `resets ${day(account.usage.resetsAt)}` : '');
   if (paid) {
-    const meter = document.querySelector('.meter');
+    const meter = document.querySelector('[data-when="paid"] .meter');
     meter.style.setProperty('--used', `${account.usage.percent}%`);
     meter.setAttribute('aria-valuenow', String(account.usage.percent));
     const left = Math.max(0, account.usage.limit - account.usage.used);
     bind('usage', `${account.planName} · ${account.usage.percent} % used · ${credits(left)} left of ${credits(account.usage.limit)} · resets ${day(account.usage.resetsAt)}`);
   }
   bind('models', account.models.length ? `Models: ${account.models.join(', ')}` : '');
+  showCloud(account.cloud);
   markPlans(document.querySelector('[data-plans]'), account, (id) => `/account/checkout?plan=${id}`);
 
   const table = document.querySelector('[data-conns]');
@@ -185,6 +193,26 @@ async function accountPage() {
   if (location.hash === '#plans') document.querySelector('[data-plans]').hidden = false;
 }
 
+/** The lsuite Cloud panel: used / quota and the files, or which plans include it. */
+function showCloud(cloud) {
+  if (!cloud) return;
+  const hasRoom = cloud.quota > 0;
+  document.querySelector('[data-when="cloud"]').hidden = !hasRoom;
+  document.querySelector('[data-when="nocloud"]').hidden = hasRoom;
+  const files = `${cloud.files.toLocaleString('en-US')} file${cloud.files === 1 ? '' : 's'}`;
+  bind('cloudFiles', cloud.files || hasRoom ? files : '');
+  if (!hasRoom) {
+    const offer = plans.filter((p) => p.storage).map((p) => `${p.storageLabel} with ${p.name}`).join(', ');
+    bind('cloudPlans', cloud.files ? `${offer}. Your ${files} (${bytes(cloud.used)}) can still be downloaded and deleted` : offer);
+    return;
+  }
+  const percent = Math.min(100, Math.round((cloud.used / cloud.quota) * 100));
+  const meter = document.querySelector('[data-when="cloud"] .meter');
+  meter.style.setProperty('--used', `${percent}%`);
+  meter.setAttribute('aria-valuenow', String(percent));
+  bind('cloudUsage', `${bytes(cloud.used)} of ${bytes(cloud.quota)} used · ${files}${demo ? ' · demo storage is capped' : ''}`);
+}
+
 // ---------- /account/connect ----------
 const connectArgs = () => {
   const app = params.get('app');
@@ -200,8 +228,8 @@ async function connectPage() {
     show('bad');
     return;
   }
-  bind('app', APP_NAMES[args.app]);
-  document.title = `Connect ${APP_NAMES[args.app]} · lsuite`;
+  bind('app', CONNECT_NAMES[args.app]);
+  document.title = `Connect ${CONNECT_NAMES[args.app]} · lsuite`;
   const account = await me();
   if (!account) {
     show('out');

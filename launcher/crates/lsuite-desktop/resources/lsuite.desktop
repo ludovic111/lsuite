@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=lsuite
+GenericName=App launcher
+Comment=Install and update the lsuite apps, your lsuite AI account and lsuite Cloud
+Exec=lsuite
+Icon=lsuite
+Terminal=false
+Categories=Utility;
+Keywords=lsuite;launcher;cloud;ryolune;kimchi;zenith;nori;folio;
+StartupWMClass=xyz.lsuite.launcher
