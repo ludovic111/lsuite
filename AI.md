@@ -24,8 +24,8 @@ copy in an app. The allowance resets on the first day of each month (UTC).
 
 ## lsuite Cloud
 
-A paid plan also includes cloud storage (the sizes above, a proposal awaiting the owner; capped
-small in the demo), managed from the lsuite launcher: see [CLOUD.md](CLOUD.md) for the
+A paid plan also includes cloud storage (the sizes above, decided on 2026-10-07; capped small in
+the demo: 100 MB per account), managed from the lsuite launcher: see [CLOUD.md](CLOUD.md) for the
 `/api/cloud` API, its errors and how files are stored. `GET /api/ai/plans` gives each plan's
 `storage`, `GET /api/account/me` adds `cloud: {used, quota, files}`.
 

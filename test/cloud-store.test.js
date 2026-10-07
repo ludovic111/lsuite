@@ -142,8 +142,8 @@ test('object store: signed, streamed uploads and downloads, content stored once,
     const key = (data) => `test/cloud/${t.userId()}/blobs/${sha(data)}`;
     // Demo mode keeps the demo caps, whatever the backend.
     const status = await (await t.call('GET', '', token)).json();
-    assert.equal(status.quota, 250e6);
-    assert.equal(status.maxFile, 100e6);
+    assert.equal(status.quota, 100e6);
+    assert.equal(status.maxFile, 25e6);
 
     const data = Buffer.from('a mix, uploaded to the object store');
     const put = await t.call('PUT', '/files/Mixes/one.flac', token, data);

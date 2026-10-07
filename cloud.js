@@ -15,7 +15,7 @@
 //   index stays in the data dir. With a store, production applies the plans' own quotas.
 import { createHash, createHmac, randomBytes } from 'node:crypto';
 import { createReadStream, createWriteStream, rmSync } from 'node:fs';
-import { mkdir, mkdtemp, open, readdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, open, readdir, readFile, rename, rm, stat, statfs, writeFile } from 'node:fs/promises';
 import { request as httpRequest } from 'node:http';
 import { request as httpsRequest } from 'node:https';
 import { tmpdir } from 'node:os';
@@ -28,15 +28,22 @@ export const MAX_FILE = 5 * GB;
 /** Files and folders one account can hold, whatever their size (each change rewrites the index). */
 export const MAX_ENTRIES = 100000;
 
-/** Demo caps (CLOUD.md), from `LSUITE_CLOUD_DEMO_QUOTA`, `…_MAX_FILE` and `…_TOTAL` (bytes). */
+const bytesFrom = (v, fallback) => (/^\d+$/.test(String(v ?? '').trim()) && Number(v) > 0 ? Number(v) : fallback);
+
+/**
+ * Demo caps (CLOUD.md), from `LSUITE_CLOUD_DEMO_QUOTA`, `…_MAX_FILE` and `…_TOTAL` (bytes): sized
+ * for the site's 500 MB volume, which also holds the accounts.
+ */
 export function demoCaps(env = process.env) {
-  const n = (v, fallback) => (/^\d+$/.test(String(v ?? '').trim()) && Number(v) > 0 ? Number(v) : fallback);
   return {
-    quota: n(env.LSUITE_CLOUD_DEMO_QUOTA, 250e6),
-    maxFile: n(env.LSUITE_CLOUD_DEMO_MAX_FILE, 100e6),
-    total: n(env.LSUITE_CLOUD_DEMO_TOTAL, 5 * GB),
+    quota: bytesFrom(env.LSUITE_CLOUD_DEMO_QUOTA, 100e6),
+    maxFile: bytesFrom(env.LSUITE_CLOUD_DEMO_MAX_FILE, 25e6),
+    total: bytesFrom(env.LSUITE_CLOUD_DEMO_TOTAL, 300e6),
   };
 }
+
+/** Free space always left on the data disk (`LSUITE_CLOUD_DISK_RESERVE`, bytes): the accounts live there too. */
+export const diskReserve = (env = process.env) => bytesFrom(env.LSUITE_CLOUD_DISK_RESERVE, 100e6);
 
 /** "50 GB", "1 TB", "12.5 MB"; "None" for 0. */
 export function storageLabel(bytes) {
@@ -318,7 +325,8 @@ function hookExit() {
 
 /**
  * The cloud store. Options: `dataDir` (else a temporary folder), `production`, `caps`
- * (`{quota, maxFile, total}`, `demoCaps()` by default), `store` (`objectStoreConfig()`: blobs go
+ * (`{quota, maxFile, total}`, `demoCaps()` by default), `diskReserve` (bytes, `diskReserve()` by
+ * default) and `statfs` (tests), `store` (`objectStoreConfig()`: blobs go
  * to the object store; needs `dataDir`, where the index stays). The caps apply in demo mode, and
  * in production without a store; production with a store applies the plans' own sizes.
  * Plans are `{id, storage}` (bytes; 0 on Free).
@@ -443,6 +451,24 @@ export function createCloud(options = {}) {
     }
   }
 
+  /**
+   * Refuses an upload that would leave less than the reserve free on the disk the uploads stream
+   * to (whatever the caps say: a disk can be smaller than they are, and the accounts share it).
+   */
+  async function checkDisk(size) {
+    const reserve = options.diskReserve ?? diskReserve();
+    let free;
+    try {
+      const fs = await (options.statfs ?? statfs)(await root());
+      free = Number(fs.bavail) * Number(fs.bsize);
+    } catch {
+      return;
+    }
+    if (free - reservedTotal - size < reserve) {
+      throw new CloudError(507, 'storage_full', 'lsuite Cloud has no room left on this server for now. Delete files, or try again later.', {});
+    }
+  }
+
   /** Refuses an upload to `path` that would break the tree or `If-None-Match`. */
   function checkUpload(index, path, ifNoneMatch) {
     checkParents(index, path);
@@ -538,6 +564,7 @@ export function createCloud(options = {}) {
       const state = await userState(userId);
       checkUpload(state.index, path, ifNoneMatch);
       checkRoom(state, plan, length, state.index.files[path]?.size ?? 0, true);
+      await checkDisk(length);
       // Held until the body is in, so two uploads at once can't both take the last of the room.
       state.reserved += length;
       reservedTotal += length;

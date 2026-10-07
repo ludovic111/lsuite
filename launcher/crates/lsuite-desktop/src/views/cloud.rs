@@ -195,7 +195,10 @@ pub fn page(window: &mut Window, cx: &mut App) -> AnyElement {
                     .child(Button::new("cloud-choose", "Choose a plan").primary().small().on_click(|_, _, cx| cx.store().update(cx, |s, cx| s.go(Page::Account, cx)))),
             )
         })
-        .when(demo, |d| d.child(div().text_size(px(sz::SM)).text_color(t.text_3).child("Demo: storage is capped at 250 MB per account and 100 MB per file while lsuite AI takes no payments.")));
+        .when(demo && quota > 0, |d| {
+            let max_file = status["maxFile"].as_u64().unwrap_or(0);
+            d.child(div().text_size(px(sz::SM)).text_color(t.text_3).child(format!("Demo: {} per account and {} per file while lsuite AI takes no payments.", bytes(quota), bytes(max_file))))
+        });
 
     // The path: Cloud › Projects › My Project, each part a link.
     let mut crumbs: Vec<AnyElement> = vec![crumb("crumb-root", "Cloud", String::new(), dir.is_empty(), cx)];
@@ -300,7 +303,7 @@ fn synced(pairs: &[Value], tasks: &std::collections::BTreeMap<String, crate::sto
                         .min_w_0()
                         .flex()
                         .flex_col()
-                        .child(div().flex().items_center().gap(px(6.)).child(div().truncate().font_family(MONO).text_size(px(sz::SM)).child(p["local"].as_str().unwrap_or("").to_string())).child(div().text_color(t.text_3).child("⇄")).child(div().id(("sync-remote", i)).cursor_pointer().font_weight(FontWeight::SEMIBOLD).hover(|d| d.text_color(t.text_2)).child(remote.clone()).on_click(move |_, _, cx| {
+                        .child(div().flex().items_center().gap(px(6.)).child(div().truncate().font_family(MONO).text_size(px(sz::SM)).child(crate::app::tilde(std::path::Path::new(p["local"].as_str().unwrap_or(""))))).child(div().text_color(t.text_3).child("⇄")).child(div().id(("sync-remote", i)).cursor_pointer().font_weight(FontWeight::SEMIBOLD).hover(|d| d.text_color(t.text_2)).child(remote.clone()).on_click(move |_, _, cx| {
                             let r = r2.clone();
                             cx.store().update(cx, |s, cx| s.open_folder(r, cx))
                         })))

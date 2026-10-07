@@ -39,7 +39,7 @@ export const MODELS = [
 
 /**
  * The plans of AI.md. Prices approved by the owner: monthly USD; demo mode never charges. `storage`
- * is lsuite Cloud's (CLOUD.md, bytes, decimal: 50 GB is 50e9), a proposal awaiting the owner.
+ * is lsuite Cloud's (CLOUD.md, bytes, decimal: 50 GB is 50e9), decided on 2026-10-07.
  */
 export const PLANS = [
   { id: 'free', name: 'Free', price: 0, credits: 0, families: [], defaultModel: null, priority: false, storage: 0, summary: 'Bring your own provider: Claude Code, Codex, API keys or a local model.' },
@@ -333,7 +333,7 @@ export function createAccounts(options = {}) {
   const fetchImpl = options.fetch ?? fetch;
   const live = production ? productionServices(options.live, store, fetchImpl) : null;
   // Production applies the plans' sizes once blobs go to an object store; until then the demo caps (CLOUD.md).
-  const cloud = createCloud({ dataDir: options.dataDir ?? null, production, caps: options.cloud, store: options.cloudStore ?? null });
+  const cloud = createCloud({ dataDir: options.dataDir ?? null, production, caps: options.cloud, store: options.cloudStore ?? null, diskReserve: options.cloudDiskReserve, statfs: options.cloudStatfs });
   const inFlight = new Set();
   const enqueue = requestQueue();
   const demoDelayMs = options.demoDelayMs ?? 18;
