@@ -12,12 +12,13 @@ in beta:
 | nori | image and design (Photoshop + Illustrator + InDesign in one document) | `/nori` | [ludovic111/nori](https://github.com/ludovic111/nori/releases/tag/v0.1.0) (0.1.0) |
 | folio | office (documents, spreadsheets, presentations) | `/folio` | [ludovic111/folio](https://github.com/ludovic111/folio/releases/tag/v0.1.0) (0.1.0) |
 
-The apps are free and MIT licensed. The one thing lsuite sells is optional: **lsuite AI**
-([AI.md](AI.md)), agents that work in every app without setup, a demo for now (no payment is
-taken), served by this site (`ai.js`) with its pages at `/ai` and `/account`; a paid plan also
-includes **lsuite Cloud** storage ([CLOUD.md](CLOUD.md), `cloud.js`), managed from the lsuite
-launcher. Every app has
-plugins ([PLUGINS.md](PLUGINS.md)), and [STANDARD.md](STANDARD.md) is the contract they all meet.
+The apps are free and MIT licensed. The one thing lsuite sells is optional: **lsuite Pass**
+([PASS.md](PASS.md)), a demo for now (no payment is taken), with its pages at `/pass` and
+`/account`. It holds **lsuite AI** ([AI.md](AI.md), `ai.js`), agents that work in every app without
+setup; **lsuite Cloud** storage ([CLOUD.md](CLOUD.md), `cloud.js`), managed from the lsuite
+launcher; and the **lsuite Marketplace** ([MARKETPLACE.md](MARKETPLACE.md), `marketplace.js`,
+`/marketplace`), plugins anyone can publish, every version reviewed. Every app has plugins
+([PLUGINS.md](PLUGINS.md)), and [STANDARD.md](STANDARD.md) is the contract they all meet.
 
 Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
 
@@ -42,13 +43,16 @@ npm test
   theme gallery, unused for now), fonts (Chakra Petch, IBM Plex Mono, OFL)
   and real native-app captures in `assets/img/<app>/` (both themes). Image credits are in
   `assets/img/SOURCES.md`.
-- `ai/index.html` is `/ai`; `account/index.html`, `account/connect.html` and
-  `account/checkout.html` are the account pages (`assets/account.js`, the only script they run;
-  `<!-- include:plans -->` is filled from the plans of `ai.js`). `/account/connect` and
-  `/account/checkout` stay out of the sitemap. `/account` also shows the account's lsuite Cloud
-  usage.
+- `pass/index.html` is `/pass` (lsuite Pass; `/ai` is a 301 to it, out of the sitemap);
+  `marketplace/index.html` is `/marketplace` (`<!-- include:marketplace -->` is filled with the
+  approved plugins, `?app=<app>` filters them, no script); `account/index.html`,
+  `account/connect.html` and `account/checkout.html` are the account pages (`assets/account.js`,
+  the only script they run; `<!-- include:plans -->` is filled from the plans of `ai.js`).
+  `/account/connect` and `/account/checkout` stay out of the sitemap. `/account` also shows the
+  account's lsuite Cloud usage, its marketplace submissions and, for admins, the review queue.
 - `ai.js` serves the API (accounts, lsuite AI); `cloud.js` is lsuite Cloud's storage behind
-  `/api/cloud`; `live.js` holds the production services (Stripe, email).
+  `/api/cloud`; `marketplace.js` is the lsuite Marketplace behind `/api/marketplace`; `live.js`
+  holds the production services (Stripe, email).
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
 - `%VERSION:<app>%` becomes the version of the app's latest published GitHub release (cached
   10 min, `FALLBACK_VERSIONS` when GitHub cannot be reached), so a page never announces a version
@@ -59,8 +63,8 @@ npm test
 ## The launcher
 
 `launcher/` is **lsuite**, the suite's native launcher (Rust, GPUI; its own Cargo workspace, not
-part of the site's deployment): installs and updates the apps, the lsuite AI account and lsuite
-Cloud. See [launcher/README.md](launcher/README.md). Its page is `/launcher` (`pages/launcher.html`,
+part of the site's deployment): installs and updates the apps, the lsuite account (lsuite Pass),
+lsuite Cloud and, in its next release, plugins from the lsuite Marketplace. See [launcher/README.md](launcher/README.md). Its page is `/launcher` (`pages/launcher.html`,
 captures in `assets/img/launcher/`: `apps`, `account`, `cloud`, each with `-light`, 2000x1250;
 mark in `assets/img/icons/lsuite.webp`, from `launcher/brand/icon.png`); the home page and the
 footer link to it. Its releases are published in this repository, tagged `launcher-vX.Y.Z`.
@@ -80,8 +84,9 @@ are under `/design/`.
 | `/launcher/download[/<platform>]` | The same for the lsuite launcher, from the newest published `launcher-vX.Y.Z` release of `ludovic111/lsuite` (`tagPrefix` in `DOWNLOADS`; with no matching asset, that release's page, or the releases list): `macos-arm64`, `macos-x86_64` (.dmg), `windows-x86_64` (setup .exe), `windows-zip`, `linux-x86_64` (.AppImage), `linux-tar` (.tar.gz). The launcher is not one of the apps: not in `/api/apps`, no `/launcher/support`. |
 | `/api/ai/…`, `/api/account/…` | lsuite AI and accounts (AI.md, `ai.js`): JSON, Anthropic-compatible `/api/ai/v1/messages`. `LSUITE_DATA_DIR` holds account state. Live service requires explicit `LSUITE_MODE=production` and the complete Stripe, Anthropic and verified-email configuration in AI.md; adding an API key alone never turns demo accounts into paid access. |
 | `/api/cloud`, `/api/cloud/…` | lsuite Cloud (CLOUD.md, `cloud.js` through `ai.js`): the account's files, app token (GET also takes the session cookie). Stored under `LSUITE_DATA_DIR/cloud/` (`production-cloud/` in production), a temporary folder without it. Demo caps: `LSUITE_CLOUD_DEMO_QUOTA`, `LSUITE_CLOUD_DEMO_MAX_FILE`, `LSUITE_CLOUD_DEMO_TOTAL` (bytes; 100 MB, 25 MB, 300 MB), and `LSUITE_CLOUD_DISK_RESERVE` (100 MB always left free on the disk). With `LSUITE_CLOUD_S3_ENDPOINT`, `…_BUCKET`, `…_ACCESS_KEY_ID`, `…_SECRET_ACCESS_KEY` (optional `…_REGION`, `…_PREFIX`, `…_PATH_STYLE`), the files go to an S3-compatible object store and the index stays in the data dir; production then applies the plans' sizes (CLOUD.md, "The object store"). |
+| `/api/marketplace`, `/api/marketplace/…` | The lsuite Marketplace (MARKETPLACE.md, `marketplace.js` through `ai.js`): listings (public), submissions and uploads (app token), downloads (paid plan), review (admins: `LSUITE_ADMIN_EMAILS`, comma-separated emails). Stored under `LSUITE_DATA_DIR/marketplace/` (`production-marketplace/` in production), a temporary folder without it, or in lsuite Cloud's object store when set. Demo caps: `LSUITE_MARKET_MAX_FILE` (15 MB a bundle) and `LSUITE_MARKET_TOTAL` (80 MB in all, not with an object store); the cloud's disk reserve applies. |
 | `/api/apps` | The five apps for the lsuite launcher (CLOUD.md): `{apps: [{id, name, kind, summary, page, repo, version, published, platforms}]}` from `DOWNLOADS`, `REPOS` and the latest release versions; `Cache-Control: public, max-age=300`. |
-| `/ai`, `/account`, `/account/connect`, `/account/checkout` | lsuite AI and the account pages (session cookie `lsuite_session`, HttpOnly, SameSite=Lax). |
+| `/pass`, `/marketplace`, `/account`, `/account/connect`, `/account/checkout` | lsuite Pass, the marketplace and the account pages (session cookie `lsuite_session`, HttpOnly, SameSite=Lax). `/ai` (and `/ai/`) is a 301 to `/pass`. |
 | `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
 | `/health` | `ok`, for Railway's health check. |
 | `/robots.txt`, `/sitemap.xml` | Generated for the request's origin. |

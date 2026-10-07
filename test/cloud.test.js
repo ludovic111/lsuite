@@ -289,7 +289,7 @@ test('Free: nothing new (plan_required), but list, download and delete still wor
     for (const res of [await t.cloud.put(token, 'new.txt', 'x'), await t.cloud.mkdir(token, 'New'), await t.cloud.move(token, { from: 'Keep/a.txt', to: 'Keep/c.txt' })]) {
       const err = await error(res, 403);
       assert.equal(err.type, 'plan_required');
-      assert.match(err.message, /^lsuite Cloud comes with an lsuite AI plan\./);
+      assert.match(err.message, /^lsuite Cloud comes with lsuite Pass\./);
       assert.match(err.manage_url, /\/account$/);
       assert.equal(err.plan, 'free');
     }

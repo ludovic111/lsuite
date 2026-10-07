@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createAccounts } from '../ai.js';
 import { createCloud, objectStore, objectStoreConfig, MAX_FILE } from '../cloud.js';
+import { targz } from './tar.js';
 
 const sha = (b) => createHash('sha256').update(b).digest('hex');
 const hmac = (key, data) => createHmac('sha256', key).update(data).digest();
@@ -114,7 +115,7 @@ async function start(options) {
   };
   const call = (method, path, token, body, headers = {}) => fetch(`${base}/api/cloud${path}`, { method, headers: { authorization: `Bearer ${token}`, ...headers }, body });
   const userId = () => Object.values(accounts.store.data.users)[0].id;
-  return { accounts, connect, call, userId, close: () => new Promise((r) => server.close(r)) };
+  return { accounts, base, connect, call, userId, close: () => new Promise((r) => server.close(r)) };
 }
 
 async function error(res, status) {
@@ -321,4 +322,37 @@ test('object store settings: all or nothing, regions and URL styles', () => {
   assert.equal(region('https://s3.eu-west-3.amazonaws.com'), 'eu-west-3');
   assert.equal(region('https://s3.amazonaws.com'), 'us-east-1');
   assert.equal(region('https://s3.amazonaws.com', 'ap-south-1'), 'ap-south-1');
+});
+
+test('object store: the marketplace keeps its bundles there too, swept like the cloud\'s', async (ctx) => {
+  const s3 = await fakeS3();
+  ctx.after(() => s3.close());
+  const dir = await scratch(ctx);
+  const admins = ['root@lsuite.xyz'];
+  const t = await start({ dataDir: dir, cloudStore: s3.config, admins, market: { maxFile: 1e6, total: 10 } });
+  const token = await t.connect({ email: 'root@lsuite.xyz' });
+  const market = (method, path, body, headers = {}) => fetch(`${t.base}/api/marketplace${path}`, { method, headers: { authorization: `Bearer ${token}`, ...headers }, body });
+  const id = 'xyz.lsuite.kimchi.grain';
+  const manifest = `id = "${id}"\nname = "Grain"\nversion = "1.0.0"\napp = "kimchi"\nkind = "effect"\nabi = 1\n\n[library]\nlinux = "libgrain.so"\n`;
+  const bundle = targz([{ path: 'grain/plugin.toml', data: manifest }, { path: 'grain/libgrain.so', data: 'not really a library' }]);
+  const submit = { id, app: 'kimchi', name: 'Grain', kind: 'effect', version: '1.0.0', abi: 1, description: 'Film grain.' };
+  assert.equal((await market('POST', '/submit', JSON.stringify(submit), { 'content-type': 'application/json' })).status, 201);
+  // The total cap is the volume's: with a store, only the largest file applies.
+  assert.equal((await market('PUT', `/submit/${id}/1.0.0/linux-x86_64`, bundle)).status, 200);
+  const key = `test/marketplace/files/${sha(bundle)}`;
+  assert.deepEqual(s3.objects.get(key), bundle);
+  assert.deepEqual(await readdir(join(dir, 'marketplace', 'files')), [], 'nothing on the volume');
+  const got = await market('GET', `/plugins/${id}/download?platform=linux-x86_64`);
+  assert.equal(got.status, 200);
+  assert.deepEqual(Buffer.from(await got.arrayBuffer()), bundle);
+  await t.close();
+
+  s3.objects.set('test/marketplace/files/' + 'e'.repeat(64), Buffer.from('left over'));
+  const again = await start({ dataDir: dir, cloudStore: s3.config, admins });
+  ctx.after(again.close);
+  assert.equal((await (await fetch(`${again.base}/api/marketplace`)).json()).plugins.length, 1);
+  await again.accounts.marketplace.ready();
+  for (let i = 0; i < 50 && s3.objects.has('test/marketplace/files/' + 'e'.repeat(64)); i++) await new Promise((r) => setTimeout(r, 10));
+  assert.ok(!s3.objects.has('test/marketplace/files/' + 'e'.repeat(64)), 'swept');
+  assert.ok(s3.objects.has(key));
 });

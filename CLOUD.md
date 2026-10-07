@@ -1,17 +1,17 @@
-# lsuite Cloud: storage that comes with lsuite AI
+# lsuite Cloud: storage that comes with lsuite Pass
 
-Started on 2026-10-07 at the owner's request: a paid lsuite AI plan also includes cloud storage,
+Started on 2026-10-07 at the owner's request: a paid lsuite Pass plan ([PASS.md](PASS.md)) includes cloud storage,
 managed from the **lsuite** launcher (`launcher/`, see its README). The apps never need it:
 documents stay plain files on disk (STANDARD.md, section 4), and nothing goes to the cloud unless
 the person puts it there. Still no telemetry.
 
-**For now this is a demo**, like lsuite AI: no payment is taken, and every account's storage is
+**For now this is a demo**, like the rest of lsuite Pass: no payment is taken, and every account's storage is
 capped small (below) because demo accounts need no verified email.
 
 ## Storage per plan
 
 Decided on 2026-10-07 (the owner left it to the demo's builder: the prices are unchanged).
-These sizes apply once lsuite AI takes payments and the files live in an object store.
+These sizes apply once lsuite Pass takes payments and the files live in an object store.
 
 | Plan | Price | Cloud storage | Largest file |
 | --- | --- | --- | --- |
@@ -26,14 +26,14 @@ Sizes are decimal: 1 GB is 10⁹ bytes, 1 TB 10¹² (`PLANS[].storage` in `ai.js
 Demo mode caps every plan at **100 MB per account** and **25 MB per file**
 (`LSUITE_CLOUD_DEMO_QUOTA`, `LSUITE_CLOUD_DEMO_MAX_FILE`, bytes), and all demo accounts together
 at **300 MB** (`LSUITE_CLOUD_DEMO_TOTAL`): the site's Railway volume is 500 MB and also holds the
-accounts. Whatever the caps, an upload is refused (507 `storage_full`) when it would leave less
+accounts and the marketplace's files (MARKETPLACE.md, 80 MB at most). Whatever the caps, an upload is refused (507 `storage_full`) when it would leave less
 than **100 MB free** on the disk the uploads stream to (`LSUITE_CLOUD_DISK_RESERVE`), so cloud
 files can never stop the accounts from being saved. Production applies the plans' own sizes once blobs go to
 an object store (below); on the data dir alone it keeps the demo caps.
 `GET /api/ai/plans` gives each plan's `storage` (bytes) and `storageLabel` ("50 GB", "None" on
 Free); in demo mode also `cloudDemo: {quota, maxFile}`. Whatever applies to an account is in
 `GET /api/cloud` (`quota`, `maxFile`). Each account also holds at most 100,000 files and folders.
-The plan cards on `/ai` and `/account` show the storage ("50 GB lsuite Cloud").
+The plan cards on `/pass` and `/account` show the storage ("50 GB lsuite Cloud").
 
 
 ## Paths
@@ -71,7 +71,7 @@ Statuses and `error.type`s, besides AI.md's:
 | 400 | `checksum_mismatch` | The body doesn't match `X-Lsuite-Sha256`. Nothing is saved. | |
 | 400 | `invalid_request_error` | `X-Lsuite-Sha256` isn't 64 hex digits, `X-Lsuite-Modified` isn't ISO 8601, a JSON body is malformed, or the body ended before its `Content-Length`. | |
 | 401 | `authentication_error` | No token (or, for a GET, no session), or a revoked one. | |
-| 403 | `plan_required` | Upload, folder or move on Free: "lsuite Cloud comes with an lsuite AI plan." | `manage_url`, `plan` |
+| 403 | `plan_required` | Upload, folder or move on Free: "lsuite Cloud comes with lsuite Pass." | `manage_url`, `plan` |
 | 404 | `not_found_error` | No such file or folder. | |
 | 409 | `conflict_error` | A file where a folder is wanted (or the reverse), `to` already exists without `overwrite`, a folder moved into itself. | `path` |
 | 411 | `length_required` | `PUT` without `Content-Length`. | |
@@ -137,7 +137,8 @@ to it itself (AWS Signature V4 with `node:crypto`, no SDK):
 Endpoint, bucket and both keys go together: a partial setup stops the server at start rather than
 quietly use the volume. The keys are secrets: set them on the host, never in Git, issues or chat.
 
-**Production activation** (with AI.md's): create a bucket (on Railway: a bucket in the same project as
+**Production activation** (with AI.md's): the marketplace's bundles go to the same store
+(`[<prefix>/]production-marketplace/files/<sha256>`, MARKETPLACE.md) once it is set. Create a bucket (on Railway: a bucket in the same project as
 `lsuite-site`; its Credentials tab gives the endpoint, bucket, keys, region and URL style), then set the
 variables above privately on the Railway `lsuite-site` service, as references to the bucket's own
 variables where the host offers them (`${{<bucket>.ENDPOINT}}`…), and `LSUITE_CLOUD_S3_PATH_STYLE`

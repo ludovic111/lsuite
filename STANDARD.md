@@ -85,8 +85,9 @@ The apps are separate programs but must be usable as one suite, by a person and 
   `https://lsuite.xyz/<app>`. GitHub "website" field is that page.
 - Support/donate links go to `https://lsuite.xyz/<app>/support` (redirects to GitHub Sponsors).
 - **The apps are free**, every feature, for everyone, with no account. The one thing lsuite sells
-  is optional: an **lsuite AI** subscription (section 9). Still **no telemetry**: an app talks to
-  lsuite only when the person signed in to lsuite AI and asked the agent something.
+  is optional: **lsuite Pass** (section 9; lsuite AI, lsuite Cloud and the lsuite Marketplace).
+  Still **no telemetry**: an app talks to lsuite only when the person signed in to lsuite AI and
+  asked the agent something.
 - The app's page lives in the lsuite repo (`<app>/index.html`). **Each release updates it**:
   version, what changed, screenshots (`assets/img/<app>/`), download notes.
 
@@ -117,9 +118,14 @@ Every app has plugins: its stock plugins, the plugin formats of its trade it can
 (each shown with its maker's logo), and plugins written in Rust that a person gets by asking their
 agent. One **Plugins** area per app (Stock, Installed, Formats, Build with your agent), the same
 `plugin.*` commands in every app, a frozen `repr(C)` SDK per app, bundles in
-`~/.lsuite/plugins/<app>/`. The contract: [PLUGINS.md](PLUGINS.md).
+`~/.lsuite/plugins/<app>/`. The contract: [PLUGINS.md](PLUGINS.md). Bundles travel between people on
+the **lsuite Marketplace** (every version reviewed, installed by the launcher; the app only has to
+pick them up on `plugin.rescan`): [MARKETPLACE.md](MARKETPLACE.md).
 
-## 9. lsuite AI
+## 9. lsuite AI and lsuite Pass
+
+lsuite Pass ([PASS.md](PASS.md)) is the one optional plan: lsuite AI, lsuite Cloud and the lsuite
+Marketplace. In the apps, what they show is lsuite AI, the provider:
 
 One account for the whole suite (`~/.lsuite/account.json`), signed in through the browser with a
 loopback redirect, and an Anthropic-compatible endpoint on lsuite.xyz, so an app reaches it with
@@ -132,18 +138,20 @@ now: no payment is taken. The contract: [AI.md](AI.md).
 
 **lsuite** (`launcher/` in the lsuite repo, started 2026-10-07) is the suite's own native app, in
 Rust and GPUI like the apps: it installs, updates, opens and removes the five apps from their
-signed GitHub releases (the release keys are built in), holds the shared lsuite AI account, and
-manages lsuite Cloud ([CLOUD.md](CLOUD.md)). It reads the discovery files of section 4 and never
+signed GitHub releases (the release keys are built in), holds the shared lsuite account (lsuite
+Pass), manages lsuite Cloud ([CLOUD.md](CLOUD.md)) and, from its next release, installs and
+publishes marketplace plugins ([MARKETPLACE.md](MARKETPLACE.md)). It reads the discovery files of section 4 and never
 touches a copy it didn't install outside the usual places. It meets this standard's shape: one
-command registry, `lsuite-cli`, `lsuite-mcp` (agents held to `settings.agent`), design v2. Not
-released yet: it needs a release pipeline and a signing key of its own.
+command registry, `lsuite-cli`, `lsuite-mcp` (agents held to `settings.agent`), design v2. Released
+as `launcher-vX.Y.Z` in the lsuite repo (0.1.1 is the latest), signed with its own key.
 
 ## Status (2026-10-07)
 
 All five apps have public beta releases: ryolune 0.15.3, kimchi 0.10.0, zenith 0.4.0,
 nori 0.1.0 and folio 0.1.0. Plugins and the shared account flows ship in those releases.
-lsuite AI remains an explicit demo until the owner creates and connects billing, model-provider
-and verified-email accounts; the approved monthly prices are $12 / $29 / $79 USD.
+lsuite Pass (lsuite AI, lsuite Cloud, the lsuite Marketplace) remains an explicit demo until the
+owner creates and connects billing, model-provider and verified-email accounts; the approved
+monthly prices are $12 / $29 / $79 USD.
 
 | | ryolune | kimchi | zenith | nori | folio |
 | --- | --- | --- | --- | --- | --- |

@@ -1,5 +1,5 @@
-// lsuite accounts and lsuite AI (AI.md), dependency-free. `server.js` hands every `/api/` request
-// to `accounts.handle()`.
+// lsuite accounts and lsuite Pass (PASS.md: lsuite AI, lsuite Cloud, the lsuite Marketplace),
+// dependency-free. `server.js` hands every `/api/` request to `accounts.handle()`.
 //
 // - Storage: one JSON file, `<LSUITE_DATA_DIR>/accounts.json`, written atomically (temporary file,
 //   then rename) and only by this process; in memory when `LSUITE_DATA_DIR` is unset.
@@ -9,10 +9,13 @@
 //   forwards to Anthropic (streaming passed through as it arrives) and counts the usage the response
 //   reports into credits; without it, it answers with a short demo message in the same format.
 // - `/api/cloud…` is lsuite Cloud (CLOUD.md, `cloud.js`): the storage that comes with a plan.
+// - `/api/marketplace…` is the lsuite Marketplace (MARKETPLACE.md, `marketplace.js`): plugins anyone
+//   can publish, reviewed by the admins (`LSUITE_ADMIN_EMAILS`), installed with a paid plan.
 // - Production requires verified email, Stripe billing and persistent storage. Demo mode uses
 //   separate data, takes no payment and never forwards to a real provider.
 import { productionServices, requestQueue, ServiceError } from './live.js';
 import { CloudError, cloudPath, createCloud, demoCaps, disposition, storageLabel } from './cloud.js';
+import { adminEmails, bundleName, createMarketplace } from './marketplace.js';
 import { createHash, randomBytes } from 'node:crypto';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -38,14 +41,15 @@ export const MODELS = [
 ];
 
 /**
- * The plans of AI.md. Prices approved by the owner: monthly USD; demo mode never charges. `storage`
- * is lsuite Cloud's (CLOUD.md, bytes, decimal: 50 GB is 50e9), decided on 2026-10-07.
+ * The plans of lsuite Pass (PASS.md, AI.md). Prices approved by the owner: monthly USD; demo mode
+ * never charges. `storage` is lsuite Cloud's (CLOUD.md, bytes, decimal: 50 GB is 50e9), decided on
+ * 2026-10-07; `marketplace`: installing from the lsuite Marketplace (MARKETPLACE.md).
  */
 export const PLANS = [
-  { id: 'free', name: 'Free', price: 0, credits: 0, families: [], defaultModel: null, priority: false, storage: 0, summary: 'Bring your own provider: Claude Code, Codex, API keys or a local model.' },
-  { id: 'plus', name: 'Plus', price: 12, credits: 1000, families: ['sonnet', 'haiku'], defaultModel: 'claude-sonnet-5-5', priority: false, storage: 50e9, summary: 'Claude Sonnet and Claude Haiku in every app, no setup.' },
-  { id: 'pro', name: 'Pro', price: 29, credits: 4000, families: ['sonnet', 'haiku', 'opus'], defaultModel: 'claude-opus-5-5', priority: false, storage: 250e9, summary: 'Adds Claude Opus, for long agent runs and hard edits.' },
-  { id: 'studio', name: 'Studio', price: 79, credits: 12000, families: ['sonnet', 'haiku', 'opus', 'fable'], defaultModel: 'claude-opus-5-5', priority: true, storage: 1e12, summary: 'Every model, the most allowance, priority.' },
+  { id: 'free', name: 'Free', price: 0, credits: 0, families: [], defaultModel: null, priority: false, storage: 0, marketplace: false, summary: 'Bring your own provider: Claude Code, Codex, API keys or a local model.' },
+  { id: 'plus', name: 'Plus', price: 12, credits: 1000, families: ['sonnet', 'haiku'], defaultModel: 'claude-sonnet-5-5', priority: false, storage: 50e9, marketplace: true, summary: 'Claude Sonnet and Claude Haiku in every app, no setup.' },
+  { id: 'pro', name: 'Pro', price: 29, credits: 4000, families: ['sonnet', 'haiku', 'opus'], defaultModel: 'claude-opus-5-5', priority: false, storage: 250e9, marketplace: true, summary: 'Adds Claude Opus, for long agent runs and hard edits.' },
+  { id: 'studio', name: 'Studio', price: 79, credits: 12000, families: ['sonnet', 'haiku', 'opus', 'fable'], defaultModel: 'claude-opus-5-5', priority: true, storage: 1e12, marketplace: true, summary: 'Every model, the most allowance, priority.' },
 ];
 const PLAN = Object.fromEntries(PLANS.map((p) => [p.id, p]));
 const FAMILY_NAMES = { haiku: 'Claude Haiku', sonnet: 'Claude Sonnet', opus: 'Claude Opus', fable: 'Claude Fable' };
@@ -76,9 +80,13 @@ export function creditsFor(model, usage = {}) {
   return usd / CREDIT_USD;
 }
 
+/** What the subscription is called, and what it holds (`GET /api/ai/plans`, PASS.md). */
+export const PRODUCT = { name: 'lsuite Pass', parts: ['lsuite AI', 'lsuite Cloud', 'lsuite Marketplace'], page: '/pass' };
+
 /** `GET /api/ai/plans`: what the apps and the site show. `cloudCaps`: lsuite Cloud's demo caps. */
 export function plansDocument(production = false, cloudCaps = demoCaps()) {
   return {
+    product: { ...PRODUCT, parts: [...PRODUCT.parts] },
     demo: !production,
     currency: 'USD',
     credit: { usd: CREDIT_USD, description: 'A credit is half a US cent of model usage at the provider’s list price: input, output and cached tokens weighted by the model’s price.' },
@@ -95,6 +103,7 @@ export function plansDocument(production = false, cloudCaps = demoCaps()) {
       priority: p.priority,
       storage: p.storage,
       storageLabel: storageLabel(p.storage),
+      marketplace: p.marketplace,
       summary: p.summary,
     })),
     models: MODELS.map(({ id, name, family, input, output }) => ({ id, name, family, price: { input, output } })),
@@ -321,7 +330,9 @@ const estimateTokens = (value) => Math.max(1, Math.ceil(JSON.stringify(value ?? 
  * `dataDir`, `anthropicKey`, `upstream` (Anthropic's base URL), `fetch`, `demoDelayMs`,
  * `limits: {signin: [max, windowMs], token: [max, windowMs]}`, `cloud: {quota, maxFile, total}`
  * (lsuite Cloud's demo caps in bytes; `LSUITE_CLOUD_DEMO_*` by default), `cloudStore` (lsuite
- * Cloud's object store, `objectStoreConfig()` in `cloud.js`; blobs stay in the data dir without it).
+ * Cloud's object store, `objectStoreConfig()` in `cloud.js`; blobs stay in the data dir without it),
+ * `market: {maxFile, total}` (the marketplace's caps; `LSUITE_MARKET_*` by default), `marketStore`
+ * (its object store; `cloudStore` by default), `admins` (emails; `LSUITE_ADMIN_EMAILS` by default).
  */
 export function createAccounts(options = {}) {
   const production = options.mode === 'production';
@@ -334,6 +345,18 @@ export function createAccounts(options = {}) {
   const live = production ? productionServices(options.live, store, fetchImpl) : null;
   // Production applies the plans' sizes once blobs go to an object store; until then the demo caps (CLOUD.md).
   const cloud = createCloud({ dataDir: options.dataDir ?? null, production, caps: options.cloud, store: options.cloudStore ?? null, diskReserve: options.cloudDiskReserve, statfs: options.cloudStatfs });
+  const marketplace = createMarketplace({
+    dataDir: options.dataDir ?? null,
+    production,
+    caps: options.market,
+    store: options.marketStore === undefined ? (options.cloudStore ?? null) : options.marketStore,
+    diskReserve: options.cloudDiskReserve,
+    statfs: options.cloudStatfs,
+    passPlans: PLANS.filter((p) => p.marketplace).map((p) => p.id),
+    who: (id) => store.data.users[id] ?? null,
+  });
+  const admins = new Set((options.admins ?? adminEmails()).map((e) => String(e).trim().toLowerCase()));
+  const isAdmin = (user) => admins.has(String(user.email).toLowerCase());
   const inFlight = new Set();
   const enqueue = requestQueue();
   const demoDelayMs = options.demoDelayMs ?? 18;
@@ -425,7 +448,7 @@ export function createAccounts(options = {}) {
     const plan = activePlan(user);
     const manage = { manage_url: `${origin}/account`, plan: plan.id };
     if (plan.id === 'free') {
-      fail(res, 403, 'plan_required', `lsuite AI needs a plan: your account is on Free (bring your own provider). Pick a plan at ${origin}/account${production ? '.' : ' (demo: no payment is taken).'}`, manage);
+      fail(res, 403, 'plan_required', `lsuite AI comes with lsuite Pass: your account is on Free (bring your own provider). Pick a plan at ${origin}/account${production ? '.' : ' (demo: no payment is taken).'}`, manage);
       return null;
     }
     const model = resolveModel(modelId);
@@ -580,7 +603,7 @@ export function createAccounts(options = {}) {
     // Free keeps what is there (list, download, delete) but adds nothing.
     const free = () => {
       if (plan.storage) return false;
-      fail(res, 403, 'plan_required', `lsuite Cloud comes with an lsuite AI plan. Pick one at ${origin}/account${production ? '' : ' (demo: no payment is taken)'}; files already there can still be downloaded and deleted.`, manage);
+      fail(res, 403, 'plan_required', `lsuite Cloud comes with lsuite Pass. Pick a plan at ${origin}/account${production ? '' : ' (demo: no payment is taken)'}; files already there can still be downloaded and deleted.`, manage);
       return true;
     };
     const only = (...methods) => {
@@ -646,6 +669,121 @@ export function createAccounts(options = {}) {
     }
   }
 
+  /**
+   * `/api/marketplace…` (MARKETPLACE.md). Reading is public; publishing takes the app token (or,
+   * for JSON posts and reads, the site's session); downloads need a paid plan; review, an admin.
+   */
+  async function marketRoute(req, res, origin, method, raw, url) {
+    const reading = method === 'GET' || method === 'HEAD';
+    const only = (...methods) => {
+      if (methods.includes(method)) return false;
+      fail(res, 405, 'invalid_request_error', `Use ${methods.join(' or ')}.`, {}, { Allow: methods.join(', ') });
+      return true;
+    };
+    /** The caller: an app token, or the session for reads and same-origin JSON posts. */
+    const caller = ({ session: allowSession = true } = {}) => {
+      const app = appAuth(req);
+      if (!app && allowSession && !reading && !sameOrigin(req)) {
+        fail(res, 403, 'permission_error', 'Cross-site request refused.');
+        return null;
+      }
+      const auth = app ?? (allowSession ? session(req) : null);
+      if (!auth) {
+        fail(res, 401, 'authentication_error', `Sign in to lsuite again: this key isn't valid (signed out or revoked). ${origin}/account`);
+        return null;
+      }
+      if (auth.entry.kind !== 'session') auth.entry.lastUsedAt = now();
+      return auth.user;
+    };
+    const admin = () => {
+      const user = caller();
+      if (user && !isAdmin(user)) {
+        fail(res, 403, 'permission_error', 'Only lsuite’s reviewers can do this.');
+        return null;
+      }
+      return user;
+    };
+    /** Sends a bundle (`file` from the marketplace), counting it when `count`. */
+    const sendFile = async (file, count) => {
+      const tag = `"${file.sha256}"`;
+      const headers = { ETag: tag, 'X-Lsuite-Sha256': file.sha256, ...API_HEADERS };
+      const match = String(req.headers['if-none-match'] ?? '').split(',').map((s) => s.trim().replace(/^W\//, ''));
+      if (match.includes(tag)) {
+        res.writeHead(304, headers);
+        return res.end();
+      }
+      const body = method === 'GET' ? await marketplace.open(file) : null;
+      res.writeHead(200, { 'Content-Type': 'application/gzip', 'Content-Length': file.size, 'Content-Disposition': `attachment; filename="${bundleName(file)}"`, ...headers });
+      if (!body) return res.end();
+      if (count) marketplace.count(file.id, file.version);
+      body.on('error', () => res.destroy());
+      res.on('close', () => body.destroy());
+      return body.pipe(res);
+    };
+    let parts;
+    try {
+      parts = raw.slice('/api/marketplace'.length).split('/').filter(Boolean).map((s) => decodeURIComponent(s));
+    } catch {
+      return fail(res, 400, 'invalid_request_error', 'This path is not percent-encoded UTF-8.');
+    }
+    const [head, id, version, platform, extra] = parts;
+    try {
+      if (!head) {
+        if (only('GET', 'HEAD')) return;
+        return json(res, 200, await marketplace.catalogue(url.searchParams.get('app') || null));
+      }
+      if (head === 'plugins' && id && !platform && (!version || version === 'download')) {
+        if (only('GET', 'HEAD')) return;
+        if (!version) return json(res, 200, await marketplace.plugin(id));
+        const user = caller();
+        if (!user) return;
+        const wanted = url.searchParams.get('platform');
+        if (!wanted) return fail(res, 400, 'invalid_request_error', 'platform: one of macos-arm64, macos-x86_64, linux-x86_64, windows-x86_64.');
+        const file = await marketplace.find(id, wanted, url.searchParams.get('version') || null);
+        const plan = activePlan(user);
+        if (!plan.marketplace) {
+          return fail(res, 403, 'plan_required', `The marketplace comes with lsuite Pass. Pick a plan at ${origin}/account${production ? '.' : ' (demo: no payment is taken).'}`, { manage_url: `${origin}/account`, plan: plan.id });
+        }
+        return sendFile(file, true);
+      }
+      if (head === 'submit' && !id) {
+        if (only('POST')) return;
+        const user = caller();
+        if (!user) return;
+        const { value } = await readJson(req);
+        return json(res, 201, { submission: await marketplace.submit(user, isAdmin(user), value) });
+      }
+      if (head === 'submit' && platform && !extra) {
+        if (only('PUT')) return;
+        const user = caller({ session: false });
+        if (!user) return;
+        return json(res, 200, { submission: await marketplace.upload(user, isAdmin(user), id, version, platform, req) });
+      }
+      if (head === 'mine' && !id) {
+        if (only('GET', 'HEAD')) return;
+        const user = caller();
+        if (!user) return;
+        return json(res, 200, await marketplace.mine(user.id));
+      }
+      if (head === 'review' && !id) {
+        if (only('GET', 'HEAD', 'POST')) return;
+        if (!admin()) return;
+        if (reading) return json(res, 200, await marketplace.pending());
+        const { value } = await readJson(req);
+        return json(res, 200, { submission: await marketplace.review(value) });
+      }
+      if (head === 'review' && platform && !extra) {
+        if (only('GET', 'HEAD')) return;
+        if (!admin()) return;
+        return sendFile(await marketplace.pendingFile(id, version, platform), false);
+      }
+      return fail(res, 404, 'not_found_error', `No API at ${method} ${raw}.`);
+    } catch (err) {
+      if (!(err instanceof CloudError)) throw err;
+      return fail(res, err.status, err.type, err.message, err.extra);
+    }
+  }
+
   /** Handles `/api/…`; returns false for any other path. */
   async function handle(req, res, url) {
     const path = url.pathname;
@@ -660,6 +798,10 @@ export function createAccounts(options = {}) {
       const raw = String(req.url ?? '').split('?')[0];
       if (raw === '/api/cloud' || raw.startsWith('/api/cloud/')) {
         await cloudRoute(req, res, origin, method, raw);
+        return true;
+      }
+      if (raw === '/api/marketplace' || raw.startsWith('/api/marketplace/')) {
+        await marketRoute(req, res, origin, method, raw, url);
         return true;
       }
 
@@ -692,7 +834,10 @@ export function createAccounts(options = {}) {
         if (!auth) return fail(res, 401, 'authentication_error', 'Not signed in.'), true;
         const body = account(auth.user, origin);
         body.cloud = await cloud.summary(auth.user.id, activePlan(auth.user));
-        if (auth.entry.kind === 'session') body.connections = connections(auth.user);
+        if (auth.entry.kind === 'session') {
+          body.connections = connections(auth.user);
+          body.admin = isAdmin(auth.user);
+        }
         return json(res, 200, body), true;
       }
       if (path === '/api/account/token' && method === 'POST') {
@@ -811,5 +956,5 @@ export function createAccounts(options = {}) {
     }
   }
 
-  return { handle, store, ready, cloud };
+  return { handle, store, ready, cloud, marketplace };
 }

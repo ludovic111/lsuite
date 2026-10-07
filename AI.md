@@ -1,7 +1,10 @@
-# lsuite AI: the subscription
+# lsuite AI: the agents of lsuite Pass
 
 Decided by the owner on 2026-10-06: the apps stay free and open source, and lsuite sells one thing,
-**AI inside the apps without setup**. A person installs an app, signs in once, and the agents work:
+**AI inside the apps without setup**. Since 2026-10-07 that one thing is **lsuite Pass**
+([PASS.md](PASS.md)): lsuite AI, lsuite Cloud ([CLOUD.md](CLOUD.md)) and the lsuite Marketplace
+([MARKETPLACE.md](MARKETPLACE.md)) in one plan. This file is lsuite AI's contract (the provider in
+the apps keeps that name) and the accounts' and billing's, which the whole Pass shares. A person installs an app, signs in once, and the agents work:
 no Claude Code to install, no API key to paste. Bringing your own (Claude Code, Codex, API keys,
 Ollama) stays free and is never pushed aside.
 
@@ -10,21 +13,24 @@ The owner approved these monthly prices on 2026-10-07: **$12 / $29 / $79 USD**.
 
 ## Plans
 
-| Plan | Monthly price (USD) | Models | Monthly allowance | lsuite Cloud |
-| --- | --- | --- | --- | --- |
-| **Free** | 0 | bring your own provider | — | — |
-| **Plus** | $12 / month | Claude Sonnet, Claude Haiku | 1,000 credits | 50 GB |
-| **Pro** | $29 / month | + Claude Opus | 4,000 credits | 250 GB |
-| **Studio** | $79 / month | everything, priority | 12,000 credits | 1 TB |
+The plans of lsuite Pass (PASS.md):
+
+| Plan | Monthly price (USD) | Models | Monthly allowance | lsuite Cloud | lsuite Marketplace |
+| --- | --- | --- | --- | --- | --- |
+| **Free** | 0 | bring your own provider | — | — | browse, publish |
+| **Plus** | $12 / month | Claude Sonnet, Claude Haiku | 1,000 credits | 50 GB | install |
+| **Pro** | $29 / month | + Claude Opus | 4,000 credits | 250 GB | install |
+| **Studio** | $79 / month | everything, priority | 12,000 credits | 1 TB | install |
 
 A credit is a fixed amount of model usage (input and output tokens weighted by the model's price;
 for now half a US cent at the provider's list price, cache writes at 1.25× input, cache reads at
 their own price); `GET /api/ai/plans` is the source of truth the apps and the site read, never a
 copy in an app. The allowance resets on the first day of each month (UTC).
 
-## lsuite Cloud
+## lsuite Cloud and the lsuite Marketplace
 
-A paid plan also includes cloud storage (the sizes above, decided on 2026-10-07; capped small in
+A paid plan also includes installing from the lsuite Marketplace (MARKETPLACE.md, `/api/marketplace`;
+`plans[].marketplace`), and cloud storage (the sizes above, decided on 2026-10-07; capped small in
 the demo: 100 MB per account), managed from the lsuite launcher: see [CLOUD.md](CLOUD.md) for the
 `/api/cloud` API, its errors and how files are stored. `GET /api/ai/plans` gives each plan's
 `storage`, `GET /api/account/me` adds `cloud: {used, quota, files}`.
@@ -55,7 +61,7 @@ the demo: 100 MB per account), managed from the lsuite launcher: see [CLOUD.md](
 
 | Route | Does |
 | --- | --- |
-| `GET /api/ai/plans` | Plans, prices, models, allowances, `demo: true`. |
+| `GET /api/ai/plans` | Plans, prices, models, allowances, storage, `marketplace`, `product: {name: "lsuite Pass", …}`, `demo: true`. |
 | `GET /api/account/me` | With `Authorization: Bearer <token>`: `{email, name, plan, status, usage: {used, limit, resetsAt}, models, cloud: {used, quota, files}}`. |
 | `POST /api/account/token` | `{code}` → `{token, account}` (codes live 5 minutes, used once). |
 | `POST /api/account/signout` | Revokes the token. |
@@ -74,7 +80,7 @@ Every error is in Anthropic's shape, `{type: "error", error: {type, message, …
 | --- | --- | --- | --- |
 | 401 | `authentication_error` | Missing, unknown or revoked token: sign in again. | |
 | 402 | `allowance_exhausted` | This month's credits are used up. Show **Manage plan**. | `manage_url`, `plan`, `resets_at`, `used`, `limit` |
-| 403 | `plan_required` | The account is on Free (bring your own). | `manage_url`, `plan` |
+| 403 | `plan_required` | The account is on Free (bring your own): "lsuite AI comes with lsuite Pass: …". | `manage_url`, `plan` |
 | 403 | `model_not_in_plan` | The model is in a bigger plan. | `manage_url`, `plan`, `model` |
 | 404 | `not_found_error` | No such model in lsuite AI. | |
 | 400 | `invalid_grant` | `POST /api/account/token`: the code is unknown, used or expired. | |
@@ -84,14 +90,15 @@ Errors from Anthropic itself (overloaded, invalid request…) pass through uncha
 
 ### The site's own routes
 
-The account pages (`/account`, `/account/connect`, `/account/checkout`, `/ai`) use a session
+The account pages (`/account`, `/account/connect`, `/account/checkout`, `/pass`; `/ai` is a 301 to `/pass`) use a session
 cookie (`lsuite_session`, HttpOnly, SameSite=Lax) and JSON calls from the same origin:
 `POST /api/account/session {email, name}` (demo sign-in or creation, no password),
 `POST /api/account/checkout {plan}` (demo: no payment, the plan starts at once with a fresh
 allowance), `POST /api/account/connect {app}` → `{code}` (for the loopback redirect),
 `POST /api/account/key` → `{key}` (the paste key; a new one replaces the last),
 `POST /api/account/disconnect {id}`, and `GET /api/account/me` with the cookie, which adds the
-account's `connections`. Storage is one JSON file in `LSUITE_DATA_DIR` (0600, written atomically;
+account's `connections` and `admin` (its email is in `LSUITE_ADMIN_EMAILS`: it reviews the
+marketplace). Storage is one JSON file in `LSUITE_DATA_DIR` (0600, written atomically;
 in memory when unset) holding only SHA-256 hashes of tokens and codes.
 
 Because the endpoint speaks Anthropic's API, an app reaches it with the Anthropic provider it
