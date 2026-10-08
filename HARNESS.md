@@ -55,7 +55,18 @@ an outside agent (Claude Code, Codex) connected through the app's MCP server.
 | `harness.context` | The live context of part 3 (what the agent gets before each step). |
 | `harness.look {…}` | The app's best picture of the current work (an image the model sees), with its numbers. |
 
-## Status (2026-10-07)
+## Notes for every app
 
-Being built in every app and in the lsuite app (launcher 0.2.0). Each app's CLAUDE.md "lsuite"
-section tracks its parts; `evals/RESULTS.md` holds its scores.
+- **Claude Code reads only `structuredContent`** when an MCP tool result has both it and text
+  (found 2026-10-08). Notes the harness adds to a result (live context, the finish-routine
+  reminder after an edit, a picture that couldn't be attached) go after the text **and** under
+  `structuredContent.harnessNotes`; before that, agents in Claude Code never saw the reminder and
+  skipped the finish routine (ryolune's drums eval went from 5/6 to 6/6 with the fix).
+
+## Status (2026-10-08)
+
+All five apps have the eight parts in review, not merged yet (STANDARD.md's status table links
+each pull request): ryolune 0.16.0, kimchi 0.11.0, zenith 0.5.0, nori 0.2.0 and folio 0.2.0. Each
+has 11 to 13 evals; two or three of each ran for real with Sonnet and passed. The full sets are to
+run with the release model before each app's release. The lsuite agent is in launcher 0.2.0.
+Each app's CLAUDE.md "lsuite" section tracks its parts; `evals/RESULTS.md` holds its scores.

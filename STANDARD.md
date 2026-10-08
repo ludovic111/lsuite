@@ -176,6 +176,9 @@ monthly prices are $12 / $29 / $79 USD.
 | Plugins | ✅ 35 stock, CLAP, VST3, AU, Rust SDK | ✅ audio, frei0r, LUTs, Rust SDK | ✅ Rust MCP tools | ✅ tile filters, Rust SDK | ✅ spreadsheet functions, Rust SDK |
 | lsuite AI | ✅ demo | ✅ demo | ✅ demo through Claude Code | ✅ demo | ✅ demo |
 | Updates | Release updater | Release updater | Release updater | Signed release updater | Signed release updater |
+| Updates through lsuite.xyz | 🟡 0.16.0 in review | 🟡 0.11.0 in review | 🟡 0.5.0 in review | 🟡 0.2.0 in review | 🟡 0.2.0 in review |
+| Agent harness ([HARNESS.md](HARNESS.md)) | 🟡 13 skills, looks with loudness ([#34](https://github.com/ludovic111/ryolune/pull/34)) | 🟡 13 skills, frame sheets with loudness ([#16](https://github.com/ludovic111/kimchi/pull/16)) | 🟡 14 skills, brief and lsuite apps for its threads ([#10](https://github.com/ludovic111/zenith/pull/10)) | 🟡 11 skills, contrast, bleed and resolution checks ([#1](https://github.com/ludovic111/nori/pull/1)) | 🟡 12 skills, pages, slides and sheets as images ([#1](https://github.com/ludovic111/folio/pull/1)) |
+| Evals | 🟡 13 jobs; 2 run, passed | 🟡 12 jobs; 3 run, passed | 🟡 11 jobs; 2 run, passed | 🟡 12 jobs; 2 run, passed | 🟡 11 jobs; 2 run, passed |
 
 For nori and folio, in-place updates cover macOS bundles, Linux AppImages and installed Windows
 copies. Portable Windows copies and Linux system packages link to verified release downloads.
