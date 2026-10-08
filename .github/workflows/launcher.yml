@@ -27,10 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - { name: Linux, os: ubuntu-22.04 }
-          - { name: macOS, os: macos-14 }
-          - { name: Windows, os: windows-latest }
+        # Linux only. macOS and Windows only when started by hand: gh workflow run launcher.yml --ref <branch>.
+        include: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '[{"name":"Linux","os":"ubuntu-22.04"},{"name":"macOS","os":"macos-14"},{"name":"Windows","os":"windows-latest"}]' || '[{"name":"Linux","os":"ubuntu-22.04"}]') }}
     defaults:
       run:
         shell: bash
