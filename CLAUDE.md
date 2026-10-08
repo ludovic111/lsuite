@@ -49,7 +49,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   50 GB / 250 GB / 1 TB, demo 100 MB per account; an S3-compatible store is supported for
   production). Its page is
   `/launcher` (`pages/launcher.html`), downloads from `launcher-v*` releases of this repository
-  (0.1.0 and 0.1.1 published 2026-10-07, 0.1.1 the latest; `launcher/CHANGELOG.md`),
+  (0.1.0 and 0.1.1 published 2026-10-07; 0.2.0, which installs the apps through lsuite.xyz with an account, published 2026-10-08 and the latest; `launcher/CHANGELOG.md`),
   built by kimchi's suite release workflow (launcher/README.md, Releasing).
 - The favicon and the nav keep the plain lsuite grain tile (no lsuite logo).
 - Earlier completed notes below describe the previous pages; keep the current availability
