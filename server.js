@@ -15,6 +15,7 @@ import { liveConfig } from './live.js';
 import { createAccounts, plansDocument } from './ai.js';
 import { objectStoreConfig } from './cloud.js';
 import { MARKET_APPS, PLATFORMS } from './marketplace.js';
+import { createBuilds } from './builds.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3000;
@@ -149,8 +150,10 @@ export function osFor(userAgent = '') {
 
 /**
  * Each app's downloads (and the launcher's): its repository, an asset pattern per platform, and the
- * platform each OS gets by default. `/<app>/download/<platform>` looks the asset up in the latest
- * published release; a platform with no matching asset goes to the release page. `published:
+ * platform each OS gets by default. `/launcher/download/<platform>` looks the asset up in the latest
+ * published release; a platform with no matching asset goes to the release page. The five apps
+ * come only through the lsuite app (DISTRIBUTION.md): their `/<app>/download[/…]` lands on
+ * `/launcher`, and their tables only say which platforms `GET /api/apps` lists. `published:
  * false` keeps an app's route table ready before its first release (the route lands on the app's
  * page). `tagPrefix`: the release tags (`v` by default), for a repository that releases more than one thing.
  */
@@ -259,8 +262,9 @@ async function latestRelease(repo, prefix = null) {
 }
 
 // Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
-// latest published release, so the page never announces a version you cannot download yet.
-// All five apps have public releases; the launcher's are tagged `launcher-vX.Y.Z` in ludovic111/lsuite.
+// latest published release, so the page never announces a version you cannot get yet. The five
+// apps' versions come from the private builds (`builds.js`, DISTRIBUTION.md) once
+// `LSUITE_BUILDS_TOKEN` is set; the launcher's from its public `launcher-vX.Y.Z` releases in ludovic111/lsuite.
 const FALLBACK_VERSIONS = { ryolune: '0.15.3', kimchi: '0.10.0', zenith: '0.4.0', nori: '0.1.0', folio: '0.1.0', launcher: '0.1.1' };
 const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith', nori: 'ludovic111/nori', folio: 'ludovic111/folio', launcher: 'ludovic111/lsuite' };
 
@@ -278,11 +282,19 @@ export function versionOf(tag, prefix = 'v') {
   return tag.startsWith(prefix) ? tag.slice(prefix.length) : tag.replace(/^v/, '');
 }
 
-/** `{ app: version }` for every app (or the launcher) whose version a page asks for. */
-export async function appVersions(apps) {
+/**
+ * `{ app: version }` for every app (or the launcher) whose version a page asks for. The five apps:
+ * from `source` (the private builds, `builds.js`) when it is configured, else their public releases
+ * while those last; the fallback when neither answers.
+ */
+export async function appVersions(apps, source = builds) {
   const out = {};
   await Promise.all(
     apps.map(async (app) => {
+      if (APP_NAMES.includes(app) && source?.configured) {
+        out[app] = (await source.version(app)) ?? FALLBACK_VERSIONS[app] ?? '';
+        return;
+      }
       const prefix = DOWNLOADS[app]?.tagPrefix;
       const { tag } = REPOS[app] ? await latestRelease(REPOS[app], prefix) : {};
       out[app] = tag ? versionOf(tag, prefix) : FALLBACK_VERSIONS[app] ?? '';
@@ -312,10 +324,14 @@ export async function appsDocument(origin, versions) {
   };
 }
 
-/** Where `/<app>/download[/<platform>]` sends the visitor. */
+/**
+ * Where `/<app>/download[/<platform>]` sends the visitor. The five apps come only through the
+ * lsuite app (DISTRIBUTION.md): their downloads land on its page; the launcher's are its releases.
+ */
 export async function downloadTarget(app, wanted, userAgent) {
   const d = DOWNLOADS[app];
   if (!d) return null;
+  if (APP_NAMES.includes(app)) return '/launcher';
   // Not released yet: the download link lands on the app's page ("First build coming").
   if (d.published === false) return `/${app}`;
   // GitHub's "latest" is the repository's; a tag prefix needs that release's own page.
@@ -484,6 +500,15 @@ export const accounts = createAccounts({
   // lsuite Cloud's blobs in an S3-compatible store (`LSUITE_CLOUD_S3_*`, CLOUD.md), else on the data dir.
   cloudStore: objectStoreConfig(),
 });
+/**
+ * The apps' builds (DISTRIBUTION.md, `builds.js`): `/api/apps/<app>/…` for signed-in apps, read
+ * from the private `ludovic111/lsuite-builds` with `LSUITE_BUILDS_TOKEN` (unset: 503).
+ */
+export const builds = createBuilds({
+  token: process.env.LSUITE_BUILDS_TOKEN || '',
+  auth: accounts.appAccount,
+  origin: accounts.publicOrigin,
+});
 const DOWNLOAD_ROUTE = new RegExp(`^/(${Object.keys(DOWNLOADS).join('|')})/download(?:/([\\w-]+))?$`);
 const SUPPORT_ROUTE = new RegExp(`^/(?:(?:${APP_NAMES.join('|')})/)?support$`);
 
@@ -494,6 +519,9 @@ export async function handle(req, res) {
       return send(res, 405, JSON.stringify({ type: 'error', error: { type: 'invalid_request_error', message: 'Use GET.' } }), TYPES['.json'], 'no-store');
     }
     return send(res, 200, JSON.stringify(await appsDocument(originOf(req))), TYPES['.json'], 'public, max-age=300', req);
+  }
+  if (String(req.url ?? '').startsWith('/api/apps/')) {
+    if (await builds.handle(req, res, new URL(req.url, 'http://localhost'))) return;
   }
   if (String(req.url ?? '').startsWith('/api/')) {
     if (await accounts.handle(req, res, new URL(req.url, 'http://localhost'))) return;

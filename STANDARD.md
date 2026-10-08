@@ -47,13 +47,20 @@ Ship `docs/AI_CONTROL.md` (how to drive the app) and the generated `docs/COMMAND
 ## 3. Automatic updates
 
 - The app checks for an update when it starts and offers it in one click (or installs it in the
-  background where the platform allows), from **GitHub Releases** of its own repository.
+  background where the platform allows), **through lsuite.xyz** with the lsuite account's token
+  (DISTRIBUTION.md, decided 2026-10-07): kimchi, nori and folio read
+  `<server>/api/apps/<app>/latest.json`, ryolune and zenith `<server>/api/apps/<app>/releases/latest`
+  and its `SHA256SUMS(.sig)`. `<server>` is `LSUITE_ACCOUNT_SERVER` or the account's server, else
+  `https://lsuite.xyz`; the token comes from `~/.lsuite/account.json` (`LSUITE_HOME`), sent as
+  `Authorization: Bearer`. Signed out, the check says "Sign in to lsuite (in the lsuite app) to get
+  updates" instead of failing. The builds live in the private `ludovic111/lsuite-builds` (tag
+  `<app>-v<version>`), where the release workflow uploads them.
 - Updates are **signed** (Ed25519 / minisign or the Tauri updater key) and verified before
   anything is replaced; the previous copy is kept until the new one starts.
 - `<APP>_NO_UPDATE=1` and a setting turn the check off. "Check for updates…" is also a command.
-- Release assets use stable names per platform so `lsuite.xyz/<app>/download/<platform>` can
-  find them (see `server.js` in the lsuite repo): macOS arm64 and x86_64 (signed and notarized),
-  Windows x86_64, Linux x86_64.
+- Release assets use stable names per platform so the lsuite app finds them (`launcher/` in the
+  lsuite repo): macOS arm64 and x86_64 (signed and notarized), Windows x86_64, Linux x86_64. The
+  existing `<APP>_UPDATE_URL` overrides keep working for tests.
 
 ## 4. Apps work together
 
@@ -84,12 +91,15 @@ The apps are separate programs but must be usable as one suite, by a person and 
 - Name in lowercase everywhere. README starts with "Part of [lsuite](https://lsuite.xyz)" and links
   `https://lsuite.xyz/<app>`. GitHub "website" field is that page.
 - Support/donate links go to `https://lsuite.xyz/<app>/support` (redirects to GitHub Sponsors).
-- **The apps are free**, every feature, for everyone, with no account. The one thing lsuite sells
-  is optional: **lsuite Pass** (section 9; lsuite AI, lsuite Cloud and the lsuite Marketplace).
-  Still **no telemetry**: an app talks to lsuite only when the person signed in to lsuite AI and
-  asked the agent something.
+- **The apps are free**, every feature, for everyone. They are **downloaded through lsuite**: the
+  ready-made builds come only through the lsuite app (section 10), with a **free lsuite account**
+  (DISTRIBUTION.md); the source stays open, and anyone may build an app from it. The app's page
+  says "Get <app> in the lsuite app" and `lsuite.xyz/<app>/download` leads to `/launcher`. The one
+  thing lsuite sells is optional: **lsuite Pass** (section 9; lsuite AI, lsuite Cloud and the
+  lsuite Marketplace). Still **no telemetry**: an app talks to lsuite only to check for updates
+  (section 3) and when the person signed in to lsuite AI and asked the agent something.
 - The app's page lives in the lsuite repo (`<app>/index.html`). **Each release updates it**:
-  version, what changed, screenshots (`assets/img/<app>/`), download notes.
+  version, what changed, screenshots (`assets/img/<app>/`), notes on getting it.
 
 ## 6. Engineering
 
@@ -138,7 +148,8 @@ now: no payment is taken. The contract: [AI.md](AI.md).
 
 **lsuite** (`launcher/` in the lsuite repo, started 2026-10-07) is the suite's own native app, in
 Rust and GPUI like the apps: it installs, updates, opens and removes the five apps from their
-signed GitHub releases (the release keys are built in), holds the shared lsuite account (lsuite
+signed builds, the only way to get them (through lsuite.xyz with a free account, DISTRIBUTION.md;
+the release keys are built in), holds the shared lsuite account (lsuite
 Pass), manages lsuite Cloud ([CLOUD.md](CLOUD.md)) and, from its next release, installs and
 publishes marketplace plugins ([MARKETPLACE.md](MARKETPLACE.md)). It reads the discovery files of section 4 and never
 touches a copy it didn't install outside the usual places. It meets this standard's shape: one
@@ -165,6 +176,9 @@ monthly prices are $12 / $29 / $79 USD.
 | Plugins | ✅ 35 stock, CLAP, VST3, AU, Rust SDK | ✅ audio, frei0r, LUTs, Rust SDK | ✅ Rust MCP tools | ✅ tile filters, Rust SDK | ✅ spreadsheet functions, Rust SDK |
 | lsuite AI | ✅ demo | ✅ demo | ✅ demo through Claude Code | ✅ demo | ✅ demo |
 | Updates | Release updater | Release updater | Release updater | Signed release updater | Signed release updater |
+| Updates through lsuite.xyz | 🟡 0.16.0 in review | 🟡 0.11.0 in review | 🟡 0.5.0 in review | 🟡 0.2.0 in review | 🟡 0.2.0 in review |
+| Agent harness ([HARNESS.md](HARNESS.md)) | 🟡 13 skills, looks with loudness ([#34](https://github.com/ludovic111/ryolune/pull/34)) | 🟡 13 skills, frame sheets with loudness ([#16](https://github.com/ludovic111/kimchi/pull/16)) | 🟡 14 skills, brief and lsuite apps for its threads ([#10](https://github.com/ludovic111/zenith/pull/10)) | 🟡 11 skills, contrast, bleed and resolution checks ([#1](https://github.com/ludovic111/nori/pull/1)) | 🟡 12 skills, pages, slides and sheets as images ([#1](https://github.com/ludovic111/folio/pull/1)) |
+| Evals | 🟡 13 jobs; 2 run, passed | 🟡 12 jobs; 3 run, passed | 🟡 11 jobs; 2 run, passed | 🟡 12 jobs; 2 run, passed | 🟡 11 jobs; 2 run, passed |
 
 For nori and folio, in-place updates cover macOS bundles, Linux AppImages and installed Windows
 copies. Portable Windows copies and Linux system packages link to verified release downloads.

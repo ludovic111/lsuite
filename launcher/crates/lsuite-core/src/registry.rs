@@ -32,6 +32,7 @@ pub enum Perm {
     CloudWrite,
     CloudDelete,
     Account,
+    Publish,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -69,8 +70,8 @@ pub struct Spec {
 const APP: Param = req("app", Kind::Str, "The app: ryolune, kimchi, zenith, nori or folio.");
 
 pub const COMMANDS: &[Spec] = &[
-    Spec { name: "apps.list", summary: "Every lsuite app: installed or not, its version, the latest one, whether it is open. `refresh` asks GitHub again (otherwise the last check is reused for 6 hours).", params: &[opt("refresh", Kind::Bool, "Look for new versions now.")], perm: Perm::Read },
-    Spec { name: "apps.check", summary: "Looks for the latest release of every app now.", params: &[], perm: Perm::Read },
+    Spec { name: "apps.list", summary: "Every lsuite app: installed or not, its version, the latest one, whether it is open. `refresh` asks lsuite.xyz again (otherwise the last check is reused for 6 hours). Getting the apps needs a free lsuite account.", params: &[opt("refresh", Kind::Bool, "Look for new versions now.")], perm: Perm::Read },
+    Spec { name: "apps.check", summary: "Looks for the latest release of every app now (signed in).", params: &[], perm: Perm::Read },
     Spec { name: "apps.install", summary: "Downloads the app's latest release, checks its signature and installs it (or updates it if an older version is installed).", params: &[APP], perm: Perm::Install },
     Spec { name: "apps.update", summary: "Updates an installed app to its latest release (it must be closed).", params: &[APP], perm: Perm::Install },
     Spec { name: "apps.updateAll", summary: "Updates every installed app that has a newer release and isn't open.", params: &[], perm: Perm::Install },
@@ -78,11 +79,11 @@ pub const COMMANDS: &[Spec] = &[
     Spec { name: "apps.open", summary: "Opens the app, with files if given.", params: &[APP, opt("files", Kind::List, "Files to open in it.")], perm: Perm::Read },
     Spec { name: "apps.reveal", summary: "Shows the installed app in the file manager.", params: &[APP], perm: Perm::Read },
     Spec { name: "apps.page", summary: "Opens the app's page on lsuite.xyz in the browser.", params: &[APP], perm: Perm::Read },
-    Spec { name: "account.status", summary: "The lsuite AI account on this computer: plan, allowance used, cloud storage.", params: &[], perm: Perm::Read },
+    Spec { name: "account.status", summary: "The lsuite account on this computer: its lsuite Pass plan, AI allowance used, cloud storage.", params: &[], perm: Perm::Read },
     Spec { name: "account.signIn", summary: "Signs in to lsuite (every app on this computer with it): opens the browser, or takes a key (lsk_…) made on the account page.", params: &[opt("key", Kind::Str, "A key from lsuite.xyz/account (for terminals).")], perm: Perm::Account },
     Spec { name: "account.cancelSignIn", summary: "Stops waiting for a browser sign-in.", params: &[], perm: Perm::Read },
     Spec { name: "account.signOut", summary: "Signs out here and on the server (every app on this computer with it).", params: &[], perm: Perm::Account },
-    Spec { name: "account.plans", summary: "lsuite AI's plans: prices, models, monthly allowance and cloud storage.", params: &[], perm: Perm::Read },
+    Spec { name: "account.plans", summary: "lsuite Pass plans: prices, AI models and monthly allowance, cloud storage, the plugin marketplace.", params: &[], perm: Perm::Read },
     Spec { name: "account.manage", summary: "Opens the account page in the browser (plan, keys, connected apps).", params: &[], perm: Perm::Read },
     Spec { name: "cloud.status", summary: "lsuite Cloud: the plan's storage and how much is used.", params: &[], perm: Perm::Read },
     Spec { name: "cloud.list", summary: "A folder of lsuite Cloud: its folders and files. `all` lists every file instead.", params: &[opt("path", Kind::Str, "The folder (the root when left out)."), opt("all", Kind::Bool, "Every file and folder, flat.")], perm: Perm::Read },
@@ -96,6 +97,16 @@ pub const COMMANDS: &[Spec] = &[
     Spec { name: "cloud.syncAdd", summary: "Keeps a folder on this computer in step with a cloud folder, both ways (changes go either way; a file changed on both sides is kept twice). Syncs it once at once.", params: &[req("local", Kind::Str, "The folder on this computer."), opt("remote", Kind::Str, "The cloud folder (default: the local folder's name at the top of the cloud).")], perm: Perm::CloudWrite },
     Spec { name: "cloud.syncNow", summary: "Syncs one synced folder now, or all of them.", params: &[opt("id", Kind::Str, "The synced folder (all when left out)."), opt("force", Kind::Bool, "Go on even if more than half of a folder would be deleted.")], perm: Perm::CloudWrite },
     Spec { name: "cloud.syncRemove", summary: "Stops syncing a folder. Its files stay on this computer and in the cloud.", params: &[req("id", Kind::Str, "The synced folder.")], perm: Perm::CloudWrite },
+    Spec { name: "market.list", summary: "The lsuite Marketplace: plugins for the apps made by people who use lsuite and by lsuite, each with what is installed here. Installing needs lsuite Pass.", params: &[opt("app", Kind::Str, "Only this app's plugins.")], perm: Perm::Read },
+    Spec { name: "market.install", summary: "Installs (or updates) a marketplace plugin for this computer: checks its checksum, puts it in the app's plugin folder and asks a running app to load it. Needs lsuite Pass.", params: &[req("id", Kind::Str, "The plugin's id (from market.list).")], perm: Perm::Install },
+    Spec { name: "market.remove", summary: "Removes a plugin installed from the marketplace.", params: &[req("id", Kind::Str, "The plugin's id.")], perm: Perm::Remove },
+    Spec { name: "market.publish", summary: "Submits a plugin bundle (the folder plugin.publishLocal makes: plugin.toml and the library) to the marketplace for this computer's platform. lsuite reviews every version before it's listed.", params: &[req("path", Kind::Str, "The bundle folder."), opt("notes", Kind::Str, "What this version changes.")], perm: Perm::Publish },
+    Spec { name: "market.mine", summary: "Your marketplace submissions and their review status.", params: &[], perm: Perm::Read },
+    Spec { name: "agent.run", summary: "Asks the lsuite agent to do a job, across the apps if it needs to (it reads each app's brief and skills, does the work, looks at it, reports). Waits until it's done.", params: &[req("prompt", Kind::Str, "The job, in your words."), opt("provider", Kind::Str, "claude-code, lsuite or anthropic (the first ready one when left out).")], perm: Perm::Read },
+    Spec { name: "agent.stop", summary: "Stops the lsuite agent.", params: &[], perm: Perm::Read },
+    Spec { name: "agent.log", summary: "The lsuite agent's conversation: what was asked, the tools it used, what it answered.", params: &[], perm: Perm::Read },
+    Spec { name: "agent.clear", summary: "Starts a new conversation with the lsuite agent.", params: &[], perm: Perm::Read },
+    Spec { name: "agent.providers", summary: "The ways the lsuite agent can run on this computer (Claude Code, lsuite AI, Anthropic API).", params: &[], perm: Perm::Read },
     Spec { name: "settings.get", summary: "The launcher's settings.", params: &[], perm: Perm::Read },
     Spec { name: "settings.set", summary: "Changes one setting (`theme`, `checkOnStart`, `autoUpdate`, `reduceTransparency`, `syncEveryMinutes`, `agent.*`). Agents can't change `agent.*`.", params: &[req("key", Kind::Str, "The setting's dotted name."), req("value", Kind::Any, "Its new value.")], perm: Perm::Read },
     Spec { name: "app.version", summary: "The launcher's version, the computer's platform and where apps go.", params: &[], perm: Perm::Read },
@@ -154,7 +165,14 @@ fn allowed(perm: Perm, s: &settings::Settings) -> bool {
         Perm::CloudWrite => a.cloud_write,
         Perm::CloudDelete => a.cloud_delete,
         Perm::Account => a.account,
+        Perm::Publish => a.publish,
     }
+}
+
+/// [`call`] behind a boxed future: what the lsuite agent uses, so the agent's future doesn't
+/// contain itself (it can call commands, and `agent.run` is one).
+pub fn call_boxed(l: Arc<Launcher>, source: Source, name: String, params: Value) -> futures::future::BoxFuture<'static, CmdResult<Value>> {
+    Box::pin(async move { call(&l, source, &name, params).await })
 }
 
 /// Runs one command.
@@ -163,6 +181,9 @@ pub async fn call(l: &Arc<Launcher>, source: Source, name: &str, params: Value) 
     let p = check_params(s, &params)?;
     if source == Source::Mcp && !allowed(s.perm, &settings::load()) {
         return Err(format!("{name} is turned off for agents. The person can allow it in the lsuite launcher (Settings › Agents) or with `lsuite-cli settings.set key=agent.… value=true`."));
+    }
+    if source == Source::Mcp && name.starts_with("agent.") {
+        return Err("The lsuite agent is driven from the window or lsuite-cli, not by another agent.".into());
     }
     let str_ = |k: &str| p.get(k).and_then(Value::as_str).map(str::to_string).unwrap_or_default();
     let flag = |k: &str| p.get(k).and_then(Value::as_bool).unwrap_or(false);
@@ -285,6 +306,22 @@ pub async fn call(l: &Arc<Launcher>, source: Source, name: &str, params: Value) 
         }
         "app.checkUpdates" => crate::selfupdate::check(l).await.map(|s| crate::selfupdate::to_value(&s)),
         "app.installUpdate" => crate::selfupdate::install(l).await.map(|s| crate::selfupdate::to_value(&s)),
+        "market.list" => crate::market::list(Some(str_("app").as_str())).await,
+        "market.install" => crate::market::install(l, &str_("id")).await,
+        "market.remove" => crate::market::remove(l, &str_("id")).await,
+        "market.publish" => crate::market::publish(&l.hub, std::path::Path::new(&str_("path")), &str_("notes")).await,
+        "market.mine" => crate::market::mine().await,
+        "agent.run" => {
+            let provider = str_("provider");
+            crate::agent::run(l, &str_("prompt"), (!provider.is_empty()).then_some(provider.as_str())).await
+        }
+        "agent.stop" => Ok(json!({ "stopped": crate::agent::stop(l) })),
+        "agent.log" => Ok(crate::agent::log(l)),
+        "agent.clear" => {
+            crate::agent::clear(l);
+            Ok(json!({ "cleared": true }))
+        }
+        "agent.providers" => Ok(crate::agent::providers(l)),
         "settings.get" => Ok(serde_json::to_value(settings::load()).unwrap_or_default()),
         "settings.set" => {
             let key = str_("key");
@@ -361,6 +398,7 @@ pub fn markdown() -> String {
                 Perm::CloudWrite => "agent.cloudWrite",
                 Perm::CloudDelete => "agent.cloudDelete",
                 Perm::Account => "agent.account",
+                Perm::Publish => "agent.publish",
                 Perm::Read => "",
             };
             out.push_str(&format!("\nAgents: needs `{setting}`.\n"));

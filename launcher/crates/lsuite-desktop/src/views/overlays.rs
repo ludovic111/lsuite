@@ -22,6 +22,7 @@ pub fn confirm(ws: &mut Workspace, window: &mut Window, cx: &mut Context<Workspa
         Dialog::Rename { path } if !text.is_empty() => ("cloud.rename", json!({ "path": path, "name": text })),
         Dialog::MoveTo { path } => ("cloud.move", json!({ "from": path, "to": join(text.trim_matches('/'), name_of(path)) })),
         Dialog::UploadPath if !text.is_empty() => ("cloud.upload", json!({ "source": text, "into": dir })),
+        Dialog::PublishPath if !text.is_empty() => ("market.publish", json!({ "path": text })),
         Dialog::SyncPath if !text.is_empty() => {
             ws.close_dialog(window, cx);
             store.update(cx, |s, cx| crate::views::cloud::start_sync(s, text.clone(), cx));
@@ -60,6 +61,7 @@ pub fn dialog(ws: &Workspace, d: &Dialog, _window: &mut Window, cx: &mut Context
         Dialog::Rename { path } => (format!("Rename {}", name_of(path)), "A new name, in the same folder.".into(), "Rename", false, true),
         Dialog::MoveTo { path } => (format!("Move {}", name_of(path)), "The folder to move it to, like Projects/2026. Leave it empty for the top of your cloud.".into(), "Move", false, true),
         Dialog::UploadPath => ("Upload a file or folder".into(), "This system has no file picker the launcher can open: type the path of a file or folder on this computer.".into(), "Upload", false, true),
+        Dialog::PublishPath => ("Publish a plugin".into(), "The plugin's bundle folder on this computer: plugin.toml and the library, as the app's plugin.publishLocal makes it. lsuite reviews every version before it's listed.".into(), "Publish", false, true),
         Dialog::SyncPath => ("Sync a folder".into(), "The folder on this computer to keep in step with your cloud, both ways. It is synced into the cloud folder shown, under its own name.".into(), "Sync", false, true),
     };
     let entity = cx.entity();

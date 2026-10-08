@@ -1,4 +1,4 @@
-//! lsuite Cloud (lsuite's CLOUD.md): the storage that comes with an lsuite AI plan.
+//! lsuite Cloud (lsuite's CLOUD.md): the storage that comes with lsuite Pass.
 //!
 //! A client of `<server>/api/cloud`, authenticated with the account's token. Files are named by
 //! `/`-separated paths without a leading slash; each segment is percent-encoded in URLs.
@@ -67,12 +67,17 @@ pub fn parent_of(path: &str) -> &str {
     path.rsplit_once('/').map_or("", |(d, _)| d)
 }
 
+/// One path segment, percent-encoded.
+pub fn encode_segment(s: &str) -> String {
+    utf8_percent_encode(s, SEGMENT).to_string()
+}
+
 fn encode(path: &str) -> String {
     path.split('/').map(|s| utf8_percent_encode(s, SEGMENT).to_string()).collect::<Vec<_>>().join("/")
 }
 
 fn auth() -> CmdResult<(String, String)> {
-    let acc = account::read().ok_or("Sign in to lsuite first: lsuite Cloud comes with an lsuite AI plan.")?;
+    let acc = account::read().ok_or("Sign in to lsuite first: lsuite Cloud comes with lsuite Pass.")?;
     Ok((acc.server, acc.token))
 }
 

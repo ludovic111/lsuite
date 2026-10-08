@@ -3,17 +3,21 @@
 //!
 //! - **apps**: the lsuite apps, installed, updated, removed and opened from their signed GitHub
 //!   releases (`catalog`, `release`, `install`).
-//! - **account**: the lsuite AI account every app shares (`~/.lsuite/account.json`).
-//! - **cloud**: lsuite Cloud, the storage that comes with an lsuite AI plan.
+//! - **account**: the lsuite account every app shares (`~/.lsuite/account.json`), and its lsuite Pass.
+//! - **cloud**: lsuite Cloud, the storage that comes with lsuite Pass.
+//! - **market**: the lsuite Marketplace, plugins by the people who use lsuite (with lsuite Pass).
+//! - **agent**: the lsuite agent, for jobs that span the apps (HARNESS.md, part 8).
 //!
 //! Long work reports progress on the [`events::Hub`]; the window draws it, the CLI prints it.
 
 pub mod account;
+pub mod agent;
 pub mod apps;
 pub mod catalog;
 pub mod cloud;
 pub mod events;
 pub mod install;
+pub mod market;
 pub mod paths;
 pub mod platform;
 pub mod registry;
@@ -50,11 +54,13 @@ pub struct Launcher {
     pub(crate) update: Mutex<selfupdate::State>,
     /// Synced folders with a sync running.
     pub(crate) syncing: Mutex<BTreeSet<String>>,
+    /// The lsuite agent's conversation.
+    pub(crate) agent: Mutex<agent::State>,
 }
 
 impl Launcher {
     pub fn new() -> Arc<Self> {
-        Arc::new(Launcher { hub: Hub::default(), platform: Platform::current(), latest: Mutex::new(apps::load_latest()), busy: Mutex::default(), sign_in: Mutex::default(), others: Mutex::default(), update: Mutex::default(), syncing: Mutex::default() })
+        Arc::new(Launcher { hub: Hub::default(), platform: Platform::current(), latest: Mutex::new(apps::load_latest()), busy: Mutex::default(), sign_in: Mutex::default(), others: Mutex::default(), update: Mutex::default(), syncing: Mutex::default(), agent: Mutex::default() })
     }
 
     /// Apps with work going on (install, update, removal).

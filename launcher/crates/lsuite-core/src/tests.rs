@@ -1,5 +1,6 @@
-//! Installs and removes apps end to end against a stand-in for GitHub on loopback: a signed
-//! release manifest (AppImage) and signed checksums (tar.gz), and the refusals in between.
+//! Installs and removes apps end to end against a stand-in for lsuite.xyz on loopback (the
+//! builds route of DISTRIBUTION.md): a signed release manifest (AppImage) and signed checksums
+//! (tar.gz), the sign-in it needs, and the refusals in between.
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -28,7 +29,12 @@ async fn serve(routes: Routes) -> String {
                 let n = s.read(&mut buf).await.unwrap_or(0);
                 let req = String::from_utf8_lossy(&buf[..n]).to_string();
                 let path = req.split_whitespace().nth(1).unwrap_or("/").to_string();
-                let (status, headers, body) = routes.lock().get(&path).cloned().unwrap_or((404, vec![], b"not found".to_vec()));
+                let authed = req.to_ascii_lowercase().contains("authorization: bearer lsk_test");
+                let (status, headers, body) = if path.starts_with("/api/apps/") && !authed {
+                    (401, vec![], br#"{"type":"error","error":{"type":"authentication_error","message":"Sign in"}}"#.to_vec())
+                } else {
+                    routes.lock().get(&path).cloned().unwrap_or((404, vec![], b"not found".to_vec()))
+                };
                 let mut head = format!("HTTP/1.1 {status} X\r\nContent-Length: {}\r\nConnection: close\r\n", body.len());
                 for (k, v) in headers {
                     head.push_str(&format!("{k}: {v}\r\n"));
@@ -77,6 +83,12 @@ async fn installs_updates_and_removes_from_signed_releases() {
     }
     let linux = Platform::parse("linux-x86_64").unwrap();
     let l = Launcher::new();
+    // Signed out, the apps aren't offered.
+    let probe: &'static App = Box::leak(Box::new(App { id: "folio", name: "folio", kind: "office", kind_label: "Office", summary: "t", repo: "t/folio", signing: Signing::Manifest { public_key: "x" }, files: &[] }));
+    assert_eq!(release::latest(probe, linux).await.unwrap_err(), release::SIGN_IN);
+    let account = json!({ "format": 1, "server": base, "email": "ada@example.com", "name": "Ada", "plan": "free", "token": "lsk_test_token_0123456789", "signedInAt": "2026-10-07T00:00:00Z" });
+    std::fs::create_dir_all(home.path().join("lsuite")).unwrap();
+    std::fs::write(home.path().join("lsuite/account.json"), account.to_string()).unwrap();
 
     // ---- A manifest app (AppImage), signed with a throwaway key. ----
     let k = keys();
@@ -91,12 +103,16 @@ async fn installs_updates_and_removes_from_signed_releases() {
         files: &[],
     }));
     let appimage = b"#!/bin/sh\necho folio\n".repeat(50);
+    // The server's answer: the release with its manifest, URLs on the server's file route.
+    let latest = |version: &str, manifest: serde_json::Value| json!({ "app": "folio", "version": version, "tag": format!("folio-v{version}"), "manifest": manifest }).to_string().into_bytes();
     let publish = |version: &str, data: &[u8], signed_for: &str| {
-        let url = format!("{base}/test/folio/releases/download/v{version}/folio-linux-x86_64.AppImage");
-        let manifest = json!({ "version": version, "platforms": { "linux-x86_64-appimage": { "url": url, "signature": sign(&k, data, signed_for) } } });
+        let path = format!("/api/apps/folio/files/folio-v{version}/folio-linux-x86_64.AppImage");
+        let manifest = json!({ "version": version, "platforms": { "linux-x86_64-appimage": { "url": format!("{base}{path}"), "signature": sign(&k, data, signed_for) } } });
         let mut r = routes.lock();
-        r.insert("/test/folio/releases/latest/download/latest.json".into(), (200, vec![], manifest.to_string().into_bytes()));
-        r.insert(format!("/test/folio/releases/download/v{version}/folio-linux-x86_64.AppImage"), (200, vec![], data.to_vec()));
+        r.insert("/api/apps/folio/latest".into(), (200, vec![], latest(version, manifest)));
+        // The file route sends the download on, like lsuite.xyz does to GitHub's signed address.
+        r.insert(path, (302, vec![("Location".into(), format!("{base}/signed/folio-{version}"))], vec![]));
+        r.insert(format!("/signed/folio-{version}"), (200, vec![], data.to_vec()));
     };
     publish("0.1.0", &appimage, "0.1.0");
     let rel = release::latest(manifest_app, linux).await.unwrap();
@@ -123,11 +139,11 @@ async fn installs_updates_and_removes_from_signed_releases() {
     let mut bad = b"#!/bin/sh\necho evil\n".repeat(50);
     let good_sig_for_other = sign(&k, &appimage, "0.2.0");
     {
-        let url = format!("{base}/test/folio/releases/download/v0.2.0/folio-linux-x86_64.AppImage");
-        let manifest = json!({ "version": "0.2.0", "platforms": { "linux-x86_64-appimage": { "url": url, "signature": good_sig_for_other } } });
+        let path = "/api/apps/folio/files/folio-v0.2.0/folio-linux-x86_64.AppImage";
+        let manifest = json!({ "version": "0.2.0", "platforms": { "linux-x86_64-appimage": { "url": format!("{base}{path}"), "signature": good_sig_for_other } } });
         let mut r = routes.lock();
-        r.insert("/test/folio/releases/latest/download/latest.json".into(), (200, vec![], manifest.to_string().into_bytes()));
-        r.insert("/test/folio/releases/download/v0.2.0/folio-linux-x86_64.AppImage".into(), (200, vec![], bad.clone()));
+        r.insert("/api/apps/folio/latest".into(), (200, vec![], latest("0.2.0", manifest)));
+        r.insert(path.into(), (200, vec![], bad.clone()));
     }
     let rel = release::latest(manifest_app, linux).await.unwrap();
     let err = install::install(manifest_app, &rel, linux, &mut p).await.unwrap_err();
@@ -140,9 +156,9 @@ async fn installs_updates_and_removes_from_signed_releases() {
     // A manifest pointing elsewhere is refused.
     {
         let manifest = json!({ "version": "0.4.0", "platforms": { "linux-x86_64": { "url": "https://evil.example/folio.AppImage", "signature": sign(&k, b"x", "0.4.0") } } });
-        routes.lock().insert("/test/folio/releases/latest/download/latest.json".into(), (200, vec![], manifest.to_string().into_bytes()));
+        routes.lock().insert("/api/apps/folio/latest".into(), (200, vec![], latest("0.4.0", manifest)));
     }
-    assert!(release::latest(manifest_app, linux).await.unwrap_err().contains("outside its own releases"));
+    assert!(release::latest(manifest_app, linux).await.unwrap_err().contains("outside lsuite's downloads"));
     // A proper update replaces it.
     let v2 = b"#!/bin/sh\necho folio 2\n".repeat(50);
     publish("0.2.0", &v2, "0.2.0");
@@ -172,12 +188,11 @@ async fn installs_updates_and_removes_from_signed_releases() {
     let sums = format!("{sha}  zenith-linux-x86_64.tar.gz\n");
     use ed25519_dalek::Signer;
     let sig = format!("zenith-ed25519 {}\n", base64::engine::general_purpose::STANDARD.encode(sk.sign(sums.as_bytes()).to_bytes()));
+    let zenith_latest = |sums: &str| json!({ "app": "zenith", "version": "0.4.0", "tag": "zenith-v0.4.0", "manifest": null, "sha256sums": sums, "sha256sumsSig": sig }).to_string().into_bytes();
     {
         let mut r = routes.lock();
-        r.insert("/test/zenith/releases/latest".into(), (302, vec![("Location".into(), format!("{base}/test/zenith/releases/tag/v0.4.0"))], vec![]));
-        r.insert("/test/zenith/releases/download/v0.4.0/SHA256SUMS".into(), (200, vec![], sums.clone().into_bytes()));
-        r.insert("/test/zenith/releases/download/v0.4.0/SHA256SUMS.sig".into(), (200, vec![], sig.into_bytes()));
-        r.insert("/test/zenith/releases/download/v0.4.0/zenith-linux-x86_64.tar.gz".into(), (200, vec![], archive.clone()));
+        r.insert("/api/apps/zenith/latest".into(), (200, vec![], zenith_latest(&sums)));
+        r.insert("/api/apps/zenith/files/zenith-v0.4.0/zenith-linux-x86_64.tar.gz".into(), (200, vec![], archive.clone()));
     }
     let rel = release::latest(sums_app, linux).await.unwrap();
     assert_eq!(rel.version, "0.4.0");
@@ -185,7 +200,7 @@ async fn installs_updates_and_removes_from_signed_releases() {
     assert_eq!(rec.executable, home.path().join("apps/zenith/zenith"));
     assert!(home.path().join("apps/zenith/zenith-cli").is_file());
     // A forged checksums file is refused.
-    routes.lock().insert("/test/zenith/releases/download/v0.4.0/SHA256SUMS".into(), (200, vec![], format!("{}  zenith-linux-x86_64.tar.gz\n", "0".repeat(64)).into_bytes()));
+    routes.lock().insert("/api/apps/zenith/latest".into(), (200, vec![], zenith_latest(&format!("{}  zenith-linux-x86_64.tar.gz\n", "0".repeat(64)))));
     assert!(release::latest(sums_app, linux).await.unwrap_err().contains("aren't signed"));
 
     // ---- Removing: refused while running, then done, documents untouched. ----
@@ -223,7 +238,8 @@ async fn installs_updates_and_removes_from_signed_releases() {
     crate::call(&l, crate::Source::Cli, "settings.set", json!({ "key": "theme", "value": "dark" })).await.unwrap();
     assert!(crate::call(&l, crate::Source::Cli, "settings.set", json!({ "key": "theme", "value": "pink" })).await.is_err());
     assert!(crate::call(&l, crate::Source::Cli, "settings.set", json!({ "key": "autoUpdate", "value": "yes" })).await.is_err());
-    // Cloud commands say to sign in first.
+    // Signed out, cloud commands say to sign in first.
+    std::fs::remove_file(home.path().join("lsuite/account.json")).unwrap();
     let err = crate::call(&l, crate::Source::Window, "cloud.status", json!({})).await.unwrap_err();
     assert!(err.contains("Sign in"), "{err}");
 }

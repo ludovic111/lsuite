@@ -1,5 +1,5 @@
 //! lsuite: the launcher of the suite. Installs, updates, opens and removes the lsuite apps, holds
-//! the lsuite AI account they share, and manages lsuite Cloud.
+//! the lsuite account they share (and its lsuite Pass), lsuite Cloud and the lsuite Marketplace.
 //!
 //! The window (GPUI) is one client of `lsuite-core`'s command registry, like `lsuite-cli` and
 //! `lsuite-mcp`; everything it shows comes from the commands' answers and the core's events.

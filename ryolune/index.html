@@ -16,7 +16,7 @@
   <meta property="og:url" content="%ORIGIN%/ryolune">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
   <meta name="twitter:card" content="summary_large_image">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ryolune","url":"%ORIGIN%/ryolune","description":"A free, open-source digital audio workstation in beta that your AI can drive.","applicationCategory":"MultimediaApplication","applicationSubCategory":"Digital audio workstation","operatingSystem":"macOS, Windows, Linux","softwareVersion":"%VERSION:ryolune%","downloadUrl":"https://github.com/ludovic111/ryolune/releases/latest","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isPartOf":{"@type":"WebSite","name":"lsuite","url":"%ORIGIN%/"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ryolune","url":"%ORIGIN%/ryolune","description":"A free, open-source digital audio workstation in beta that your AI can drive.","applicationCategory":"MultimediaApplication","applicationSubCategory":"Digital audio workstation","operatingSystem":"macOS, Windows, Linux","softwareVersion":"%VERSION:ryolune%","downloadUrl":"%ORIGIN%/launcher","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isPartOf":{"@type":"WebSite","name":"lsuite","url":"%ORIGIN%/"}}</script>
   <link rel="preload" href="/assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/design/tokens.css?v=1">
   <link rel="stylesheet" href="/assets/styles.css?v=1">
@@ -38,11 +38,10 @@
       <h1 class="display reveal" style="--d:1">Finish the song.<br>Hand the busywork <span class="neg">to an agent</span>.</h1>
       <p class="lede reveal" style="--d:2">ryolune is a complete DAW in beta: record while you hear yourself through your effects, arrange, edit MIDI, mix on a real mixer and export stems, with 35 stock instruments and effects and your own CLAP, VST3 and Audio Units. When you'd rather not quantise forty notes by hand, ask the built-in agent, or plug Claude Code, Codex or any MCP client straight into the song.</p>
       <div class="hero__actions reveal" style="--d:3">
-        <a class="btn btn--primary" href="#downloads" data-download="ryolune" data-href-macos="/ryolune/download/macos-arm64" data-href-windows="/ryolune/download/windows-x86_64" data-href-linux="/ryolune/download/linux-x86_64"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span data-os>Download ryolune</span></a>
-        <a class="btn" href="#downloads">All platforms</a>
+        <a class="btn btn--primary" href="#downloads">Get ryolune</a>
         <a class="btn" href="https://github.com/ludovic111/ryolune">Source on GitHub</a>
       </div>
-      <p class="fine hero__fine reveal" style="--d:4">Beta · Version %VERSION:ryolune% · free and MIT licensed · macOS, Windows, Linux · native Rust app · drivable by your AI · no telemetry</p>
+      <p class="fine hero__fine reveal" style="--d:4">Beta · Version %VERSION:ryolune% · in the lsuite app, with a free account · free and MIT licensed · macOS, Windows, Linux · native Rust app · drivable by your AI · no telemetry</p>
     </div>
     <div class="wrap">
       <figure class="shot shot--hero reveal" style="--d:3"><picture><source srcset="/assets/img/ryolune/arrangement-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/ryolune/arrangement.webp" width="1600" height="1000" alt="Tracks, waveforms and the piano roll in ryolune." loading="lazy"></picture></figure>
@@ -55,7 +54,7 @@
         <div><b>35</b><span>stock instruments and effects</span></div>
         <div><b>239</b><span>commands, for you and your AI alike</span></div>
         <div><b>3</b><span>systems: macOS, Windows, Linux</span></div>
-        <div><b>0</b><span>telemetry. No account needed</span></div>
+        <div><b>0</b><span>telemetry. The lsuite account is free</span></div>
       </div>
     </div>
   </section>
@@ -169,7 +168,7 @@
       <div class="section__head">
         <span class="eyebrow">Changelog</span>
         <h2 class="h2 reveal" id="changelog-title">Every version, in plain words.</h2>
-        <p class="lede reveal" style="--d:1">ryolune shows the same notes after it updates; the full notes are in <a href="https://github.com/ludovic111/ryolune/tree/main/docs/releases">docs/releases</a> and on <a href="https://github.com/ludovic111/ryolune/releases">GitHub releases</a>.</p>
+        <p class="lede reveal" style="--d:1">ryolune shows the same notes after it updates; the full notes are in <a href="https://github.com/ludovic111/ryolune/tree/main/docs/releases">docs/releases</a>.</p>
       </div>
       <ol class="releases reveal">
         <li class="release release--now">
@@ -246,18 +245,16 @@
 
   <section class="section" id="downloads" aria-labelledby="downloads-title">
     <div class="wrap">
-      <div class="section__head">
-        <span class="eyebrow">Download</span>
-        <h2 class="h2 reveal" id="downloads-title">Download ryolune beta</h2>
-        <p class="lede reveal" style="--d:1"><code>ryolune-cli</code> and <code>ryolune-mcp</code> come with the app. ryolune checks for updates on launch and every six hours; updates are signed (Ed25519) and verified before anything is replaced.</p>
+      <div class="band reveal">
+        <span class="eyebrow">Get ryolune</span>
+        <h2 class="h2" id="downloads-title">Get ryolune in the lsuite app.</h2>
+        <p class="lede" style="margin-inline:auto">ryolune comes through lsuite, the suite's own app. Sign in with a free lsuite account and every app is in one place: installed in a click, kept up to date, with its plugins. Free, for macOS, Windows and Linux.</p>
+        <div class="hero__actions" style="justify-content:center">
+          <a class="btn btn--primary" href="/launcher/download" data-download="launcher" data-href-macos="/launcher/download/macos-arm64" data-href-windows="/launcher/download/windows-x86_64" data-href-linux="/launcher/download/linux-x86_64"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>Download lsuite</a>
+          <a class="btn" href="/launcher">About the lsuite app <span class="arrow" aria-hidden="true">→</span></a>
+        </div>
+        <p class="fine" style="margin:18px auto 0;max-width:64ch">ryolune %VERSION:ryolune% · macOS, Windows and Linux. <code>ryolune-cli</code> and <code>ryolune-mcp</code> come with the app, and its updates are signed (Ed25519) and verified before anything is replaced. The source stays open (MIT): <a href="https://github.com/ludovic111/ryolune">build it yourself</a> any time.</p>
       </div>
-      <div class="dl reveal">
-        <a href="/ryolune/download/macos-arm64" data-os-match="macos"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Apple silicon</b><span>.zip · signed and notarized</span></a>
-        <a href="/ryolune/download/macos-x86_64"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.4 1.2 9.8.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.2-.8s1.9.8 3.2.8c1.3 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.6-1-2.6-3.9zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>macOS · Intel</b><span>.zip · signed and notarized</span></a>
-        <a href="/ryolune/download/windows-x86_64" data-os-match="windows"><b><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5.5l7.5-1v7H3zm0 13l7.5 1v-7H3zm8.5 1.2L21 21v-8.5h-9.5zm0-15.4v7.2H21V3z"/></svg>Windows · 64-bit</b><span>.exe · or portable .zip</span></a>
-        <a href="/ryolune/download/linux-x86_64" data-os-match="linux"><b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10l3 2-3 2M13 15h3" stroke-linecap="round" stroke-linejoin="round"/></svg>Linux · x86-64</b><span>.tar.gz</span></a>
-      </div>
-      <p class="fine reveal" style="margin-top: 18px;">Also: <a href="/ryolune/download/windows-zip">Windows portable .zip</a> · <a href="https://github.com/ludovic111/ryolune/releases">All releases</a>, with <code>SHA256SUMS</code> and its signature. The Windows build isn't code-signed yet.</p>
     </div>
   </section>
 

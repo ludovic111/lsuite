@@ -8,13 +8,13 @@ Every command runs the same from the window, `lsuite-cli <command> key=value…`
 
 ### `apps.list`
 
-Every lsuite app: installed or not, its version, the latest one, whether it is open. `refresh` asks GitHub again (otherwise the last check is reused for 6 hours).
+Every lsuite app: installed or not, its version, the latest one, whether it is open. `refresh` asks lsuite.xyz again (otherwise the last check is reused for 6 hours). Getting the apps needs a free lsuite account.
 
 - `refresh` (true/false): Look for new versions now.
 
 ### `apps.check`
 
-Looks for the latest release of every app now.
+Looks for the latest release of every app now (signed in).
 
 ### `apps.install`
 
@@ -69,7 +69,7 @@ Opens the app's page on lsuite.xyz in the browser.
 
 ### `account.status`
 
-The lsuite AI account on this computer: plan, allowance used, cloud storage.
+The lsuite account on this computer: its lsuite Pass plan, AI allowance used, cloud storage.
 
 ### `account.signIn`
 
@@ -91,7 +91,7 @@ Agents: needs `agent.account`.
 
 ### `account.plans`
 
-lsuite AI's plans: prices, models, monthly allowance and cloud storage.
+lsuite Pass plans: prices, AI models and monthly allowance, cloud storage, the plugin marketplace.
 
 ### `account.manage`
 
@@ -192,6 +192,68 @@ Stops syncing a folder. Its files stay on this computer and in the cloud.
 - `id` (text, required): The synced folder.
 
 Agents: needs `agent.cloudWrite`.
+
+## market
+
+### `market.list`
+
+The lsuite Marketplace: plugins for the apps made by people who use lsuite and by lsuite, each with what is installed here. Installing needs lsuite Pass.
+
+- `app` (text): Only this app's plugins.
+
+### `market.install`
+
+Installs (or updates) a marketplace plugin for this computer: checks its checksum, puts it in the app's plugin folder and asks a running app to load it. Needs lsuite Pass.
+
+- `id` (text, required): The plugin's id (from market.list).
+
+Agents: needs `agent.install`.
+
+### `market.remove`
+
+Removes a plugin installed from the marketplace.
+
+- `id` (text, required): The plugin's id.
+
+Agents: needs `agent.remove`.
+
+### `market.publish`
+
+Submits a plugin bundle (the folder plugin.publishLocal makes: plugin.toml and the library) to the marketplace for this computer's platform. lsuite reviews every version before it's listed.
+
+- `path` (text, required): The bundle folder.
+- `notes` (text): What this version changes.
+
+Agents: needs `agent.publish`.
+
+### `market.mine`
+
+Your marketplace submissions and their review status.
+
+## agent
+
+### `agent.run`
+
+Asks the lsuite agent to do a job, across the apps if it needs to (it reads each app's brief and skills, does the work, looks at it, reports). Waits until it's done.
+
+- `prompt` (text, required): The job, in your words.
+- `provider` (text): claude-code, lsuite or anthropic (the first ready one when left out).
+
+### `agent.stop`
+
+Stops the lsuite agent.
+
+### `agent.log`
+
+The lsuite agent's conversation: what was asked, the tools it used, what it answered.
+
+### `agent.clear`
+
+Starts a new conversation with the lsuite agent.
+
+### `agent.providers`
+
+The ways the lsuite agent can run on this computer (Claude Code, lsuite AI, Anthropic API).
 
 ## settings
 

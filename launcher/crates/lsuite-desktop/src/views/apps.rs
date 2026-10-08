@@ -36,6 +36,8 @@ pub fn page(_window: &mut Window, cx: &mut App) -> AnyElement {
     let tasks = s.tasks.clone();
     let installed = s.apps["installed"].as_u64().unwrap_or(0);
     let others: Vec<Value> = s.apps["others"].as_array().cloned().unwrap_or_default();
+    let signed_in = s.signed_in();
+    let account_known = !s.account.is_null();
     let cards: Vec<AnyElement> = apps.iter().map(|a| card(a, tasks.get(&format!("install:{}", a["id"].as_str().unwrap_or(""))).cloned(), cx)).collect();
     let t = cx.theme().clone();
     column(
@@ -58,6 +60,20 @@ pub fn page(_window: &mut Window, cx: &mut App) -> AnyElement {
                     ))
                     .child(div().flex().flex_col().items_end().gap(px(4.)).flex_none().child(tag(format!("{os} · {}", platform.split('-').nth(1).unwrap_or("")), false, cx)).child(div().font_family(MONO).text_size(px(sz::XS)).text_color(t.text_3).child(format!("{installed} of {} installed", apps.len())))),
             )
+            .when(account_known && !signed_in, |d| {
+                d.child(
+                    div()
+                        .flex()
+                        .items_center()
+                        .justify_between()
+                        .gap(px(14.))
+                        .p(px(16.))
+                        .glass(t.glass1)
+                        .border_color(t.accent)
+                        .child(div().flex().flex_col().gap(px(2.)).child(div().font_weight(FontWeight::SEMIBOLD).text_size(px(sz::MD)).child("Sign in to get the apps")).child(div().text_size(px(sz::SM)).text_color(t.text_2).child("Your free lsuite account gets you every app, its updates and the marketplace. No payment, ever, for the apps.")))
+                        .child(Button::new("apps-signin", "Sign in").with_icon("log-in").primary().on_click(|_, _, cx| cx.store().update(cx, |s, cx| s.go(crate::store::Page::Account, cx)))),
+                )
+            })
             .child(div().flex().flex_wrap().gap(px(14.)).children(cards))
             .when(!others.is_empty(), |d| d.child(more(&others, cx)))
             .child(agents(&apps, cx)),
@@ -119,7 +135,8 @@ fn card(a: &Value, task: Option<TaskView>, cx: &App) -> AnyElement {
             );
         }
     } else if available {
-        buttons.push(Button::new(SharedString::from(format!("install-{id}")), "Install").with_icon("download").primary().small().on_click(move |_, _, cx| cx.store().update(cx, |s, cx| s.run("apps.install", json!({ "app": i3 }), cx))).into_any_element());
+        let signed_in = cx.store().read(cx).signed_in();
+        buttons.push(Button::new(SharedString::from(format!("install-{id}")), "Install").with_icon("download").primary().small().disabled(!signed_in).tooltip(if signed_in { "Download, check and install it" } else { "Sign in to get the apps (free)" }).on_click(move |_, _, cx| cx.store().update(cx, |s, cx| s.run("apps.install", json!({ "app": i3 }), cx))).into_any_element());
     }
     if busy {
     } else if !installed {

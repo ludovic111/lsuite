@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>folio beta — documents, spreadsheets and presentations in one app your AI can drive · lsuite</title>
-  <meta name="description" content="folio is lsuite's office app, in beta and written in Rust: documents, spreadsheets and presentations in one app, the work of Word, Excel and PowerPoint combined, with every action a command your AI can run. Free and MIT licensed. Download folio.">
+  <meta name="description" content="folio is lsuite's office app, in beta and written in Rust: documents, spreadsheets and presentations in one app, the work of Word, Excel and PowerPoint combined, with every action a command your AI can run. Free and MIT licensed, in the lsuite app.">
   <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/folio">
@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="lsuite">
   <meta property="og:title" content="folio beta — documents, sheets and slides in one app your AI can drive">
-  <meta property="og:description" content="Documents, spreadsheets and presentations in one native Rust app, with every action a command your AI can run. Free and MIT licensed. Download folio.">
+  <meta property="og:description" content="Documents, spreadsheets and presentations in one native Rust app, with every action a command your AI can run. Free and MIT licensed, in the lsuite app.">
   <meta property="og:url" content="%ORIGIN%/folio">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -37,10 +37,10 @@
       <h1 class="display reveal" style="--d:1">Write it, count it,<br><span class="neg">present it</span>.</h1>
       <p class="lede reveal" style="--d:2">folio is lsuite's office app, in beta: documents, spreadsheets and presentations in one app, the work of Word, Excel and PowerPoint combined. A native Rust app in lsuite's black-and-white look, where everything you can click is a command, so you, a script or an AI agent can write, calculate and build slides, with one undo.</p>
       <div class="hero__actions reveal" style="--d:3">
-        <a class="btn btn--primary" href="#downloads">Download folio</a>
+        <a class="btn btn--primary" href="#downloads">Get folio</a>
         <a class="btn" href="#what">What it does</a>
       </div>
-      <p class="fine hero__fine reveal" style="--d:4">Beta · 0.1 · free and MIT licensed · native Rust app · drivable by your AI · no telemetry</p>
+      <p class="fine hero__fine reveal" style="--d:4">Beta · Version %VERSION:folio% · in the lsuite app, with a free account · free and MIT licensed · native Rust app · drivable by your AI · no telemetry</p>
     </div>
     <div class="wrap">
       <figure class="shot shot--hero reveal" style="--d:3"><picture><source srcset="/assets/img/folio/document-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/folio/document.webp" width="1600" height="1000" alt="A report with a live spreadsheet table and chart in folio." loading="lazy"></picture></figure>
@@ -137,15 +137,14 @@
   <section class="section" id="downloads" aria-labelledby="downloads-title">
     <div class="wrap">
       <div class="band reveal">
-        <span class="eyebrow">Download</span>
-        <h2 class="h2" id="downloads-title">Download folio.</h2>
-        <p class="lede" style="margin-inline:auto">folio 0.1.0 is available for macOS, Windows and Linux. Free and open source, in beta.</p>
-        <div class="hero__actions" style="justify-content:center;flex-wrap:wrap;margin-top:24px">
-          <a class="btn btn--primary" href="/folio/download/macos-arm64">Mac · Apple Silicon</a>
-          <a class="btn" href="/folio/download/macos-x86_64">Mac · Intel</a>
-          <a class="btn" href="/folio/download/windows-x86_64">Windows</a>
-          <a class="btn" href="/folio/download/linux-x86_64">Linux</a>
+        <span class="eyebrow">Get folio</span>
+        <h2 class="h2" id="downloads-title">Get folio in the lsuite app.</h2>
+        <p class="lede" style="margin-inline:auto">folio comes through lsuite, the suite's own app. Sign in with a free lsuite account and every app is in one place: installed in a click, kept up to date, with its plugins. Free, for macOS, Windows and Linux.</p>
+        <div class="hero__actions" style="justify-content:center">
+          <a class="btn btn--primary" href="/launcher/download" data-download="launcher" data-href-macos="/launcher/download/macos-arm64" data-href-windows="/launcher/download/windows-x86_64" data-href-linux="/launcher/download/linux-x86_64"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg>Download lsuite</a>
+          <a class="btn" href="/launcher">About the lsuite app <span class="arrow" aria-hidden="true">→</span></a>
         </div>
+        <p class="fine" style="margin:18px auto 0;max-width:64ch">folio %VERSION:folio% · macOS, Windows and Linux. The first public beta, with signed updates. The source stays open (MIT): <a href="https://github.com/ludovic111/folio">build it yourself</a> any time.</p>
       </div>
     </div>
   </section>

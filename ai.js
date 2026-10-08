@@ -956,5 +956,13 @@ export function createAccounts(options = {}) {
     }
   }
 
-  return { handle, store, ready, cloud, marketplace };
+  /**
+   * For the other services on the same accounts (`builds.js`): an app's token (Bearer or
+   * `x-api-key`, never the site's cookie) once the store is loaded, and the public origin the
+   * other routes use (`LSUITE_PUBLIC_ORIGIN` in production, else the request's).
+   */
+  const appAccount = async (req) => (await ready, appAuth(req));
+  const publicOrigin = (req) => live?.origin ?? originOf(req);
+
+  return { handle, store, ready, cloud, marketplace, appAccount, publicOrigin };
 }

@@ -96,6 +96,8 @@ pub struct Workspace {
     pub input: Entity<TextInput>,
     /// The account page's key field.
     pub key_input: Entity<TextInput>,
+    /// The lsuite agent's composer.
+    pub agent_input: Entity<TextInput>,
     last_dialog: Option<Dialog>,
     _subs: Vec<Subscription>,
 }
@@ -108,6 +110,8 @@ impl Workspace {
         let input = cx.new(TextInput::new);
         let key_input = cx.new(|cx| TextInput::new(cx).placeholder("lsk_…"));
         key_input.update(cx, |i, _| i.mono = true);
+        let agent_input = cx.new(|cx| TextInput::new(cx).multiline(2).placeholder("Ask the lsuite agent: “Score my latest kimchi cut with a calm piano track”"));
+        agent_input.update(cx, |i, _| i.submit_on_enter = true);
         let mut subs = vec![cx.observe_in(&store, window, |ws: &mut Self, _, window, cx| ws.store_changed(window, cx))];
         subs.push(cx.observe_window_appearance(window, |ws, _, cx| {
             let settings = ws.store.read(cx).settings.clone();
@@ -118,12 +122,17 @@ impl Workspace {
             InputEvent::Cancel => ws.close_dialog(window, cx),
             _ => {}
         }));
+        subs.push(cx.subscribe_in(&agent_input, window, |ws: &mut Self, _, e: &InputEvent, _, cx| {
+            if let InputEvent::Submit = e {
+                ws.ask_agent(cx);
+            }
+        }));
         subs.push(cx.subscribe_in(&key_input, window, |ws: &mut Self, _, e: &InputEvent, _, cx| {
             if let InputEvent::Submit = e {
                 ws.sign_in_with_key(cx);
             }
         }));
-        Self { store, focus, input, key_input, last_dialog: None, _subs: subs }
+        Self { store, focus, input, key_input, agent_input, last_dialog: None, _subs: subs }
     }
 
     /// A dialog that just opened gets its field filled and focused.
@@ -138,6 +147,7 @@ impl Workspace {
                 Some(Dialog::MoveTo { path }) => (lsuite_core::cloud::parent_of(path).to_string(), "Folder (empty: the top of your cloud)"),
                 Some(Dialog::UploadPath) => (String::new(), if cfg!(windows) { r"C:\Users\you\Documents\file.folio" } else { "/home/you/Documents/file.folio" }),
                 Some(Dialog::SyncPath) => (String::new(), if cfg!(windows) { r"C:\Users\you\Documents\Projects" } else { "/home/you/Documents/Projects" }),
+                Some(Dialog::PublishPath) => (String::new(), "The plugin's bundle folder (with plugin.toml)"),
                 _ => (String::new(), ""),
             };
             let _ = dir;
@@ -147,7 +157,7 @@ impl Workspace {
                 i.select_all_text(cx);
             });
             match dialog {
-                Some(Dialog::NewFolder | Dialog::Rename { .. } | Dialog::MoveTo { .. } | Dialog::UploadPath | Dialog::SyncPath) => crate::ui::input::focus(&self.input, window, cx),
+                Some(Dialog::NewFolder | Dialog::Rename { .. } | Dialog::MoveTo { .. } | Dialog::UploadPath | Dialog::SyncPath | Dialog::PublishPath) => crate::ui::input::focus(&self.input, window, cx),
                 _ => window.focus(&self.focus, cx),
             }
         }
@@ -157,6 +167,20 @@ impl Workspace {
     pub fn close_dialog(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         self.store.update(cx, |s, cx| s.close_dialog(cx));
         window.focus(&self.focus, cx);
+    }
+
+    /// Sends the composer's text to the lsuite agent.
+    pub fn ask_agent(&mut self, cx: &mut Context<Self>) {
+        let prompt = self.agent_input.read(cx).text().trim().to_string();
+        if prompt.is_empty() || self.store.read(cx).agent["running"] == true {
+            return;
+        }
+        self.agent_input.update(cx, |i, cx| i.set_text("", cx));
+        self.store.update(cx, |s, cx| {
+            let provider = s.agent_provider.clone();
+            s.run_result("agent.run", json!({ "prompt": prompt, "provider": provider }), cx, |s, _, _| s.agent = lsuite_core::agent::log(&s.launcher));
+            s.agent = lsuite_core::agent::log(&s.launcher);
+        });
     }
 
     pub fn sign_in_with_key(&mut self, cx: &mut Context<Self>) {
@@ -241,7 +265,9 @@ impl Workspace {
                     .gap(px(2.))
                     .px(px(10.))
                     .pt(px(6.))
+                    .child(nav("nav-agent", "bot", Page::Agent, None))
                     .child(nav("nav-apps", "layout-grid", Page::Apps, (updates > 0).then(|| tag(format!("{updates}"), page != Page::Apps, cx).into_any_element())))
+                    .child(nav("nav-market", "package", Page::Marketplace, None))
                     .child(nav("nav-cloud", "cloud", Page::Cloud, cloud_pct.map(|p| div().font_family(MONO).text_size(px(sz::XS)).child(p).into_any_element())))
                     .child(nav("nav-account", "user", Page::Account, plan.map(|p| div().font_family(MONO).text_size(px(sz::XS)).child(p.to_uppercase()).into_any_element())))
                     .child(nav("nav-settings", "settings", Page::Settings, None)),
@@ -299,7 +325,9 @@ impl Workspace {
                     .pr(px(if controls.is_some() { 0. } else { 20. }))
                     .on_mouse_down(MouseButton::Left, |_, _, cx| cx.stop_propagation())
                     .child(match page {
+                        Page::Agent => views::agent::actions(cx),
                         Page::Apps => views::apps::actions(cx),
+                        Page::Marketplace => views::market::actions(cx),
                         Page::Cloud => views::cloud::actions(cx),
                         Page::Account => views::account::actions(cx),
                         Page::Settings => div().into_any_element(),
@@ -320,7 +348,9 @@ impl Render for Workspace {
         let dialog = s.dialog.clone();
         window.set_window_title(&format!("{} — lsuite", page.title()));
         let body = match page {
+            Page::Agent => views::agent::page(self, window, cx),
             Page::Apps => views::apps::page(window, cx),
+            Page::Marketplace => views::market::page(window, cx),
             Page::Cloud => views::cloud::page(window, cx),
             Page::Account => views::account::page(self, window, cx),
             Page::Settings => views::settings::page(window, cx),

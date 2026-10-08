@@ -1,4 +1,5 @@
-//! lsuite AI: the one account of the suite (lsuite's AI.md), shared with every app.
+//! The one lsuite account of the suite (lsuite's AI.md and PASS.md), shared with every app: it
+//! carries the lsuite Pass plan (AI, Cloud, the Marketplace).
 //!
 //! The account lives in `~/.lsuite/account.json` (0600, written atomically; `LSUITE_HOME`
 //! replaces `~/.lsuite`) and is read again whenever it is needed, since an app may change it.

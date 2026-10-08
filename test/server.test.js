@@ -30,16 +30,63 @@ test('platform from the user agent', () => {
   assert.equal(osFor('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'), null);
 });
 
-test('download routes of every released app point to GitHub', async () => {
+test('the five apps come only through the lsuite app: their pages and download routes lead to it', async () => {
   for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) {
-    assert.equal(await downloadTarget(app, 'nope'), `https://github.com/ludovic111/${app}/releases/latest`, app);
+    for (const wanted of [undefined, 'macos-arm64', 'nope']) assert.equal(await downloadTarget(app, wanted, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'), '/launcher', app);
     assert.equal(DOWNLOADS[app].repo, `ludovic111/${app}`);
     assert.notEqual(DOWNLOADS[app].published, false);
-    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', {});
-    assert.ok(html.includes(`href="/${app}/download`), `${app}: public download link`);
+    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { [app]: '9.8.7' });
+    assert.ok(!html.includes(`/${app}/download`), `${app}: no download of its own`);
+    assert.ok(!html.includes(`github.com/ludovic111/${app}/releases"`), `${app}: no public releases`);
+    assert.ok(html.includes(`<h2 class="h2" id="downloads-title">Get ${app} in the lsuite app.</h2>`), `${app}: get it in the lsuite app`);
+    assert.ok(html.includes('<a class="btn btn--primary" href="/launcher/download"'), `${app}: lsuite's download is the primary button`);
+    assert.ok(html.includes('href="/launcher">About the lsuite app'), `${app}: links /launcher`);
+    assert.ok(html.includes(`<a class="btn btn--primary" href="#downloads">Get ${app}</a>`), `${app}: the hero leads there`);
+    assert.ok(html.includes('free lsuite account'), `${app}: the account is free`);
+    assert.ok(html.includes(`Version 9.8.7`) && html.includes(`${app} 9.8.7 ·`), `${app}: version shown`);
     assert.ok(!html.includes('First public build coming'), app);
   }
   assert.equal(await downloadTarget('photoshop', 'macos-arm64'), null);
+  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '1.0.1', kimchi: '1.0.2', zenith: '1.0.3', nori: '1.0.4', folio: '1.0.5' });
+  assert.ok(home.includes('<a class="btn btn--primary" href="/launcher/download">Download lsuite'));
+  assert.ok(home.includes('come through the lsuite app with a free account'));
+  for (const v of ['1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5']) assert.ok(home.includes(`Beta · v${v}`), v);
+
+  const server = createServer((req, res) => handle(req, res));
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const base = `http://127.0.0.1:${server.address().port}`;
+    const get = (path, headers = {}) => fetch(base + path, { redirect: 'manual', headers });
+    for (const app of APP_NAMES) {
+      for (const path of [`/${app}/download`, `/${app}/download/macos-arm64`, `/${app}/download/windows-x86_64`]) {
+        const res = await get(path);
+        assert.equal(res.status, 302, path);
+        assert.equal(res.headers.get('location'), '/launcher', path);
+      }
+    }
+    // GET /api/apps stays public; the builds need an app token (and, here, LSUITE_BUILDS_TOKEN).
+    const list = await get('/api/apps');
+    assert.equal(list.status, 200);
+    assert.deepEqual((await list.json()).apps.map((a) => a.id), APP_NAMES);
+    const signedOut = await get('/api/apps/kimchi/latest');
+    assert.equal(signedOut.status, 401);
+    assert.equal((await signedOut.json()).error.message, 'Sign in to lsuite to get the apps: the account is free.');
+    let jar = '';
+    const post = async (path, body) => {
+      const res = await fetch(base + path, { method: 'POST', headers: { 'content-type': 'application/json', ...(jar ? { cookie: jar } : {}) }, body: JSON.stringify(body) });
+      jar = res.headers.get('set-cookie')?.split(';')[0] ?? jar;
+      return res;
+    };
+    await post('/api/account/session', { email: 'grace@example.com', name: 'Grace' });
+    const { code } = await (await post('/api/account/connect', { app: 'lsuite' })).json();
+    const { token } = await (await post('/api/account/token', { code })).json();
+    assert.equal((await get('/api/apps/kimchi/latest', { cookie: jar })).status, 401, 'the site cookie is not an app token');
+    const unset = await get('/api/apps/kimchi/latest', { authorization: `Bearer ${token}` });
+    assert.equal(unset.status, 503);
+    assert.deepEqual((await unset.json()).error, { type: 'api_error', message: "App downloads aren't set up on this server yet." });
+  } finally {
+    server.close();
+  }
 });
 
 test('beta apps: every page says Beta, the nav lists all five, nothing says coming soon', async () => {
