@@ -22,7 +22,7 @@ concurrency:
 jobs:
   test:
     name: ${{ matrix.name }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ (matrix.os == 'ubuntu-22.04' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)) && (vars.LINUX_RUNNER || 'ludodesktop') || matrix.os }}
     timeout-minutes: 90
     strategy:
       fail-fast: false
@@ -43,18 +43,28 @@ jobs:
       HAS_BUILDS: ${{ secrets.LSUITE_BUILDS_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # On ludodesktop, keep target/ between runs (incremental builds).
+          clean: ${{ runner.environment == 'github-hosted' }}
       - name: Linux build dependencies
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
         working-directory: .
         run: |
           sudo apt-get update
           sudo apt-get install -y pkg-config clang libasound2-dev libdbus-1-dev libfontconfig-dev libfreetype-dev \
             libssl-dev libvulkan-dev libwayland-dev libx11-xcb-dev libxcb1-dev libxkbcommon-dev libxkbcommon-x11-dev \
             libzstd-dev libglib2.0-dev
+      - name: Own Rust install per repo on ludodesktop
+        if: runner.environment == 'self-hosted'
+        run: |
+          echo "RUSTUP_HOME=$HOME/.rustup-${GITHUB_REPOSITORY#*/}" >> "$GITHUB_ENV"
+          echo "CARGO_HOME=$HOME/.cargo-${GITHUB_REPOSITORY#*/}" >> "$GITHUB_ENV"
+          echo "$HOME/.cargo-${GITHUB_REPOSITORY#*/}/bin" >> "$GITHUB_PATH"
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
+        if: runner.environment == 'github-hosted'
         with:
           workspaces: launcher -> target
       - name: Clippy
