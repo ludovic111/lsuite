@@ -6,6 +6,10 @@ share, and to manage **lsuite Cloud**, the storage that comes with an lsuite AI 
 ([CLOUD.md](../CLOUD.md)). Written in Rust like the apps: the window is GPUI (the same pinned Zed
 commit as kimchi, nori and folio) and wears the lsuite design system v2.
 
+**Beta: Linux only.** lsuite is released for Linux x86_64 (AppImage and tar.gz) while it is in
+beta; macOS and Windows are coming soon. Their code paths below stay in the source, but no builds
+are made or shipped for them.
+
 ```
 crates/lsuite-core     everything: the command registry (registry.rs), the app catalogue and its
                        release keys (catalog.rs), signed release lookup and verified downloads
@@ -111,11 +115,11 @@ free lsuite account; files are checked against the keys built into the launcher 
 
 1. Set the version in `Cargo.toml` (`[workspace.package]`), `cargo run -p lsuite-cli -- docs`,
    commit and push to `main` of ludovic111/lsuite.
-2. Build and sign with the suite release workflow (it holds the Apple Developer ID and
-   notarization secrets, and `LSUITE_UPDATE_SIGNING_KEY`):
+2. Build and sign with the suite release workflow (it holds `LSUITE_UPDATE_SIGNING_KEY`, and the
+   Apple Developer ID and notarization secrets for when macOS returns):
    `gh workflow run suite-build.yml -R ludovic111/kimchi -f app=lsuite -f ref=<full commit SHA>`
-   (macOS arm64 and x86_64 signed and notarized, Windows installer and zip, Linux AppImage and
-   tar.gz, each update file signed with `lsuite-release sign`).
+   (Linux AppImage and tar.gz during the beta, each update file signed with `lsuite-release
+   sign`; the macOS and Windows matrix lines are commented out until they ship).
 3. Download the artifacts into one folder, write `latest.json` and the checksums, and publish:
    ```bash
    gh run download <run id> -R ludovic111/kimchi -D dist && mv dist/*/* dist/
@@ -132,7 +136,7 @@ people install by hand.
 
 ## Limits
 
-- zenith has no Windows build, so the launcher offers it on macOS and Linux only.
+- Beta: Linux only. macOS and Windows are coming soon; the launcher has no builds for them yet.
 - Apps installed by their Windows installers go where the installer puts them
   (`%LOCALAPPDATA%\<app>`), whatever `LSUITE_APPS_DIR` says.
 - The file picker needs the system's portal on Linux; without one, uploads ask for a path

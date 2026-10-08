@@ -59,7 +59,8 @@ Ship `docs/AI_CONTROL.md` (how to drive the app) and the generated `docs/COMMAND
   anything is replaced; the previous copy is kept until the new one starts.
 - `<APP>_NO_UPDATE=1` and a setting turn the check off. "Check for updates…" is also a command.
 - Release assets use stable names per platform so the lsuite app finds them (`launcher/` in the
-  lsuite repo): macOS arm64 and x86_64 (signed and notarized), Windows x86_64, Linux x86_64. The
+  lsuite repo): Linux x86_64 during the beta; macOS (arm64 and x86_64, signed and notarized) and
+  Windows x86_64 are coming soon, and no builds are made for them until then. The
   existing `<APP>_UPDATE_URL` overrides keep working for tests.
 
 ## 4. Apps work together
@@ -180,8 +181,7 @@ monthly prices are $12 / $29 / $79 USD.
 | Agent harness ([HARNESS.md](HARNESS.md)) | 🟡 13 skills, looks with loudness ([#34](https://github.com/ludovic111/ryolune/pull/34)) | 🟡 13 skills, frame sheets with loudness ([#16](https://github.com/ludovic111/kimchi/pull/16)) | 🟡 14 skills, brief and lsuite apps for its threads ([#10](https://github.com/ludovic111/zenith/pull/10)) | 🟡 11 skills, contrast, bleed and resolution checks ([#1](https://github.com/ludovic111/nori/pull/1)) | 🟡 12 skills, pages, slides and sheets as images ([#1](https://github.com/ludovic111/folio/pull/1)) |
 | Evals | 🟡 13 jobs; 2 run, passed | 🟡 12 jobs; 3 run, passed | 🟡 11 jobs; 2 run, passed | 🟡 12 jobs; 2 run, passed | 🟡 11 jobs; 2 run, passed |
 
-For nori and folio, in-place updates cover macOS bundles, Linux AppImages and installed Windows
-copies. Portable Windows copies and Linux system packages link to verified release downloads.
-Mac packages are signed and notarized; installing this rollout on the owner’s Macs is still
-blocked by unavailable SSH access. nori’s physical tablet and Adobe interoperability checks
+While lsuite is in beta, every app ships for Linux only (owner's decision, 2026-10-08): AppImages
+update in place, and tarballs and Linux system packages link to verified release downloads. macOS
+and Windows are coming soon. nori’s physical tablet and Adobe interoperability checks
 remain beta validation limits, detailed in its release notes.

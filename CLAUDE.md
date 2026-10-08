@@ -12,6 +12,12 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   kimchi (video), zenith (code), nori (image and design: Photoshop + Illustrator + InDesign in one
   document) and folio (office: documents, spreadsheets and presentations). The suite's line: every
   kind of creative and office tool, combined, free and open source, driven by your agent.
+- **Linux only during the beta** (owner's decision, 2026-10-08): the launcher and the five apps
+  are built and shipped for Linux x86_64 only; macOS and Windows are "coming soon" everywhere on
+  the site (hero lines, stats, the launcher's download tiles, `/launcher/download/<macos|windows…>`
+  → `/launcher#downloads`). Their files were removed from every release (launcher, lsuite-builds
+  and the apps' public releases); the release workflows keep the macOS/Windows matrix lines
+  commented out. Past changelog cards still describe what those versions shipped.
 - **The apps come only through the lsuite app** (DISTRIBUTION.md, owner's decision 2026-10-07,
   like Creative Cloud): a free lsuite account gets every app; the source stays open. Each app page
   has "Get <app> in the lsuite app" (`#downloads`, primary button `/launcher/download`, then

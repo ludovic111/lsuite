@@ -33,14 +33,15 @@ function ready() {
     reveals.forEach((el) => el.classList.add('in'));
   }
 
-  // "Download for <your OS>": buttons carry data-download="<app>" and per-OS hrefs.
+  // "Download for <your OS>": buttons carry data-download="<app>" and per-OS hrefs. An OS with no
+  // href is coming soon (lsuite's beta is Linux only): the button says so and points at #downloads.
   const os = detectPlatform();
   if (os) {
     document.querySelectorAll('[data-download]').forEach((a) => {
       const href = a.getAttribute(`data-href-${os}`);
-      if (href) a.setAttribute('href', href);
+      a.setAttribute('href', href || '#downloads');
       const label = a.querySelector('[data-os]');
-      if (label) label.textContent = `Download for ${OS_NAME[os]}`;
+      if (label) label.textContent = href ? `Download for ${OS_NAME[os]}` : `Coming soon on ${OS_NAME[os]}`;
     });
     document.querySelectorAll(`.dl a[data-os-match~="${os}"]`).forEach((a, i) => {
       if (i === 0) a.classList.add('is-you');

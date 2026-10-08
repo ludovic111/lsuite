@@ -54,7 +54,7 @@
 
 /* The design system's tiers: chrome and cards are tier 1 (translucent over the grain), floating and
    code tier 2; work (screenshots, the illustration's canvas) stays solid. */
-.nav, .card, .cell, .table-wrap, .versus > div, .stats > div, .dl a, .band, .tabs, .pill, .faq details, .foot, .release, .releases__older summary {
+.nav, .card, .cell, .table-wrap, .versus > div, .stats > div, .dl a, .dl__soon, .band, .tabs, .pill, .faq details, .foot, .release, .releases__older summary {
   background: var(--ls-glass-1-bg);
   -webkit-backdrop-filter: var(--ls-glass-1-filter);
   backdrop-filter: var(--ls-glass-1-filter);
@@ -65,7 +65,7 @@
   backdrop-filter: var(--ls-glass-2-filter);
 }
 @media (prefers-reduced-transparency: reduce) {
-  .nav, .card, .cell, .table-wrap, .versus > div, .stats > div, .dl a, .band, .tabs, .pill, .faq details, .foot, .release, .releases__older summary, .term, .code, .code__copy {
+  .nav, .card, .cell, .table-wrap, .versus > div, .stats > div, .dl a, .dl__soon, .band, .tabs, .pill, .faq details, .foot, .release, .releases__older summary, .term, .code, .code__copy {
     background: var(--ls-glass-opaque); -webkit-backdrop-filter: none; backdrop-filter: none;
   }
 }
@@ -423,7 +423,7 @@ figcaption b { color: var(--text-2); font-weight: 600; }
 
 /* ---------- Downloads ---------- */
 .dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-.dl a {
+.dl a, .dl__soon {
   display: grid; gap: 4px; padding: 18px 18px 16px; border-radius: 0; text-decoration: none;
   border: 1px solid var(--ls-glass-edge); box-shadow: var(--ls-glass-highlight); transition: border-color 0.2s, background 0.2s;
 }
@@ -433,6 +433,7 @@ figcaption b { color: var(--text-2); font-weight: 600; }
 .dl span { font: 400 12.5px/1.5 var(--mono); color: var(--text-3); }
 .dl a.is-you { border-color: color-mix(in srgb, var(--accent-fill) 60%, var(--ls-glass-edge)); }
 .dl a.is-you span::before { content: "your system · "; color: var(--accent); }
+.dl__soon { opacity: 0.72; }
 
 /* ---------- Theme gallery ---------- */
 .tabs { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 0; border: 1px solid var(--ls-glass-edge); box-shadow: var(--ls-glass-highlight); }
