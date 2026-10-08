@@ -155,7 +155,7 @@ What the launcher reads to know which apps exist, served by `server.js` (no auth
 ```json
 {"apps": [{"id": "ryolune", "name": "ryolune", "kind": "music", "summary": "The DAW your AI can drive.",
   "page": "https://lsuite.xyz/ryolune", "repo": "ludovic111/ryolune", "version": "0.15.3",
-  "published": true, "platforms": ["macos-arm64", "macos-x86_64", "windows-x86_64", "windows-zip", "linux-x86_64"]}, …]}
+  "published": true, "platforms": ["linux-x86_64"]}, …]}
 ```
 
 `kind` is `music`, `video`, `code`, `image` or `office`; `repo` is the GitHub `owner/name`;

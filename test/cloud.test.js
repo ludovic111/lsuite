@@ -548,7 +548,8 @@ test('GET /api/apps: the five apps for the launcher', async () => {
       assert.equal(app.repo, `ludovic111/${app.id}`);
       assert.match(app.version, /^\d+\.\d+\.\d+/);
       assert.equal(app.published, true);
-      assert.ok(app.platforms.includes('macos-arm64'));
+      // Beta: Linux only (macOS and Windows coming soon).
+      assert.ok(app.platforms.length && app.platforms.every((p) => p.startsWith('linux')), app.id);
       assert.ok(app.summary && !app.summary.includes('\n'));
     }
     assert.equal((await fetch(`${base}/api/apps`, { method: 'POST' })).status, 405);

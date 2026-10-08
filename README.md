@@ -8,6 +8,10 @@ in beta:
 The five apps come only through it, with a free lsuite account ([DISTRIBUTION.md](DISTRIBUTION.md)):
 their builds live in the private `ludovic111/lsuite-builds`, served by `builds.js`.
 
+**Beta: Linux only.** While lsuite is in beta, the launcher and the five apps are built and
+shipped for Linux x86_64 only; macOS and Windows are coming soon (the site says so, and no builds
+are made for them).
+
 | App | Kind | Page | Source |
 | --- | --- | --- | --- |
 | ryolune | music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) |
@@ -87,7 +91,7 @@ are under `/design/`.
 | Path | Does |
 | --- | --- |
 | `/<app>/download[/<platform>]` | 302 to `/launcher` for the five apps: they come only through the lsuite app (DISTRIBUTION.md). Their pages say "Get <app> in the lsuite app". |
-| `/launcher/download[/<platform>]` | 302 to the matching asset of the newest published `launcher-vX.Y.Z` release of `ludovic111/lsuite` (`DOWNLOADS` in `server.js`, `tagPrefix`, looked up on the GitHub API, cached 10 min); without a platform the visitor's OS picks one; with no matching asset, that release's page, or the releases list: `macos-arm64`, `macos-x86_64` (.dmg), `windows-x86_64` (setup .exe), `windows-zip`, `linux-x86_64` (.AppImage), `linux-tar` (.tar.gz). The launcher is not one of the apps: not in `/api/apps`, no `/launcher/support`. |
+| `/launcher/download[/<platform>]` | 302 to the matching asset of the newest published `launcher-vX.Y.Z` release of `ludovic111/lsuite` (`DOWNLOADS` in `server.js`, `tagPrefix`, looked up on the GitHub API, cached 10 min); without a platform the visitor's OS picks one (macOS and Windows, coming soon, land on `/launcher#downloads`); with no matching asset, that release's page, or the releases list: `macos-arm64`, `macos-x86_64` (.dmg), `windows-x86_64` (setup .exe), `windows-zip`, `linux-x86_64` (.AppImage), `linux-tar` (.tar.gz). The launcher is not one of the apps: not in `/api/apps`, no `/launcher/support`. |
 | `/api/apps/<app>/latest`, `…/latest.json`, `…/releases/latest`, `…/files/<tag>/<name>` | The apps' builds (DISTRIBUTION.md, `builds.js`), for any signed-in app token (Free included; not the site's cookie): the newest release of `<app>-v*` in the private `ludovic111/lsuite-builds` (no drafts or pre-releases, newest by semver), with `latest.json` and `SHA256SUMS(.sig)` read on the server (cached 5 min) and every download address rewritten to the file route, which answers a 302 to GitHub's short-lived address (the file never passes through the site, the token never leaves it). Needs `LSUITE_BUILDS_TOKEN` (a fine-grained token, read-only on `lsuite-builds`; never in Git): without it 503. 401 "Sign in to lsuite to get the apps: the account is free."; GitHub errors 502. |
 | `/api/ai/…`, `/api/account/…` | lsuite AI and accounts (AI.md, `ai.js`): JSON, Anthropic-compatible `/api/ai/v1/messages`. `LSUITE_DATA_DIR` holds account state. Live service requires explicit `LSUITE_MODE=production` and the complete Stripe, Anthropic and verified-email configuration in AI.md; adding an API key alone never turns demo accounts into paid access. |
 | `/api/cloud`, `/api/cloud/…` | lsuite Cloud (CLOUD.md, `cloud.js` through `ai.js`): the account's files, app token (GET also takes the session cookie). Stored under `LSUITE_DATA_DIR/cloud/` (`production-cloud/` in production), a temporary folder without it. Demo caps: `LSUITE_CLOUD_DEMO_QUOTA`, `LSUITE_CLOUD_DEMO_MAX_FILE`, `LSUITE_CLOUD_DEMO_TOTAL` (bytes; 100 MB, 25 MB, 300 MB), and `LSUITE_CLOUD_DISK_RESERVE` (100 MB always left free on the disk). With `LSUITE_CLOUD_S3_ENDPOINT`, `…_BUCKET`, `…_ACCESS_KEY_ID`, `…_SECRET_ACCESS_KEY` (optional `…_REGION`, `…_PREFIX`, `…_PATH_STYLE`), the files go to an S3-compatible object store and the index stays in the data dir; production then applies the plans' sizes (CLOUD.md, "The object store"). |
