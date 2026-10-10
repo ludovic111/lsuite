@@ -11,6 +11,10 @@ for name in APPLE_CERTIFICATE_P12_BASE64 APPLE_SIGNING_IDENTITY APPLE_API_KEY_P8
   fi
 done
 keychain="$RUNNER_TEMP/signing.keychain-db"
+# On the self-hosted Mac the runner is the owner's account: save the search list exactly as it is,
+# before create-keychain adds to it, so scripts/cleanup-apple-signing.sh puts it back (the default
+# keychain is never touched).
+security list-keychains -d user | sed -e 's/^ *"//' -e 's/"$//' > "$RUNNER_TEMP/keychains-before"
 password=$(uuidgen)
 security create-keychain -p "$password" "$keychain"
 security set-keychain-settings -lut 21600 "$keychain"
@@ -21,10 +25,7 @@ security import "$RUNNER_TEMP/developer-id.p12" -k "$keychain" -P "${APPLE_CERTI
   -f pkcs12 -T /usr/bin/codesign
 rm -f "$RUNNER_TEMP/developer-id.p12"
 security set-key-partition-list -S apple-tool:,apple: -s -k "$password" "$keychain" > /dev/null
-# Search the new keychain first, keeping the user's own keychains after it. On the self-hosted
-# Mac the runner is the owner's account: the list is saved exactly as it was, and
-# scripts/cleanup-apple-signing.sh puts it back (the default keychain is never touched).
-security list-keychains -d user | sed -e 's/^ *"//' -e 's/"$//' > "$RUNNER_TEMP/keychains-before"
+# Search the new keychain first, keeping the user's own keychains after it.
 existing=()
 while IFS= read -r line; do existing+=("$line"); done < "$RUNNER_TEMP/keychains-before"
 security list-keychains -d user -s "$keychain" ${existing[@]+"${existing[@]}"}
