@@ -25,8 +25,7 @@ an outside agent (Claude Code, Codex) connected through the app's MCP server.
 4. **Eyes and ears.** The agent can look at and measure what it made, and pictures reach the model
    as images (built-in agent and MCP alike): a frame or range of the timeline (kimchi), a page or
    layer (nori), a page, a slide or a sheet range (folio), a bar range's waveform, spectrum and
-   piano roll with loudness, true peak and clipping numbers (ryolune), the running app or a web
-   preview (zenith). `harness.look` is the app's best picture of the current work.
+   piano roll with loudness, true peak and clipping numbers (ryolune). `harness.look` is the app's best picture of the current work.
 5. **A finish routine.** Before it says it's done the agent looks and measures, compares the
    result with the request, fixes what's off (up to three passes), then reports what changed in a
    few lines. Written into the brief and the skills; checked by the evals.
@@ -41,9 +40,7 @@ an outside agent (Claude Code, Codex) connected through the app's MCP server.
 8. **The suite harness.** In the lsuite app, the **lsuite agent** takes a job that spans apps
    ("score this cut", "turn this report into a deck and a poster"), plans it, drives each app
    through its MCP server with that app's skills, moves files between apps (STANDARD.md section 4)
-   and checks the result in each. zenith hands its Claude Code and Codex threads the lsuite apps'
-   MCP servers **with** their briefs and skills (appended instructions), so a coding agent knows
-   how to use them.
+   and checks the result in each.
 
 ## Commands (same names everywhere)
 
@@ -65,8 +62,8 @@ an outside agent (Claude Code, Codex) connected through the app's MCP server.
 
 ## Status (2026-10-08)
 
-All five apps have the eight parts in review, not merged yet (STANDARD.md's status table links
-each pull request): ryolune 0.16.0, kimchi 0.11.0, zenith 0.5.0, nori 0.2.0 and folio 0.2.0. Each
+All four apps have the eight parts in review, not merged yet (STANDARD.md's status table links
+each pull request): ryolune 0.16.0, kimchi 0.11.0, nori 0.2.0 and folio 0.2.0. Each
 has 11 to 13 evals; two or three of each ran for real with Sonnet and passed. The full sets are to
 run with the release model before each app's release. The lsuite agent is in launcher 0.2.0.
 Each app's CLAUDE.md "lsuite" section tracks its parts; `evals/RESULTS.md` holds its scores.

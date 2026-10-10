@@ -109,7 +109,7 @@ fn sign_in_card(ws: &Workspace, entity: gpui::Entity<Workspace>, waiting: Option
                 .p(px(20.))
                 .glass(t.glass1)
                 .child(div().flex().items_center().gap(px(10.)).child(icon("sparkles")).child(div().text_size(px(sz::LG)).font_weight(FontWeight::BOLD).child("No setup. Sign in and your agents work.")))
-                .child(div().text_color(t.text_2).child("Signing in here signs in every lsuite app on this computer: ryolune, kimchi, zenith, nori and folio use the same account, and lsuite AI is the first provider in each of their agents."))
+                .child(div().text_color(t.text_2).child("Signing in here signs in every lsuite app on this computer: ryolune, kimchi, nori and folio use the same account, and lsuite AI is the first provider in each of their agents."))
                 .child(match waiting_box {
                     Some(w) => w.into_any_element(),
                     None => div().flex().child(Button::new("signin", "Sign in with the browser").with_icon("log-in").primary().on_click(|_, _, cx| cx.store().update(cx, |s, cx| s.run("account.signIn", json!({}), cx)))).into_any_element(),

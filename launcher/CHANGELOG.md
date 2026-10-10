@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **zenith is no longer an lsuite app**: the launcher no longer lists, installs or updates it.
+  lsuite is now ryolune, kimchi, nori and folio. A copy of zenith that is already installed is
+  left where it is.
+
 ## 0.2.0
 
 - **The lsuite agent**: one agent for jobs that span the apps (Agent area, `agent.*`). It reads

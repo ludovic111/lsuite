@@ -67,7 +67,7 @@ pub struct Spec {
     pub perm: Perm,
 }
 
-const APP: Param = req("app", Kind::Str, "The app: ryolune, kimchi, zenith, nori or folio.");
+const APP: Param = req("app", Kind::Str, "The app: ryolune, kimchi, nori or folio.");
 
 pub const COMMANDS: &[Spec] = &[
     Spec { name: "apps.list", summary: "Every lsuite app: installed or not, its version, the latest one, whether it is open. `refresh` asks lsuite.xyz again (otherwise the last check is reused for 6 hours). Getting the apps needs a free lsuite account.", params: &[opt("refresh", Kind::Bool, "Look for new versions now.")], perm: Perm::Read },

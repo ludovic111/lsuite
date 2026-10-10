@@ -127,7 +127,7 @@ test('plugin.toml: the TOML a manifest uses', () => {
 test('the catalogue: empty at first, the Pass plans, the apps; the plans say what includes it', async (t) => {
   const s = await start();
   t.after(s.close);
-  assert.deepEqual(await s.market.catalogue(), { plugins: [], apps: ['ryolune', 'kimchi', 'zenith', 'nori', 'folio'], pass: { required: true, plans: ['plus', 'pro', 'studio'] } });
+  assert.deepEqual(await s.market.catalogue(), { plugins: [], apps: ['ryolune', 'kimchi', 'nori', 'folio'], pass: { required: true, plans: ['plus', 'pro', 'studio'] } });
   await error(await s.call('GET', '/api/marketplace?app=photoshop'), 400, 'invalid_request_error');
   await error(await s.call('GET', '/api/marketplace/plugins/com.example.nothing'), 404, 'not_found_error');
   await error(await s.call('POST', '/api/marketplace'), 405, 'invalid_request_error');

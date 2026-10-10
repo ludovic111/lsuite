@@ -349,7 +349,7 @@ pub(crate) mod tests {
         assert_eq!(FileKind::of("folio-macos-arm64.app.tar.gz", Os::Macos), Some(FileKind::MacBundleTarGz));
         assert_eq!(FileKind::of("ryolune-macos-arm64.zip", Os::Macos), Some(FileKind::MacZip));
         assert_eq!(FileKind::of("nori_amd64.AppImage", Os::Linux), Some(FileKind::AppImage));
-        assert_eq!(FileKind::of("zenith-linux-x86_64.tar.gz", Os::Linux), Some(FileKind::TarGz));
+        assert_eq!(FileKind::of("ryolune-linux-x86_64.tar.gz", Os::Linux), Some(FileKind::TarGz));
         assert_eq!(FileKind::of("kimchi_x64-setup.exe", Os::Windows), Some(FileKind::WindowsInstaller));
         assert_eq!(FileKind::of("ryolune-windows-x86_64.zip", Os::Windows), Some(FileKind::Zip));
         assert_eq!(FileKind::of("kimchi_aarch64.dmg", Os::Macos), None);
@@ -364,7 +364,7 @@ pub(crate) mod tests {
         let sig = format!("ryolune-ed25519 {}\n", base64::engine::general_purpose::STANDARD.encode(sk.sign(sums).to_bytes()));
         verify_checksums(sums, &sig, &key_hex, "ryolune-ed25519").unwrap();
         assert!(verify_checksums(b"abd  ryolune-linux-x86_64.tar.gz\n", &sig, &key_hex, "ryolune-ed25519").is_err());
-        assert!(verify_checksums(sums, &sig, &key_hex, "zenith-ed25519").is_err());
+        assert!(verify_checksums(sums, &sig, &key_hex, "kimchi-ed25519").is_err());
         let other = ed25519_dalek::SigningKey::from_bytes(&[8u8; 32]);
         let other_hex: String = other.verifying_key().as_bytes().iter().map(|b| format!("{b:02x}")).collect();
         assert!(verify_checksums(sums, &sig, &other_hex, "ryolune-ed25519").is_err());

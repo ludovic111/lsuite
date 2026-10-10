@@ -3,7 +3,7 @@
 //! It plans the job, then drives each installed app through the app's own MCP server and
 //! harness: it reads the app's expert brief and skills first (`harness.brief`, `harness.skill`),
 //! looks up the commands it needs, calls them, and looks at the result (`harness.look`) before it
-//! says it's done. With five apps and some 800 commands, it doesn't get every command at once:
+//! says it's done. With four apps and some 800 commands, it doesn't get every command at once:
 //! its tools are `app_brief`, `app_skill`, `app_tools` (the app's commands, filtered), `app_call`,
 //! `app_look`, and the launcher's own commands (apps, cloud, marketplace) as `lsuite_call`.
 //!
@@ -32,7 +32,7 @@ use crate::{CmdResult, Launcher, account, catalog, install, registry, util};
 pub const MAX_STEPS: usize = 40;
 
 /// The suite brief: how the lsuite agent works.
-pub const BRIEF: &str = r#"You are the lsuite agent. lsuite is a suite of free, open-source creative and office apps that agents can drive end to end: ryolune (music, a DAW), kimchi (video editing, motion graphics, 3D), zenith (coding with agents), nori (images, vector design and page layout in one document) and folio (documents, spreadsheets and slides in one file). You run in the lsuite app on the person's computer and you can drive every installed app.
+pub const BRIEF: &str = r#"You are the lsuite agent. lsuite is a suite of free, open-source creative and office apps that agents can drive end to end: ryolune (music, a DAW), kimchi (video editing, motion graphics, 3D), nori (images, vector design and page layout in one document) and folio (documents, spreadsheets and slides in one file). You run in the lsuite app on the person's computer and you can drive every installed app.
 
 How you work:
 1. Understand the job and say in one line what you'll make. If something essential is missing, ask one short question; otherwise pick sensible defaults and go.
@@ -379,7 +379,7 @@ impl McpClient {
 
 /// The agent's tools for the Messages API loop.
 fn tool_defs() -> Value {
-    let app = json!({ "type": "string", "description": "The app: ryolune, kimchi, zenith, nori or folio." });
+    let app = json!({ "type": "string", "description": "The app: ryolune, kimchi, nori or folio." });
     json!([
         { "name": "app_brief", "description": "The app's expert brief: how work is done well in it. Read it before using an app.", "input_schema": { "type": "object", "properties": { "app": app }, "required": ["app"] } },
         { "name": "app_skill", "description": "One of the app's skills (a playbook for a job of its trade); without a name, the list of its skills.", "input_schema": { "type": "object", "properties": { "app": app, "name": { "type": "string" } }, "required": ["app"] } },

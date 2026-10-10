@@ -7,5 +7,5 @@ Exec=lsuite
 Icon=lsuite
 Terminal=false
 Categories=Utility;
-Keywords=lsuite;launcher;cloud;ryolune;kimchi;zenith;nori;folio;
+Keywords=lsuite;launcher;cloud;ryolune;kimchi;nori;folio;
 StartupWMClass=xyz.lsuite.launcher

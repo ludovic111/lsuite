@@ -15,7 +15,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWriteExt};
 
 const PROTOCOLS: [&str; 4] = ["2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25"];
 
-const INSTRUCTIONS: &str = "The lsuite launcher: installs, updates, opens and removes the lsuite apps (ryolune music, kimchi video, zenith code, nori image and design, folio office) from their signed releases; shows the lsuite account and its lsuite Pass; manages lsuite Cloud, the storage that comes with the Pass (upload, download, folders, synced folders); and the lsuite Marketplace of plugins made by people who use lsuite (browse, install, publish what you build). Start with apps_list, cloud_list or market_list. Each installed app has its own MCP server (apps_list gives its `mcp` path) to drive it.";
+const INSTRUCTIONS: &str = "The lsuite launcher: installs, updates, opens and removes the lsuite apps (ryolune music, kimchi video, nori image and design, folio office) from their signed releases; shows the lsuite account and its lsuite Pass; manages lsuite Cloud, the storage that comes with the Pass (upload, download, folders, synced folders); and the lsuite Marketplace of plugins made by people who use lsuite (browse, install, publish what you build). Start with apps_list, cloud_list or market_list. Each installed app has its own MCP server (apps_list gives its `mcp` path) to drive it.";
 
 #[tokio::main]
 async fn main() {

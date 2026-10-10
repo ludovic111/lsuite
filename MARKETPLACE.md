@@ -1,6 +1,6 @@
 # The lsuite Marketplace: plugins made by the people who use lsuite
 
-Decided on 2026-10-07: **lsuite Pass** (PASS.md) includes a marketplace of plugins for the five
+Decided on 2026-10-07: **lsuite Pass** (PASS.md) includes a marketplace of plugins for the four
 apps, made by the people who use them and by lsuite itself. Anyone with an lsuite account can
 publish; installing from the marketplace comes with a paid Pass plan. Plugins are the bundles of
 PLUGINS.md (Rust, frozen `repr(C)` ABI per app), so **every version is reviewed by lsuite before
@@ -85,7 +85,7 @@ covers each):
 - **Order.** A listing shows its highest approved version (semantic-version order) that has at
   least one file; the catalogue lists the most recently approved first.
 - **Submit.** `id`: lowercase reverse-DNS (`[a-z0-9][a-z0-9_-]*` between dots, two parts at least,
-  128 characters); `version`: semantic (`1.2.0`, `1.2.0-beta.1`); `app`: one of the five; `kind`:
+  128 characters); `version`: semantic (`1.2.0`, `1.2.0-beta.1`); `app`: one of the four; `kind`:
   `[a-z][a-z0-9-]{0,31}`; `abi`: a positive integer; `name` ≤ 60, `description` ≤ 300 (one line),
   `notes` ≤ 2000. Anything else → 400 `invalid_request_error`. Submitting a pending or rejected
   version again updates it and makes it pending (201 too; a rejected one has no files left, so it is

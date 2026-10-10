@@ -1,7 +1,7 @@
 # Getting the apps: only through the lsuite app
 
-Decided by the owner on 2026-10-07: like Adobe's Creative Cloud, the five apps (ryolune, kimchi,
-zenith, nori, folio) are obtained **only through the lsuite app** (the launcher, `launcher/`),
+Decided by the owner on 2026-10-07: like Adobe's Creative Cloud, the four apps (ryolune, kimchi,
+nori, folio) are obtained **only through the lsuite app** (the launcher, `launcher/`),
 which needs a **free lsuite account**. The site offers the lsuite app alone; the apps' builds
 are no longer public. The apps stay free and their source stays open (MIT): anyone may build them
 from source, but the ready-made builds come through lsuite.
@@ -36,7 +36,7 @@ the apps: the account is free." Unknown app: 404. Errors in the shape of AI.md.
 | --- | --- |
 | `GET /api/apps/<app>/latest` | The app's newest release: `{app, version, tag, notes, files: [{name, size}], manifest, sha256sums, sha256sumsSig}`: `manifest` is the release's `latest.json` with every `url` rewritten to the file route below (null when the release has none); `sha256sums` and `sha256sumsSig` are the texts of `SHA256SUMS` and `SHA256SUMS.sig` (null when absent). Cached 5 minutes. |
 | `GET /api/apps/<app>/latest.json` | Just the rewritten `latest.json` (for the updaters of kimchi, nori and folio, which read that format). 404 when the release has none. |
-| `GET /api/apps/<app>/releases/latest` | The release in the GitHub API's shape, `{tag_name, name, body, assets: [{name, size, browser_download_url}]}`, with `browser_download_url` on the file route (for the updaters of ryolune and zenith, which read GitHub's API). `tag_name` is `v<version>` (`v0.16.0`), as the app's own releases were tagged, so those updaters parse it unchanged; the builds tag (`ryolune-v0.16.0`) stays in the `browser_download_url` paths and in `/latest`'s `tag`. |
+| `GET /api/apps/<app>/releases/latest` | The release in the GitHub API's shape, `{tag_name, name, body, assets: [{name, size, browser_download_url}]}`, with `browser_download_url` on the file route (for ryolune's updater, which reads GitHub's API). `tag_name` is `v<version>` (`v0.16.0`), as the app's own releases were tagged, so that updater parses it unchanged; the builds tag (`ryolune-v0.16.0`) stays in the `browser_download_url` paths and in `/latest`'s `tag`. |
 | `GET /api/apps/<app>/files/<tag>/<name>` | 302 to a short-lived download address of that file (GitHub's signed URL; the token never leaves the server). Only files of that app's releases. |
 
 `GET /api/apps` (the list the lsuite app shows) is unchanged and public.
@@ -56,7 +56,7 @@ lsuite account gets you every app").
 ## In each app
 
 The updater (STANDARD.md section 3) asks lsuite.xyz instead of GitHub, with the account's token:
-kimchi, nori and folio fetch `<server>/api/apps/<app>/latest.json`; ryolune and zenith fetch
+kimchi, nori and folio fetch `<server>/api/apps/<app>/latest.json`; ryolune fetches
 `<server>/api/apps/<app>/releases/latest` and its `SHA256SUMS(.sig)` files. `<server>` is
 `LSUITE_ACCOUNT_SERVER` or the account's server, else `https://lsuite.xyz`; the token comes from
 `~/.lsuite/account.json` (`LSUITE_HOME`), sent as `Authorization: Bearer`. Signed out, the update

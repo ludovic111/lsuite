@@ -465,7 +465,6 @@ fn write_desktop_entry(app: &App, exe: &Path) -> std::io::Result<()> {
     let categories = match app.kind {
         "music" => "AudioVideo;Audio;",
         "video" => "AudioVideo;Video;",
-        "code" => "Development;",
         "image" => "Graphics;",
         _ => "Office;",
     };

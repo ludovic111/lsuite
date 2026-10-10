@@ -44,7 +44,6 @@ export const PAGES = {
   '/': 'index.html',
   '/ryolune': 'ryolune/index.html',
   '/kimchi': 'kimchi/index.html',
-  '/zenith': 'zenith/index.html',
   '/nori': 'nori/index.html',
   '/folio': 'folio/index.html',
   '/launcher': 'pages/launcher.html',
@@ -153,7 +152,7 @@ export function osFor(userAgent = '') {
  * platform each OS gets by default. `/launcher/download/<platform>` looks the asset up in the latest
  * published release; a platform with no matching asset goes to the release page. While lsuite is in
  * beta only Linux is built: macOS and Windows visitors land on `/launcher#downloads` ("coming
- * soon"). The five apps come only through the lsuite app (DISTRIBUTION.md): their `/<app>/download[/…]` lands on
+ * soon"). The four apps come only through the lsuite app (DISTRIBUTION.md): their `/<app>/download[/…]` lands on
  * `/launcher`, and their tables only say which platforms `GET /api/apps` lists. `published:
  * false` keeps an app's route table ready before its first release (the route lands on the app's
  * page). `tagPrefix`: the release tags (`v` by default), for a repository that releases more than one thing.
@@ -175,13 +174,6 @@ export const DOWNLOADS = {
       'linux-rpm': /\.x86_64\.rpm$/,
     },
     byOs: { linux: 'linux-appimage' },
-  },
-  zenith: {
-    repo: 'ludovic111/zenith',
-    patterns: {
-      'linux-x86_64': /\/zenith-linux-x86_64\.tar\.gz$/,
-    },
-    byOs: { linux: 'linux-x86_64' },
   },
   // Published image and design app builds.
   nori: {
@@ -212,8 +204,8 @@ export const DOWNLOADS = {
     byOs: { linux: 'linux-x86_64' },
   },
 };
-/** The five apps (`/api/apps`, `/<app>/support`). The launcher has downloads but isn't one of them. */
-export const APP_NAMES = ['ryolune', 'kimchi', 'zenith', 'nori', 'folio'];
+/** The four apps (`/api/apps`, `/<app>/support`). The launcher has downloads but isn't one of them. */
+export const APP_NAMES = ['ryolune', 'kimchi', 'nori', 'folio'];
 
 const releaseCache = new Map();
 /**
@@ -243,17 +235,16 @@ async function latestRelease(repo, prefix = null) {
 }
 
 // Shown when GitHub cannot be reached. Pages say `%VERSION:<app>%` and get the version of the
-// latest published release, so the page never announces a version you cannot get yet. The five
+// latest published release, so the page never announces a version you cannot get yet. The four
 // apps' versions come from the private builds (`builds.js`, DISTRIBUTION.md) once
 // `LSUITE_BUILDS_TOKEN` is set; the launcher's from its public `launcher-vX.Y.Z` releases in ludovic111/lsuite.
-const FALLBACK_VERSIONS = { ryolune: '0.15.3', kimchi: '0.10.0', zenith: '0.4.0', nori: '0.1.0', folio: '0.1.0', launcher: '0.1.1' };
-const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', zenith: 'ludovic111/zenith', nori: 'ludovic111/nori', folio: 'ludovic111/folio', launcher: 'ludovic111/lsuite' };
+const FALLBACK_VERSIONS = { ryolune: '0.15.3', kimchi: '0.10.0', nori: '0.1.0', folio: '0.1.0', launcher: '0.1.1' };
+const REPOS = { ryolune: 'ludovic111/ryolune', kimchi: 'ludovic111/kimchi', nori: 'ludovic111/nori', folio: 'ludovic111/folio', launcher: 'ludovic111/lsuite' };
 
 /** What `GET /api/apps` says of each app besides its downloads (the home page's cards). */
 const APP_INFO = {
   ryolune: { kind: 'music', summary: 'The DAW your AI can drive.' },
   kimchi: { kind: 'video', summary: 'A video editor where generation is part of the cut.' },
-  zenith: { kind: 'code', summary: 'An app for coding with agents.' },
   nori: { kind: 'image', summary: 'Pixels, vectors and pages in one document.' },
   folio: { kind: 'office', summary: 'Documents, spreadsheets and slides in one app.' },
 };
@@ -264,7 +255,7 @@ export function versionOf(tag, prefix = 'v') {
 }
 
 /**
- * `{ app: version }` for every app (or the launcher) whose version a page asks for. The five apps:
+ * `{ app: version }` for every app (or the launcher) whose version a page asks for. The four apps:
  * from `source` (the private builds, `builds.js`) when it is configured, else their public releases
  * while those last; the fallback when neither answers.
  */
@@ -306,7 +297,7 @@ export async function appsDocument(origin, versions) {
 }
 
 /**
- * Where `/<app>/download[/<platform>]` sends the visitor. The five apps come only through the
+ * Where `/<app>/download[/<platform>]` sends the visitor. The four apps come only through the
  * lsuite app (DISTRIBUTION.md): their downloads land on its page; the launcher's are its releases.
  */
 export async function downloadTarget(app, wanted, userAgent) {
@@ -465,7 +456,7 @@ function originOf(req) {
 }
 
 async function notFound(req, res) {
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Not found · lsuite</title><link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml"><link rel="stylesheet" href="/design/tokens.css"><link rel="stylesheet" href="/assets/styles.css"></head><body>${(await readFile(join(ROOT, 'partials', 'nav.html'), 'utf8')).trim()}<main id="content" class="hero hero--center" style="min-height:60vh"><div class="hero__glow"></div><div class="wrap hero__in"><span class="eyebrow eyebrow--plain">404</span><h1 class="h2">Nothing at this address.</h1><p class="lede">Maybe one of the apps?</p><div class="hero__actions"><a class="btn btn--primary" href="/">lsuite home</a><a class="btn" href="/ryolune">ryolune</a><a class="btn" href="/kimchi">kimchi</a><a class="btn" href="/zenith">zenith</a><a class="btn" href="/nori">nori</a><a class="btn" href="/folio">folio</a></div></div></main></body></html>`;
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Not found · lsuite</title><link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml"><link rel="stylesheet" href="/design/tokens.css"><link rel="stylesheet" href="/assets/styles.css"></head><body>${(await readFile(join(ROOT, 'partials', 'nav.html'), 'utf8')).trim()}<main id="content" class="hero hero--center" style="min-height:60vh"><div class="hero__glow"></div><div class="wrap hero__in"><span class="eyebrow eyebrow--plain">404</span><h1 class="h2">Nothing at this address.</h1><p class="lede">Maybe one of the apps?</p><div class="hero__actions"><a class="btn btn--primary" href="/">lsuite home</a><a class="btn" href="/ryolune">ryolune</a><a class="btn" href="/kimchi">kimchi</a><a class="btn" href="/nori">nori</a><a class="btn" href="/folio">folio</a></div></div></main></body></html>`;
   send(res, 404, html, TYPES['.html'], 'no-store', req);
 }
 
@@ -535,6 +526,9 @@ export async function handle(req, res) {
   if (pathname === '/ondera' || pathname.startsWith('/ondera/')) {
     return redirect(res, 301, '/ryolune' + pathname.slice('/ondera'.length) + url.search, 'public, max-age=86400');
   }
+
+  // zenith left lsuite (2026-10-10): its old addresses land on the home page.
+  if (pathname === '/zenith' || pathname.startsWith('/zenith/')) return redirect(res, 301, '/', 'public, max-age=86400');
 
   if (PAGES[pathname]) {
     const html = await renderPage(PAGES[pathname], originOf(req), undefined, undefined, url.searchParams);

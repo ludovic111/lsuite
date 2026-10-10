@@ -8,7 +8,7 @@
 //! - **Release manifest** (kimchi, nori, folio): `latest.json` in the Tauri updater's format, each
 //!   platform's file signed with the app's minisign (Ed25519) key; the signature's trusted
 //!   comment names the version.
-//! - **Signed checksums** (ryolune, zenith): `SHA256SUMS` and `SHA256SUMS.sig`, a raw Ed25519
+//! - **Signed checksums** (ryolune): `SHA256SUMS` and `SHA256SUMS.sig`, a raw Ed25519
 //!   signature of the checksums file (`<app>-ed25519 <base64>`); the file's SHA-256 must be listed.
 
 use serde::Serialize;
@@ -28,7 +28,7 @@ pub struct App {
     pub id: &'static str,
     /// The app's name, always lowercase.
     pub name: &'static str,
-    /// `music`, `video`, `code`, `image`, `office` (as in the discovery files).
+    /// `music`, `video`, `image`, `office` (as in the discovery files).
     pub kind: &'static str,
     /// The line under its name.
     pub summary: &'static str,
@@ -99,16 +99,6 @@ pub const APPS: &[App] = &[
             public_key: "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDRDMDcxNTc4RjA1N0Q5QTcKUldTbjJWZndlQlVIVEZyRWNtU2tqeWxCaFNvTGQxbU1qczFIMGY5cUYzVVdBWkxOL0FvalJocEkK",
         },
         files: &[],
-    },
-    App {
-        id: "zenith",
-        name: "zenith",
-        kind: "code",
-        kind_label: "Code",
-        summary: "An app for coding with agents.",
-        repo: "ludovic111/zenith",
-        signing: Signing::Checksums { public_key_hex: "865bfc7a83722e492a0967e2ced7493fdbc78d9dc3389f0d57ac9cd2423a2c44", prefix: "zenith-ed25519" },
-        files: &[("macos-arm64", "zenith-macos-arm64.zip"), ("macos-x86_64", "zenith-macos-x86_64.zip"), ("linux-x86_64", "zenith-linux-x86_64.tar.gz")],
     },
     App {
         id: "nori",
@@ -191,7 +181,7 @@ mod tests {
             }
             assert!(a.supports(Platform::parse("macos-arm64").unwrap()), "{} has no Mac build", a.id);
         }
-        assert!(!get("zenith").unwrap().supports(Platform::parse("windows-x86_64").unwrap()));
+        assert!(get("ryolune").unwrap().supports(Platform::parse("windows-x86_64").unwrap()));
         assert!(find("Folio").is_ok());
         assert!(find("photoshop").unwrap_err().contains("ryolune"));
     }

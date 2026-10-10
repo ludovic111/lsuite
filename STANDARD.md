@@ -1,8 +1,7 @@
 # The lsuite standard
 
 lsuite (always lowercase) combines every kind of creative and office tool, free and open source:
-**ryolune** (music), **kimchi** (video), **zenith** (code: an app for coding with agents),
-**nori** (image and design: photo editing, vector illustration and page layout in one document)
+**ryolune** (music), **kimchi** (video), **nori** (image and design: photo editing, vector illustration and page layout in one document)
 and **folio** (office: documents, spreadsheets and presentations). Like the suites you pay for,
 but MIT licensed, written in Rust, and **every app can be driven end to end by an AI agent**.
 
@@ -10,7 +9,6 @@ but MIT licensed, written in Rust, and **every app can be driven end to end by a
 | --- | --- | --- |
 | ryolune · music · the reference implementation | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) | `../ryolune` |
 | kimchi · video | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) | `../kimchi` |
-| zenith · code | [ludovic111/zenith](https://github.com/ludovic111/zenith) | `../zenith` |
 | nori · image and design | `ludovic111/nori` (not published yet) | `../nori` |
 | folio · office | `ludovic111/folio` (not published yet) | `../folio` |
 
@@ -49,7 +47,7 @@ Ship `docs/AI_CONTROL.md` (how to drive the app) and the generated `docs/COMMAND
 - The app checks for an update when it starts and offers it in one click (or installs it in the
   background where the platform allows), **through lsuite.xyz** with the lsuite account's token
   (DISTRIBUTION.md, decided 2026-10-07): kimchi, nori and folio read
-  `<server>/api/apps/<app>/latest.json`, ryolune and zenith `<server>/api/apps/<app>/releases/latest`
+  `<server>/api/apps/<app>/latest.json`, ryolune `<server>/api/apps/<app>/releases/latest`
   and its `SHA256SUMS(.sig)`. `<server>` is `LSUITE_ACCOUNT_SERVER` or the account's server, else
   `https://lsuite.xyz`; the token comes from `~/.lsuite/account.json` (`LSUITE_HOME`), sent as
   `Authorization: Bearer`. Signed out, the check says "Sign in to lsuite (in the lsuite app) to get
@@ -69,20 +67,18 @@ The apps are separate programs but must be usable as one suite, by a person and 
 
 - **Discovery.** Each app writes `~/.lsuite/apps/<app>.json` when it starts, and the others read
   that folder to know what is installed and how to drive it (`LSUITE_HOME` replaces `~/.lsuite`).
-  Format 1 (kimchi's `kimchi-control/src/discovery.rs`, zenith's `zenith-commands/src/lsuite.rs`):
-  `format` (1), `app`, `version`, `kind` (`music`, `video`, `code`, `image`, `office`), absolute paths `appPath`,
+  Format 1 (kimchi's `kimchi-control/src/discovery.rs`):
+  `format` (1), `app`, `version`, `kind` (`music`, `video`, `image`, `office`), absolute paths `appPath`,
   `executable`, `cli`, `mcp` (the MCP server's program, run with `--live`), `dataDir`, optional
   `documents` (`{extensions, description}`), `running` (`{pid, port?, controlFile?, since}` while
   the app runs, else `null`; check the pid is alive) and `updatedAt`. Readers ignore unknown
-  fields (zenith adds `bridge: {url, tokenFile}`) and files with another `format`.
+  fields and files with another `format`.
 - **Open formats, real files.** Documents are files on disk in a documented format (ryolune: one
   `.ryolune` JSON file with audio inside; kimchi: project JSON). Media goes between apps as plain
   files (WAV/FLAC/MP4…), never through a cloud.
 - **Hand-offs** (first targets):
   - ryolune → kimchi: export a mix or stems straight onto a kimchi project's audio track.
   - kimchi → ryolune: send a cut's audio, length and markers to ryolune to score it.
-  - zenith (decided 2026-10-02): lists the installed lsuite apps in its settings and hands their
-    MCP servers to the agents of its threads, so an agent working in zenith can drive them.
 - Shared vocabulary in command names where the concept is the same (`history.undo`,
   `history.redo`, `app.version`, `app.checkUpdates`, `session.overview` / `project.overview`,
   `export.*`).
@@ -120,8 +116,7 @@ Every app wears the shared design system in `design/` (spec `design/DESIGN.md`, 
 - Every area titled like a sidebar, tools boxed by kind, switches always in view.
 - Chakra Petch + IBM Plex Mono, shared spacing and motion, dark and light, tested contrast.
 - App icons: the mark in one ink, white on a near-black tile with a corner of dithered light.
-- ryolune wears v2 since 0.14; zenith moves to v2 in 0.4 (its new mark is a Z); nori and folio are
-  born in v2.
+- ryolune wears v2 since 0.14; nori and folio are born in v2.
 
 ## 8. Plugins
 
@@ -148,7 +143,7 @@ now: no payment is taken. The contract: [AI.md](AI.md).
 ## 10. The launcher
 
 **lsuite** (`launcher/` in the lsuite repo, started 2026-10-07) is the suite's own native app, in
-Rust and GPUI like the apps: it installs, updates, opens and removes the five apps from their
+Rust and GPUI like the apps: it installs, updates, opens and removes the four apps from their
 signed builds, the only way to get them (through lsuite.xyz with a free account, DISTRIBUTION.md;
 the release keys are built in), holds the shared lsuite account (lsuite
 Pass), manages lsuite Cloud ([CLOUD.md](CLOUD.md)) and, from its next release, installs and
@@ -159,27 +154,27 @@ as `launcher-vX.Y.Z` in the lsuite repo (0.1.1 is the latest), signed with its o
 
 ## Status (2026-10-07)
 
-All five apps have public beta releases: ryolune 0.15.3, kimchi 0.10.0, zenith 0.4.0,
-nori 0.1.0 and folio 0.1.0. Plugins and the shared account flows ship in those releases.
+All four apps have public beta releases: ryolune 0.15.3, kimchi 0.10.0, nori 0.1.0 and
+folio 0.1.0. Plugins and the shared account flows ship in those releases.
 lsuite Pass (lsuite AI, lsuite Cloud, the lsuite Marketplace) remains an explicit demo until the
 owner creates and connects billing, model-provider and verified-email accounts; the approved
 monthly prices are $12 / $29 / $79 USD.
 
-| | ryolune | kimchi | zenith | nori | folio |
-| --- | --- | --- | --- | --- | --- |
-| Command registry, one undo | ✅ 239 commands | ✅ 250 commands | ✅ 82 commands; undo per turn | ✅ 156 commands | ✅ 150 commands |
-| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` | ✅ `zenith-cli` | ✅ `nori-cli` | ✅ `folio-cli` |
-| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `zenith-mcp --live` | ✅ `nori-mcp --live` | ✅ `folio-mcp --live` |
-| Built-in agent | ✅ Agent panel | ✅ Agent panel | ✅ Claude Code and Codex threads | ✅ Agent panel | ✅ Agent panel |
-| Discovery | ✅ `~/.lsuite/apps/ryolune.json` | ✅ `~/.lsuite/apps/kimchi.json` | ✅ `~/.lsuite/apps/zenith.json` | ✅ `~/.lsuite/apps/nori.json` | ✅ `~/.lsuite/apps/folio.json` |
-| Open files | ✅ JSON, DAWproject | ✅ JSON projects | ✅ Git repositories | ✅ `.nori` ZIP, PSD, OpenRaster, SVG, IDML, PDF-compatible AI, 8-bit XCF | ✅ `.folio` ZIP, Office and OpenDocument |
-| Design v2 | ✅ | ✅ | ✅ native and web | ✅ | ✅ |
-| Plugins | ✅ 35 stock, CLAP, VST3, AU, Rust SDK | ✅ audio, frei0r, LUTs, Rust SDK | ✅ Rust MCP tools | ✅ tile filters, Rust SDK | ✅ spreadsheet functions, Rust SDK |
-| lsuite AI | ✅ demo | ✅ demo | ✅ demo through Claude Code | ✅ demo | ✅ demo |
-| Updates | Release updater | Release updater | Release updater | Signed release updater | Signed release updater |
-| Updates through lsuite.xyz | 🟡 0.16.0 in review | 🟡 0.11.0 in review | 🟡 0.5.0 in review | 🟡 0.2.0 in review | 🟡 0.2.0 in review |
-| Agent harness ([HARNESS.md](HARNESS.md)) | 🟡 13 skills, looks with loudness ([#34](https://github.com/ludovic111/ryolune/pull/34)) | 🟡 13 skills, frame sheets with loudness ([#16](https://github.com/ludovic111/kimchi/pull/16)) | 🟡 14 skills, brief and lsuite apps for its threads ([#10](https://github.com/ludovic111/zenith/pull/10)) | 🟡 11 skills, contrast, bleed and resolution checks ([#1](https://github.com/ludovic111/nori/pull/1)) | 🟡 12 skills, pages, slides and sheets as images ([#1](https://github.com/ludovic111/folio/pull/1)) |
-| Evals | 🟡 13 jobs; 2 run, passed | 🟡 12 jobs; 3 run, passed | 🟡 11 jobs; 2 run, passed | 🟡 12 jobs; 2 run, passed | 🟡 11 jobs; 2 run, passed |
+| | ryolune | kimchi | nori | folio |
+| --- | --- | --- | --- | --- |
+| Command registry, one undo | ✅ 239 commands | ✅ 250 commands | ✅ 156 commands | ✅ 150 commands |
+| CLI | ✅ `ryolune-cli` | ✅ `kimchi-cli` | ✅ `nori-cli` | ✅ `folio-cli` |
+| MCP | ✅ `ryolune-mcp --live` | ✅ `kimchi-mcp --live` | ✅ `nori-mcp --live` | ✅ `folio-mcp --live` |
+| Built-in agent | ✅ Agent panel | ✅ Agent panel | ✅ Agent panel | ✅ Agent panel |
+| Discovery | ✅ `~/.lsuite/apps/ryolune.json` | ✅ `~/.lsuite/apps/kimchi.json` | ✅ `~/.lsuite/apps/nori.json` | ✅ `~/.lsuite/apps/folio.json` |
+| Open files | ✅ JSON, DAWproject | ✅ JSON projects | ✅ `.nori` ZIP, PSD, OpenRaster, SVG, IDML, PDF-compatible AI, 8-bit XCF | ✅ `.folio` ZIP, Office and OpenDocument |
+| Design v2 | ✅ | ✅ | ✅ | ✅ |
+| Plugins | ✅ 35 stock, CLAP, VST3, AU, Rust SDK | ✅ audio, frei0r, LUTs, Rust SDK | ✅ tile filters, Rust SDK | ✅ spreadsheet functions, Rust SDK |
+| lsuite AI | ✅ demo | ✅ demo | ✅ demo | ✅ demo |
+| Updates | Release updater | Release updater | Signed release updater | Signed release updater |
+| Updates through lsuite.xyz | 🟡 0.16.0 in review | 🟡 0.11.0 in review | 🟡 0.2.0 in review | 🟡 0.2.0 in review |
+| Agent harness ([HARNESS.md](HARNESS.md)) | 🟡 13 skills, looks with loudness ([#34](https://github.com/ludovic111/ryolune/pull/34)) | 🟡 13 skills, frame sheets with loudness ([#16](https://github.com/ludovic111/kimchi/pull/16)) | 🟡 11 skills, contrast, bleed and resolution checks ([#1](https://github.com/ludovic111/nori/pull/1)) | 🟡 12 skills, pages, slides and sheets as images ([#1](https://github.com/ludovic111/folio/pull/1)) |
+| Evals | 🟡 13 jobs; 2 run, passed | 🟡 12 jobs; 3 run, passed | 🟡 12 jobs; 2 run, passed | 🟡 11 jobs; 2 run, passed |
 
 While lsuite is in beta, every app ships for Linux only (owner's decision, 2026-10-08): AppImages
 update in place, and tarballs and Linux system packages link to verified release downloads. macOS

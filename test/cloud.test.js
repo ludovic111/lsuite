@@ -529,7 +529,7 @@ test('me.cloud, the plans\' storage and the plan cards', async () => {
   }
 });
 
-test('GET /api/apps: the five apps for the launcher', async () => {
+test('GET /api/apps: the four apps for the launcher', async () => {
   const server = createServer((req, res) => handle(req, res));
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
   try {
@@ -540,7 +540,7 @@ test('GET /api/apps: the five apps for the launcher', async () => {
     assert.match(res.headers.get('content-type'), /^application\/json/);
     const { apps } = await res.json();
     assert.deepEqual(apps.map((a) => a.id), APP_NAMES);
-    assert.deepEqual(apps.map((a) => a.kind), ['music', 'video', 'code', 'image', 'office']);
+    assert.deepEqual(apps.map((a) => a.kind), ['music', 'video', 'image', 'office']);
     for (const app of apps) {
       assert.deepEqual(Object.keys(app).sort(), ['id', 'kind', 'name', 'page', 'platforms', 'published', 'repo', 'summary', 'version']);
       assert.equal(app.name, app.id);

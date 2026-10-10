@@ -20,7 +20,7 @@ Looks for the latest release of every app now (signed in).
 
 Downloads the app's latest release, checks its signature and installs it (or updates it if an older version is installed).
 
-- `app` (text, required): The app: ryolune, kimchi, zenith, nori or folio.
+- `app` (text, required): The app: ryolune, kimchi, nori or folio.
 
 Agents: needs `agent.install`.
 
@@ -28,7 +28,7 @@ Agents: needs `agent.install`.
 
 Updates an installed app to its latest release (it must be closed).
 
-- `app` (text, required): The app: ryolune, kimchi, zenith, nori or folio.
+- `app` (text, required): The app: ryolune, kimchi, nori or folio.
 
 Agents: needs `agent.install`.
 
@@ -42,7 +42,7 @@ Agents: needs `agent.install`.
 
 Removes the app (it must be closed). Its documents, settings and data folders stay.
 
-- `app` (text, required): The app: ryolune, kimchi, zenith, nori or folio.
+- `app` (text, required): The app: ryolune, kimchi, nori or folio.
 
 Agents: needs `agent.remove`.
 
@@ -50,20 +50,20 @@ Agents: needs `agent.remove`.
 
 Opens the app, with files if given.
 
-- `app` (text, required): The app: ryolune, kimchi, zenith, nori or folio.
+- `app` (text, required): The app: ryolune, kimchi, nori or folio.
 - `files` (list): Files to open in it.
 
 ### `apps.reveal`
 
 Shows the installed app in the file manager.
 
-- `app` (text, required): The app: ryolune, kimchi, zenith, nori or folio.
+- `app` (text, required): The app: ryolune, kimchi, nori or folio.
 
 ### `apps.page`
 
 Opens the app's page on lsuite.xyz in the browser.
 
-- `app` (text, required): The app: ryolune, kimchi, zenith, nori or folio.
+- `app` (text, required): The app: ryolune, kimchi, nori or folio.
 
 ## account
 

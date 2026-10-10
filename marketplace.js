@@ -1,4 +1,4 @@
-// The lsuite Marketplace (MARKETPLACE.md): plugins people publish for the five apps, every version
+// The lsuite Marketplace (MARKETPLACE.md): plugins people publish for the four apps, every version
 // reviewed before anyone can install it; dependency-free. `ai.js` authenticates and routes
 // `/api/marketplace…` here.
 //
@@ -24,7 +24,7 @@ import { bytesFrom, CloudError, diskReserve, freeSpace, objectStore, receive, st
 /** The platforms a version can be uploaded for, and the `[library]` key each one reads. */
 export const PLATFORMS = { 'macos-arm64': 'macos', 'macos-x86_64': 'macos', 'linux-x86_64': 'linux', 'windows-x86_64': 'windows' };
 /** The apps plugins are made for. */
-export const MARKET_APPS = ['ryolune', 'kimchi', 'zenith', 'nori', 'folio'];
+export const MARKET_APPS = ['ryolune', 'kimchi', 'nori', 'folio'];
 /** Ids that are lsuite's own: only admins publish under them. */
 export const RESERVED_PREFIX = 'xyz.lsuite.';
 
