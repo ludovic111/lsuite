@@ -1,8 +1,8 @@
 # Getting the apps: only through the lsuite app
 
 Decided by the owner on 2026-10-07: like Adobe's Creative Cloud, the four apps (ryolune, kimchi,
-nori, folio) are obtained **only through the lsuite app** (the launcher, `launcher/`),
-which needs a **free lsuite account**. The site offers the lsuite app alone; the apps' builds
+nori, folio) are obtained **only through the lsuite app** (the launcher, `launcher/`). Since
+2026-10-10 lsuite is entirely free: **no account** is needed for anything. The site offers the lsuite app alone; the apps' builds
 are no longer public. The apps stay free and their source stays open (MIT): anyone may build them
 from source, but the ready-made builds come through lsuite.
 
@@ -28,9 +28,8 @@ from source, but the ready-made builds come through lsuite.
 
 ## API (served by the site, `builds.js`)
 
-Every route needs an app token (`Authorization: Bearer <token>` from `~/.lsuite/account.json`):
-any account, Free included. Without one: 401 `authentication_error`, "Sign in to lsuite to get
-the apps: the account is free." Unknown app: 404. Errors in the shape of AI.md.
+Every route is public (since 2026-10-10; an `Authorization` header older versions still send is
+ignored). Unknown app: 404. Errors in the shape of AI.md.
 
 | Route | Does |
 | --- | --- |
@@ -50,16 +49,13 @@ downloads (`/launcher/download/<platform>`) don't change.
 ## The lsuite app (launcher 0.2.0)
 
 Apps' installs and updates read `GET /api/apps/<app>/latest` and download through the file route,
-checking signatures exactly as before. Signed out, the Apps area asks to sign in first ("Your free
-lsuite account gets you every app").
+checking signatures exactly as before. From 0.3.0 nothing asks to sign in.
 
 ## In each app
 
-The updater (STANDARD.md section 3) asks lsuite.xyz instead of GitHub, with the account's token:
+The updater (STANDARD.md section 3) asks lsuite.xyz instead of GitHub, with no token:
 kimchi, nori and folio fetch `<server>/api/apps/<app>/latest.json`; ryolune fetches
 `<server>/api/apps/<app>/releases/latest` and its `SHA256SUMS(.sig)` files. `<server>` is
-`LSUITE_ACCOUNT_SERVER` or the account's server, else `https://lsuite.xyz`; the token comes from
-`~/.lsuite/account.json` (`LSUITE_HOME`), sent as `Authorization: Bearer`. Signed out, the update
-check says "Sign in to lsuite (in the lsuite app) to get updates" instead of failing. The existing
+`LSUITE_SERVER`, else `https://lsuite.xyz`. The existing
 `<APP>_UPDATE_URL` overrides keep working for tests. Release workflows make a draft
 release, published to `ludovic111/lsuite-builds` by `scripts/publish-build.sh` (above).
