@@ -1,6 +1,7 @@
 //! Installs and removes apps end to end against a stand-in for lsuite.xyz on loopback (the
-//! builds route of DISTRIBUTION.md): a signed release manifest (AppImage) and signed checksums
-//! (tar.gz), with no account (no Authorization header is ever sent), and the refusals in between.
+//! builds route of DISTRIBUTION.md): signed release manifests (an AppImage, a macOS .app.tar.gz)
+//! and signed checksums (a tar.gz, a macOS zip), with no account (no Authorization header is
+//! ever sent), and the refusals in between.
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -224,6 +225,91 @@ async fn installs_updates_and_removes_from_signed_releases() {
     assert!(!f.managed && !f.standard);
     assert!(install::uninstall(sums_app, linux.os).unwrap_err().contains("wasn't installed by the launcher"));
     assert!(dev.join("ryolune").exists());
+
+    // ---- macOS: app bundles from the darwin entries (unpacked with ditto on a Mac). ----
+    let mac = Platform::parse("macos-arm64").unwrap();
+    let mac_app: &'static App = Box::leak(Box::new(App {
+        id: "kimchi",
+        name: "kimchi",
+        kind: "video",
+        kind_label: "Video",
+        summary: "test",
+        repo: "test/kimchi",
+        signing: Signing::Manifest { public_key: leak(k.pk_b64.clone()) },
+        files: &[],
+    }));
+    let plist = |id: &str, v: &str| format!("<?xml version=\"1.0\"?><plist version=\"1.0\"><dict><key>CFBundleExecutable</key><string>{id}</string><key>CFBundleShortVersionString</key><string>{v}</string></dict></plist>");
+    let bundle = targz(&[("kimchi.app/Contents/MacOS/kimchi", b"#!/bin/sh\necho kimchi\n"), ("kimchi.app/Contents/Info.plist", plist("kimchi", "0.11.0").as_bytes())]);
+    {
+        let mut platforms = serde_json::Map::new();
+        for (key, arch) in [("darwin-aarch64-app", "arm64"), ("darwin-x86_64-app", "x86_64")] {
+            let path = format!("/api/apps/kimchi/files/kimchi-v0.11.0/kimchi-macos-{arch}.app.tar.gz");
+            platforms.insert(key.into(), json!({ "url": format!("{base}{path}"), "signature": sign(&k, &bundle, "0.11.0") }));
+            routes.lock().insert(path, (200, vec![], bundle.clone()));
+        }
+        // A Linux entry the Mac must not pick.
+        platforms.insert("linux-x86_64-appimage".into(), json!({ "url": format!("{base}/api/apps/kimchi/files/kimchi-v0.11.0/kimchi.AppImage"), "signature": sign(&k, b"x", "0.11.0") }));
+        let manifest = json!({ "version": "0.11.0", "platforms": platforms });
+        routes.lock().insert("/api/apps/kimchi/latest".into(), (200, vec![], json!({ "app": "kimchi", "version": "0.11.0", "tag": "kimchi-v0.11.0", "manifest": manifest }).to_string().into_bytes()));
+    }
+    let rel = release::latest(mac_app, mac).await.unwrap();
+    assert_eq!((rel.file.as_str(), rel.kind), ("kimchi-macos-arm64.app.tar.gz", release::FileKind::MacBundleTarGz));
+    assert_eq!(release::latest(mac_app, Platform::parse("macos-x86_64").unwrap()).await.unwrap().file, "kimchi-macos-x86_64.app.tar.gz");
+    let rec = install::install(mac_app, &rel, mac, &mut p).await.unwrap();
+    assert_eq!(rec.path, home.path().join("apps/kimchi.app"));
+    assert_eq!(rec.executable, home.path().join("apps/kimchi.app/Contents/MacOS/kimchi"));
+    assert!(rec.executable.is_file());
+    assert_eq!(install::find("kimchi", mac.os).unwrap().version.as_deref(), Some("0.11.0"));
+    // A bundle found in a usual place, not installed by the launcher: its version from Info.plist.
+    let records = std::fs::read(crate::paths::installed_file()).unwrap();
+    let mut without: serde_json::Value = serde_json::from_slice(&records).unwrap();
+    without["apps"].as_object_mut().unwrap().remove("kimchi");
+    std::fs::write(crate::paths::installed_file(), without.to_string()).unwrap();
+    let f = install::find("kimchi", mac.os).unwrap();
+    assert!(!f.managed && f.standard);
+    assert_eq!(f.version.as_deref(), Some("0.11.0"));
+    std::fs::write(crate::paths::installed_file(), &records).unwrap();
+
+    // A checksums app's zip (ryolune ships zips of its bundle on macOS).
+    let zip_app: &'static App = Box::leak(Box::new(App {
+        id: "nori",
+        name: "nori",
+        kind: "image",
+        kind_label: "Image",
+        summary: "test",
+        repo: "test/nori",
+        signing: Signing::Checksums { public_key_hex: leak(sk.verifying_key().as_bytes().iter().map(|b| format!("{b:02x}")).collect()), prefix: "nori-ed25519" },
+        files: &[("macos-arm64", "nori-macos-arm64.zip")],
+    }));
+    let zipped = {
+        use std::io::Write;
+        let mut z = zip::ZipWriter::new(std::io::Cursor::new(Vec::new()));
+        let opts = zip::write::SimpleFileOptions::default().unix_permissions(0o755);
+        z.start_file("nori.app/Contents/MacOS/nori", opts).unwrap();
+        z.write_all(b"#!/bin/sh\necho nori\n").unwrap();
+        z.start_file("nori.app/Contents/Info.plist", opts).unwrap();
+        z.write_all(plist("nori", "0.2.0").as_bytes()).unwrap();
+        z.finish().unwrap().into_inner()
+    };
+    let zsha: String = {
+        use sha2::Digest;
+        sha2::Sha256::digest(&zipped).iter().map(|b| format!("{b:02x}")).collect()
+    };
+    let zsums = format!("{zsha}  nori-macos-arm64.zip\n");
+    let zsig = format!("nori-ed25519 {}\n", base64::engine::general_purpose::STANDARD.encode(sk.sign(zsums.as_bytes()).to_bytes()));
+    {
+        let mut r = routes.lock();
+        r.insert("/api/apps/nori/latest".into(), (200, vec![], json!({ "app": "nori", "version": "0.2.0", "tag": "nori-v0.2.0", "manifest": null, "sha256sums": zsums, "sha256sumsSig": zsig }).to_string().into_bytes()));
+        r.insert("/api/apps/nori/files/nori-v0.2.0/nori-macos-arm64.zip".into(), (200, vec![], zipped));
+    }
+    let rel = release::latest(zip_app, mac).await.unwrap();
+    assert_eq!(rel.kind, release::FileKind::MacZip);
+    let rec = install::install(zip_app, &rel, mac, &mut p).await.unwrap();
+    assert_eq!(rec.executable, home.path().join("apps/nori.app/Contents/MacOS/nori"));
+    assert!(rec.executable.is_file());
+    install::uninstall(zip_app, mac.os).unwrap();
+    install::uninstall(mac_app, mac.os).unwrap();
+    assert!(!home.path().join("apps/kimchi.app").exists() && !home.path().join("apps/nori.app").exists());
 
     // The registry: unknown parameters, agents held to their permissions.
     let err = crate::call(&l, crate::Source::Window, "apps.install", json!({ "app": "folio", "version": "1" })).await.unwrap_err();
