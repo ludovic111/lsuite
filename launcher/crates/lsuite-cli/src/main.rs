@@ -1,6 +1,6 @@
 //! `lsuite-cli`: every command of the lsuite launcher in a terminal, without the window.
 //!
-//! `lsuite-cli apps.install app=kimchi`, `lsuite-cli cloud.upload source=~/song.ryolune into=Music`.
+//! `lsuite-cli apps.install app=kimchi`, `lsuite-cli plugins.list app=ryolune`.
 //! Parameters are `key=value`; values are read by the command's parameter types (`true`/`false`,
 //! lists as JSON or comma-separated). The answer is JSON on stdout; progress goes to stderr.
 
@@ -21,10 +21,9 @@ USAGE
 EXAMPLES
   lsuite-cli apps.list refresh=true
   lsuite-cli apps.install app=folio
-  lsuite-cli account.signIn                 (opens the browser)
-  lsuite-cli account.signIn key=lsk_…       (a key from lsuite.xyz/account)
-  lsuite-cli cloud.upload source=./mix.wav into=Music
-  lsuite-cli cloud.download path=Music/mix.wav into=.";
+  lsuite-cli plugins.list
+  lsuite-cli plugins.remove app=ryolune id=com.example.warm
+  lsuite-cli agent.run prompt=\"Build a nori plugin: a halftone filter\"";
 
 #[tokio::main]
 async fn main() {

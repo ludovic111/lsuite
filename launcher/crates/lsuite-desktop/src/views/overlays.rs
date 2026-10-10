@@ -1,7 +1,6 @@
 //! What floats above the page: dialogs, an app's "more" menu, toasts.
 
 use gpui::{AnyElement, App, Context, FontWeight, MouseButton, Pixels, Point, Window, anchored, deferred, div, prelude::*, px};
-use lsuite_core::cloud::{join, name_of};
 use serde_json::json;
 
 use crate::app::Workspace;
@@ -14,26 +13,23 @@ pub fn confirm(ws: &mut Workspace, window: &mut Window, cx: &mut Context<Workspa
     let store = cx.store();
     let Some(dialog) = store.read(cx).dialog.clone() else { return };
     let text = ws.input.read(cx).text().trim().to_string();
-    let dir = store.read(cx).cloud_dir.clone();
     let (name, params) = match &dialog {
         Dialog::RemoveApp { app, .. } => ("apps.uninstall", json!({ "app": app })),
-        Dialog::DeleteCloud { path, .. } => ("cloud.delete", json!({ "path": path })),
-        Dialog::NewFolder if !text.is_empty() => ("cloud.mkdir", json!({ "path": join(&dir, &text) })),
-        Dialog::Rename { path } if !text.is_empty() => ("cloud.rename", json!({ "path": path, "name": text })),
-        Dialog::MoveTo { path } => ("cloud.move", json!({ "from": path, "to": join(text.trim_matches('/'), name_of(path)) })),
-        Dialog::UploadPath if !text.is_empty() => ("cloud.upload", json!({ "source": text, "into": dir })),
-        Dialog::PublishPath if !text.is_empty() => ("market.publish", json!({ "path": text })),
-        Dialog::SyncPath if !text.is_empty() => {
+        Dialog::RemovePlugin { app, id, .. } => ("plugins.remove", json!({ "app": app, "id": id })),
+        Dialog::BuildPlugin { app, .. } if !text.is_empty() => {
+            let prompt = lsuite_core::plugins::build_request(app, &text);
             ws.close_dialog(window, cx);
-            store.update(cx, |s, cx| crate::views::cloud::start_sync(s, text.clone(), cx));
+            store.update(cx, |s, cx| {
+                s.ask_agent(prompt, cx);
+                s.go(crate::store::Page::Agent, cx);
+            });
             return;
         }
         _ => return,
     };
     let say = match &dialog {
         Dialog::RemoveApp { name, .. } => Some(format!("{name} is removed. Its documents and settings are still there.")),
-        Dialog::DeleteCloud { path, .. } => Some(format!("{} is deleted.", name_of(path))),
-        Dialog::NewFolder => Some(format!("{text} is created.")),
+        Dialog::RemovePlugin { name, .. } => Some(format!("{name} is removed.")),
         _ => None,
     };
     ws.close_dialog(window, cx);
@@ -50,19 +46,14 @@ pub fn dialog(ws: &Workspace, d: &Dialog, _window: &mut Window, cx: &mut Context
     let t = cx.theme().clone();
     let (title, text, button, danger, field): (String, String, &str, bool, bool) = match d {
         Dialog::RemoveApp { name, .. } => (format!("Remove {name}?"), format!("{name} is removed from this computer. Your documents, its settings and its data stay where they are; install it again any time."), "Remove", true, false),
-        Dialog::DeleteCloud { path, folder } => (
-            format!("Delete {}?", name_of(path)),
-            if *folder { "The folder and everything in it are deleted from your cloud. This can't be undone.".into() } else { "The file is deleted from your cloud. This can't be undone.".into() },
-            "Delete",
-            true,
+        Dialog::RemovePlugin { app, name, .. } => (format!("Remove {name}?"), format!("Its folder is deleted from this computer, and {app} lets go of it. Build it again any time."), "Remove", true, false),
+        Dialog::BuildPlugin { name, .. } => (
+            format!("Build a {name} plugin"),
+            format!("Say what it should do. The lsuite agent builds it with {name}'s plugin tools, checks it compiles and installs it; you follow it on the Agent page."),
+            "Build",
             false,
+            true,
         ),
-        Dialog::NewFolder => ("New folder".into(), "In the folder shown.".into(), "Create", false, true),
-        Dialog::Rename { path } => (format!("Rename {}", name_of(path)), "A new name, in the same folder.".into(), "Rename", false, true),
-        Dialog::MoveTo { path } => (format!("Move {}", name_of(path)), "The folder to move it to, like Projects/2026. Leave it empty for the top of your cloud.".into(), "Move", false, true),
-        Dialog::UploadPath => ("Upload a file or folder".into(), "This system has no file picker the launcher can open: type the path of a file or folder on this computer.".into(), "Upload", false, true),
-        Dialog::PublishPath => ("Publish a plugin".into(), "The plugin's bundle folder on this computer: plugin.toml and the library, as the app's plugin.publishLocal makes it. lsuite reviews every version before it's listed.".into(), "Publish", false, true),
-        Dialog::SyncPath => ("Sync a folder".into(), "The folder on this computer to keep in step with your cloud, both ways. It is synced into the cloud folder shown, under its own name.".into(), "Sync", false, true),
     };
     let entity = cx.entity();
     let (e1, e2) = (entity.clone(), entity);

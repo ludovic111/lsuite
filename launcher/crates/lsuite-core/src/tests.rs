@@ -1,6 +1,6 @@
 //! Installs and removes apps end to end against a stand-in for lsuite.xyz on loopback (the
 //! builds route of DISTRIBUTION.md): a signed release manifest (AppImage) and signed checksums
-//! (tar.gz), the sign-in it needs, and the refusals in between.
+//! (tar.gz), with no account (no Authorization header is ever sent), and the refusals in between.
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -29,9 +29,9 @@ async fn serve(routes: Routes) -> String {
                 let n = s.read(&mut buf).await.unwrap_or(0);
                 let req = String::from_utf8_lossy(&buf[..n]).to_string();
                 let path = req.split_whitespace().nth(1).unwrap_or("/").to_string();
-                let authed = req.to_ascii_lowercase().contains("authorization: bearer lsk_test");
-                let (status, headers, body) = if path.starts_with("/api/apps/") && !authed {
-                    (401, vec![], br#"{"type":"error","error":{"type":"authentication_error","message":"Sign in"}}"#.to_vec())
+                // The builds are public: a request carrying credentials is a bug.
+                let (status, headers, body) = if req.to_ascii_lowercase().contains("\r\nauthorization:") {
+                    (400, vec![], br#"{"type":"error","error":{"type":"invalid_request_error","message":"No Authorization header, please"}}"#.to_vec())
                 } else {
                     routes.lock().get(&path).cloned().unwrap_or((404, vec![], b"not found".to_vec()))
                 };
@@ -79,16 +79,13 @@ async fn installs_updates_and_removes_from_signed_releases() {
         std::env::set_var("LSUITE_HOME", home.path().join("lsuite"));
         std::env::set_var("LSUITE_APPS_DIR", home.path().join("apps"));
         std::env::set_var("LSUITE_GITHUB", &base);
-        std::env::set_var("LSUITE_ACCOUNT_SERVER", &base);
+        std::env::set_var("LSUITE_SERVER", &base);
     }
     let linux = Platform::parse("linux-x86_64").unwrap();
     let l = Launcher::new();
-    // Signed out, the apps aren't offered.
-    let probe: &'static App = Box::leak(Box::new(App { id: "folio", name: "folio", kind: "office", kind_label: "Office", summary: "t", repo: "t/folio", signing: Signing::Manifest { public_key: "x" }, files: &[] }));
-    assert_eq!(release::latest(probe, linux).await.unwrap_err(), release::SIGN_IN);
-    let account = json!({ "format": 1, "server": base, "email": "ada@example.com", "name": "Ada", "plan": "free", "token": "lsk_test_token_0123456789", "signedInAt": "2026-10-07T00:00:00Z" });
+    // An old account file (launcher 0.2) is ignored, and left alone.
     std::fs::create_dir_all(home.path().join("lsuite")).unwrap();
-    std::fs::write(home.path().join("lsuite/account.json"), account.to_string()).unwrap();
+    std::fs::write(home.path().join("lsuite/account.json"), r#"{"format":1,"server":"https://lsuite.xyz","email":"ada@example.com","token":"lsk_old_0123456789","signedInAt":"2026-10-07T00:00:00Z"}"#).unwrap();
 
     // ---- A manifest app (AppImage), signed with a throwaway key. ----
     let k = keys();
@@ -238,10 +235,27 @@ async fn installs_updates_and_removes_from_signed_releases() {
     crate::call(&l, crate::Source::Cli, "settings.set", json!({ "key": "theme", "value": "dark" })).await.unwrap();
     assert!(crate::call(&l, crate::Source::Cli, "settings.set", json!({ "key": "theme", "value": "pink" })).await.is_err());
     assert!(crate::call(&l, crate::Source::Cli, "settings.set", json!({ "key": "autoUpdate", "value": "yes" })).await.is_err());
-    // Signed out, cloud commands say to sign in first.
-    std::fs::remove_file(home.path().join("lsuite/account.json")).unwrap();
-    let err = crate::call(&l, crate::Source::Window, "cloud.status", json!({})).await.unwrap_err();
-    assert!(err.contains("Sign in"), "{err}");
+    // Account, cloud and marketplace commands are gone.
+    for gone in ["account.status", "cloud.status", "market.list"] {
+        assert!(crate::call(&l, crate::Source::Window, gone, json!({})).await.unwrap_err().contains("There's no command"), "{gone}");
+    }
+    assert!(home.path().join("lsuite/account.json").is_file(), "the old account file stays");
+
+    // ---- Plugins: listed from their plugin.toml, removed by id. ----
+    let warm = home.path().join("lsuite/plugins/ryolune/com.example.warm");
+    std::fs::create_dir_all(&warm).unwrap();
+    std::fs::write(warm.join("plugin.toml"), "id = \"com.example.warm\"\nname = \"Warm\"\nversion = \"1.0.0\"\napp = \"ryolune\"\nkind = \"effect\"\ndescription = \"Tape.\"\n").unwrap();
+    let v = crate::call(&l, crate::Source::Mcp, "plugins.list", json!({ "app": "ryolune" })).await.unwrap();
+    assert_eq!(v["count"], 1);
+    assert_eq!(v["apps"][0]["plugins"][0]["name"], "Warm");
+    assert_eq!(v["apps"][0]["plugins"][0]["kind"], "effect");
+    assert_eq!(crate::call(&l, crate::Source::Cli, "plugins.list", json!({})).await.unwrap()["apps"].as_array().unwrap().len(), crate::catalog::APPS.len());
+    let err = crate::call(&l, crate::Source::Mcp, "plugins.remove", json!({ "app": "ryolune", "id": "com.example.warm" })).await.unwrap_err();
+    assert!(err.contains("turned off for agents"), "{err}");
+    assert!(crate::call(&l, crate::Source::Cli, "plugins.remove", json!({ "app": "kimchi", "id": "com.example.warm" })).await.unwrap_err().contains("no plugin"));
+    let v = crate::call(&l, crate::Source::Cli, "plugins.remove", json!({ "app": "ryolune", "id": "com.example.warm" })).await.unwrap();
+    assert_eq!(v["removed"], "com.example.warm");
+    assert!(!warm.exists());
 }
 
 #[test]

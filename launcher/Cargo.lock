@@ -3315,7 +3315,6 @@ name = "lsuite"
 version = "0.2.0"
 dependencies = [
  "anyhow",
- "chrono",
  "dirs",
  "futures",
  "gpui",
@@ -3358,7 +3357,6 @@ dependencies = [
  "minisign",
  "minisign-verify",
  "parking_lot",
- "percent-encoding",
  "rand 0.9.5",
  "reqwest",
  "semver",
@@ -3370,7 +3368,6 @@ dependencies = [
  "tokio",
  "toml 0.8.23",
  "tracing",
- "url",
  "zip",
 ]
 

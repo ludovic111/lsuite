@@ -1,8 +1,8 @@
 //! `lsuite-mcp`: the lsuite launcher as a Model Context Protocol server over stdio
 //! (newline-delimited JSON-RPC 2.0). Every registry command is a tool (`apps.install` becomes
 //! `apps_install`) with its description and schema from the registry. Calls are held to the
-//! launcher's `settings.agent` permissions (removing apps, deleting cloud files and signing in
-//! or out are off until the person turns them on). Only protocol goes to stdout.
+//! launcher's `settings.agent` permissions (removing apps and plugins is off until the person
+//! turns it on). Only protocol goes to stdout.
 //!
 //! The launcher keeps its state on disk, so the server works the same whether the window is
 //! open or not: `claude mcp add lsuite -- /path/to/lsuite-mcp`.
@@ -15,7 +15,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWriteExt};
 
 const PROTOCOLS: [&str; 4] = ["2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25"];
 
-const INSTRUCTIONS: &str = "The lsuite launcher: installs, updates, opens and removes the lsuite apps (ryolune music, kimchi video, nori image and design, folio office) from their signed releases; shows the lsuite account and its lsuite Pass; manages lsuite Cloud, the storage that comes with the Pass (upload, download, folders, synced folders); and the lsuite Marketplace of plugins made by people who use lsuite (browse, install, publish what you build). Start with apps_list, cloud_list or market_list. Each installed app has its own MCP server (apps_list gives its `mcp` path) to drive it.";
+const INSTRUCTIONS: &str = "The lsuite launcher: installs, updates, opens and removes the lsuite apps (ryolune music, kimchi video, nori image and design, folio office) from their signed releases, free with no account; and lists and removes the lsuite plugins installed for each app (plugins are built with each app's own plugin.* tools). Start with apps_list or plugins_list. Each installed app has its own MCP server (apps_list gives its `mcp` path) to drive it.";
 
 #[tokio::main]
 async fn main() {
@@ -104,7 +104,7 @@ async fn dispatch(l: &Arc<Launcher>, method: &str, params: &Value) -> Result<Val
                         "title": s.name,
                         "description": s.summary,
                         "inputSchema": registry::input_schema(s),
-                        "annotations": { "readOnlyHint": read_only, "destructiveHint": matches!(s.perm, registry::Perm::Remove | registry::Perm::CloudDelete) },
+                        "annotations": { "readOnlyHint": read_only, "destructiveHint": s.perm == registry::Perm::Remove },
                     })
                 })
                 .collect();

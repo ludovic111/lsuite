@@ -1,6 +1,6 @@
 [package]
 name = "lsuite"
-description = "lsuite — install and update the lsuite apps, your lsuite AI account and lsuite Cloud"
+description = "lsuite — install and update the lsuite apps, their plugins and the lsuite agent"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -13,7 +13,6 @@ path = "src/main.rs"
 lsuite-core.workspace = true
 
 anyhow.workspace = true
-chrono.workspace = true
 dirs.workspace = true
 futures.workspace = true
 parking_lot.workspace = true
