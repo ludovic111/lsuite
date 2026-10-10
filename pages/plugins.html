@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Plugins — ask your agent for the plugin you need, in every lsuite app · lsuite</title>
+  <meta name="description" content="Every lsuite app has plugins: its stock plugins, the formats of its trade, and native Rust plugins your agent builds for you from a sentence. Free, like the rest of lsuite.">
+  <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
+  <link rel="canonical" href="%ORIGIN%/plugins">
+  <link rel="icon" href="/assets/img/lsuite.svg" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="lsuite">
+  <meta property="og:title" content="Plugins — ask your agent for the plugin you need">
+  <meta property="og:description" content="Describe the plugin you want; the app's agent writes it in Rust, builds it and loads it. In ryolune, kimchi, nori and folio, free.">
+  <meta property="og:url" content="%ORIGIN%/plugins">
+  <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="/assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/design/tokens.css?v=1">
+  <link rel="stylesheet" href="/assets/styles.css?v=1">
+  <script src="/assets/main.js?v=1"></script>
+</head>
+<body class="app-suite">
+<!-- include:nav -->
+
+<main id="content">
+  <section class="hero">
+    <div class="hero__glow"></div>
+    <div class="hero__grid"></div>
+    <div class="wrap hero__in">
+      <span class="eyebrow reveal">Plugins</span>
+      <h1 class="display reveal" style="--d:1">The plugin you need,<br>built by your <span class="neg">agent</span>.</h1>
+      <p class="lede reveal" style="--d:2">An effect for ryolune or kimchi, a filter for nori, a function for folio: describe it in a sentence and the app's agent writes it in Rust, builds it and loads it, without a restart. Every app also has its stock plugins and loads the plugin formats of its trade.</p>
+      <div class="hero__actions reveal" style="--d:3">
+        <a class="btn btn--primary" href="#build">Build a plugin <span class="arrow" aria-hidden="true">→</span></a>
+        <a class="btn" href="https://github.com/ludovic111/lsuite/blob/main/PLUGINS.md">Read the contract</a>
+      </div>
+      <p class="fine hero__fine reveal" style="--d:4">Free, like everything in lsuite · native Rust · in all four apps · one switch per plugin</p>
+    </div>
+  </section>
+
+  <section class="section" id="what" aria-labelledby="what-title" style="padding-top: 0; border-top: 0;">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">What it is</span>
+        <h2 class="h2 reveal" id="what-title">One Plugins area in every app.</h2>
+        <p class="lede reveal" style="--d:1">A plugin is a folder: a <code>plugin.toml</code> and a library built against the app's Rust SDK (<a href="https://github.com/ludovic111/lsuite/blob/main/PLUGINS.md">the contract</a>). Each app's Plugins area shows four things.</p>
+      </div>
+      <div class="grid grid--4">
+        <div class="cell reveal"><span class="cell__k">Stock</span><h3>Ships with the app</h3><p>The plugins every copy of the app comes with, by kind, each with a line saying what it does.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Installed</span><h3>Yours, on this computer</h3><p>The plugins you built or added, and the compatible formats found on your computer, each with an on/off switch always in view.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Formats</span><h3>Your trade's plugins</h3><p>CLAP, VST3 and Audio Units in ryolune, frei0r and <code>.cube</code> LUTs in kimchi, and what each app can really load.</p></div>
+        <div class="cell reveal" style="--d:3"><span class="cell__k">Build</span><h3>With your agent</h3><p>One field: "Describe the plugin you want". The agent's progress shows as it works, and the plugin appears in Installed, loaded.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="build" aria-labelledby="build-title">
+    <div class="wrap split split--top">
+      <div class="stack">
+        <span class="eyebrow">Build a plugin</span>
+        <h2 class="h2 reveal" id="build-title">Describe it. The agent does the rest.</h2>
+        <p class="lede reveal" style="--d:1">In any app's Plugins area, "Describe the plugin you want" starts the app's agent on the plugin recipe. Any agent works: Claude Code, Codex, an API key or a local model.</p>
+        <ul class="bullets reveal" style="--d:2">
+          <li><span><b>It scaffolds a crate</b> from the app's SDK in <code>~/.lsuite/plugins-src/&lt;app&gt;/</code> (<code>plugin.new</code>), and offers to install Rust if it's missing.</span></li>
+          <li><span><b>It builds until it's green</b> (<code>plugin.build</code>), fixing what the compiler says, error by error.</span></li>
+          <li><span><b>It installs and tries it</b> (<code>plugin.publishLocal</code>): applied to your selection, a frame or a bar rendered, and looked at before the agent says it's done.</span></li>
+          <li><span><b>Or from the lsuite app:</b> its Plugins area lists the plugins installed for every app, removes them, and sends a plugin request to the right app's agent.</span></li>
+        </ul>
+        <p class="muted reveal" style="--d:3">Building and installing plugins is an agent permission of its own: it stays off for API agents until you allow it.</p>
+      </div>
+      <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># what the agent runs (you can too)</span></span>
+<span class="line">ryolune-cli plugin.guide</span>
+<span class="line">ryolune-cli plugin.new name=tape-warmth kind=effect</span>
+<span class="line">ryolune-cli plugin.build name=tape-warmth</span>
+<span class="line">ryolune-cli plugin.publishLocal name=tape-warmth</span>
+<span class="line"></span>
+<span class="line"><span class="c"># a plugin someone gave you: a bundle folder</span></span>
+<span class="line">ryolune-cli plugin.install path=~/Downloads/com.example.tape-warmth</span></pre></div>
+    </div>
+  </section>
+
+  <section class="section" id="safety" aria-labelledby="safety-title">
+    <div class="wrap">
+      <div class="section__head">
+        <span class="eyebrow">Safety</span>
+        <h2 class="h2 reveal" id="safety-title">Native code, under your control.</h2>
+        <p class="lede reveal" style="--d:1">A plugin runs inside the app and can do what the app can do. Build your own, or install bundles from people you trust.</p>
+      </div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">In its place</span><h3>Never blocking the window</h3><p>A plugin runs where the app's own effects run: the audio thread, the compositor, the filter worker. Its ABI version is checked before anything is called.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Guarded</span><h3>A panic switches it off</h3><p>Every call into a plugin is guarded: one that panics is disabled, and the app keeps going.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Your switch</span><h3>Off in one click</h3><p>Every plugin has an on/off switch in the app's Plugins area, and the lsuite app removes the ones you no longer want.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-title">
+    <div class="wrap">
+      <div class="section__head"><span class="eyebrow">Questions</span><h2 class="h2 reveal" id="faq-title">Before you build one.</h2></div>
+      <div class="faq reveal">
+        <details><summary>Does it cost anything?</summary><p>No. Plugins, like the apps, are free: no account, no plan. You only need an agent, and the ones you already have work.</p></details>
+        <details><summary>Do I need to know Rust?</summary><p>No. The agent writes the code, builds it and fixes it. If you do know Rust, the crate is yours to read and change: <code>~/.lsuite/plugins-src/&lt;app&gt;/&lt;name&gt;/</code>.</p></details>
+        <details><summary>How do I share a plugin?</summary><p>A plugin is a folder in <code>~/.lsuite/plugins/&lt;app&gt;/</code>. Send it, or the source crate, and the other person installs it with <code>plugin.install</code> or their agent. Only install plugins from people you trust: a plugin is native code.</p></details>
+        <details><summary>Where did the marketplace go?</summary><p>lsuite became entirely free on 2026-10-10: no accounts, no plans, so no store either. Building plugins with your agent, the part that mattered, stays in every app.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- include:foot -->
+</body>
+</html>

@@ -5,7 +5,7 @@ creative and office tool, combined, free and open source, and driven by your age
 in beta:
 
 **Get the launcher:** [lsuite.xyz/launcher](https://lsuite.xyz/launcher), or the latest `launcher-v*` [release](https://github.com/ludovic111/lsuite/releases).
-The four apps come only through it, with a free lsuite account ([DISTRIBUTION.md](DISTRIBUTION.md)):
+The four apps come only through it, with no account ([DISTRIBUTION.md](DISTRIBUTION.md)):
 their builds live in the private `ludovic111/lsuite-builds`, served by `builds.js`.
 
 **Beta: Linux only.** While lsuite is in beta, the launcher and the four apps are built and
@@ -19,13 +19,10 @@ are made for them).
 | nori | images, vectors and page layout | `/nori` | [ludovic111/nori](https://github.com/ludovic111/nori) |
 | folio | documents, spreadsheets and slides | `/folio` | [ludovic111/folio](https://github.com/ludovic111/folio) |
 
-The apps are free and MIT licensed. The one thing lsuite sells is optional: **lsuite Pass**
-([PASS.md](PASS.md)), a demo for now (no payment is taken), with its pages at `/pass` and
-`/account`. It holds **lsuite AI** ([AI.md](AI.md), `ai.js`), agents that work in every app without
-setup; **lsuite Cloud** storage ([CLOUD.md](CLOUD.md), `cloud.js`), managed from the lsuite
-launcher; and the **lsuite Marketplace** ([MARKETPLACE.md](MARKETPLACE.md), `marketplace.js`,
-`/marketplace`), plugins anyone can publish, every version reviewed. Every app has plugins
-([PLUGINS.md](PLUGINS.md)), and [STANDARD.md](STANDARD.md) is the contract they all meet.
+lsuite is entirely free (owner's decision, 2026-10-10): the apps and the launcher are MIT
+licensed, with no account, no plan and nothing to buy. The paid lsuite Pass (lsuite AI, lsuite
+Cloud, the lsuite Marketplace) and the accounts it needed were removed that day. Every app has
+plugins, built by the person's own agent ([PLUGINS.md](PLUGINS.md)), and [STANDARD.md](STANDARD.md) is the contract they all meet.
 
 Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
 
@@ -50,17 +47,9 @@ npm test
   theme gallery, unused for now), fonts (Chakra Petch, IBM Plex Mono, OFL)
   and real native-app captures in `assets/img/<app>/` (both themes). Image credits are in
   `assets/img/SOURCES.md`.
-- `pass/index.html` is `/pass` (lsuite Pass; `/ai` is a 301 to it, out of the sitemap);
-  `marketplace/index.html` is `/marketplace` (`<!-- include:marketplace -->` is filled with the
-  approved plugins, `?app=<app>` filters them, no script); `account/index.html`,
-  `account/connect.html` and `account/checkout.html` are the account pages (`assets/account.js`,
-  the only script they run; `<!-- include:plans -->` is filled from the plans of `ai.js`).
-  `/account/connect` and `/account/checkout` stay out of the sitemap. `/account` also shows the
-  account's lsuite Cloud usage, its marketplace submissions and, for admins, the review queue.
-- `ai.js` serves the API (accounts, lsuite AI); `cloud.js` is lsuite Cloud's storage behind
-  `/api/cloud`; `marketplace.js` is the lsuite Marketplace behind `/api/marketplace`; `builds.js`
-  serves the apps' builds behind `/api/apps/<app>/…` (DISTRIBUTION.md); `live.js` holds the
-  production services (Stripe, email).
+- `pages/plugins.html` is `/plugins`: how plugins work in every app and how an agent builds one
+  (PLUGINS.md); it replaced the marketplace's page.
+- `builds.js` serves the apps' builds behind `/api/apps/<app>/…` (DISTRIBUTION.md).
 - `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
 - `%VERSION:<app>%` becomes the app's newest version in `ludovic111/lsuite-builds` (`builds.js`,
   cached 5 min) when `LSUITE_BUILDS_TOKEN` is set, else the app's latest public GitHub release
@@ -72,9 +61,9 @@ npm test
 ## The launcher
 
 `launcher/` is **lsuite**, the suite's native launcher (Rust, GPUI; its own Cargo workspace, not
-part of the site's deployment): installs and updates the apps, the lsuite account (lsuite Pass),
-lsuite Cloud and, in its next release, plugins from the lsuite Marketplace. See [launcher/README.md](launcher/README.md). Its page is `/launcher` (`pages/launcher.html`,
-captures in `assets/img/launcher/`: `apps`, `account`, `cloud`, each with `-light`, 2000x1250;
+part of the site's deployment): installs and updates the apps and, from 0.3.0, lists their plugins
+and asks an app's agent to build one. See [launcher/README.md](launcher/README.md). Its page is `/launcher` (`pages/launcher.html`,
+captures in `assets/img/launcher/`: `apps`, with `-light`, 2000x1250;
 mark in `assets/img/icons/lsuite.webp`, from `launcher/brand/icon.png`); the home page and the
 footer link to it. Its releases are published in this repository, tagged `launcher-vX.Y.Z`.
 
@@ -91,12 +80,11 @@ are under `/design/`.
 | --- | --- |
 | `/<app>/download[/<platform>]` | 302 to `/launcher` for the four apps: they come only through the lsuite app (DISTRIBUTION.md). Their pages say "Get <app> in the lsuite app". |
 | `/launcher/download[/<platform>]` | 302 to the matching asset of the newest published `launcher-vX.Y.Z` release of `ludovic111/lsuite` (`DOWNLOADS` in `server.js`, `tagPrefix`, looked up on the GitHub API, cached 10 min); without a platform the visitor's OS picks one (macOS and Windows, coming soon, land on `/launcher#downloads`); with no matching asset, that release's page, or the releases list: `macos-arm64`, `macos-x86_64` (.dmg), `windows-x86_64` (setup .exe), `windows-zip`, `linux-x86_64` (.AppImage), `linux-tar` (.tar.gz). The launcher is not one of the apps: not in `/api/apps`, no `/launcher/support`. |
-| `/api/apps/<app>/latest`, `…/latest.json`, `…/releases/latest`, `…/files/<tag>/<name>` | The apps' builds (DISTRIBUTION.md, `builds.js`), for any signed-in app token (Free included; not the site's cookie): the newest release of `<app>-v*` in the private `ludovic111/lsuite-builds` (no drafts or pre-releases, newest by semver), with `latest.json` and `SHA256SUMS(.sig)` read on the server (cached 5 min) and every download address rewritten to the file route, which answers a 302 to GitHub's short-lived address (the file never passes through the site, the token never leaves it). Needs `LSUITE_BUILDS_TOKEN` (a fine-grained token, read-only on `lsuite-builds`; never in Git): without it 503. 401 "Sign in to lsuite to get the apps: the account is free."; GitHub errors 502. |
-| `/api/ai/…`, `/api/account/…` | lsuite AI and accounts (AI.md, `ai.js`): JSON, Anthropic-compatible `/api/ai/v1/messages`. `LSUITE_DATA_DIR` holds account state. Live service requires explicit `LSUITE_MODE=production` and the complete Stripe, Anthropic and verified-email configuration in AI.md; adding an API key alone never turns demo accounts into paid access. |
-| `/api/cloud`, `/api/cloud/…` | lsuite Cloud (CLOUD.md, `cloud.js` through `ai.js`): the account's files, app token (GET also takes the session cookie). Stored under `LSUITE_DATA_DIR/cloud/` (`production-cloud/` in production), a temporary folder without it. Demo caps: `LSUITE_CLOUD_DEMO_QUOTA`, `LSUITE_CLOUD_DEMO_MAX_FILE`, `LSUITE_CLOUD_DEMO_TOTAL` (bytes; 100 MB, 25 MB, 300 MB), and `LSUITE_CLOUD_DISK_RESERVE` (100 MB always left free on the disk). With `LSUITE_CLOUD_S3_ENDPOINT`, `…_BUCKET`, `…_ACCESS_KEY_ID`, `…_SECRET_ACCESS_KEY` (optional `…_REGION`, `…_PREFIX`, `…_PATH_STYLE`), the files go to an S3-compatible object store and the index stays in the data dir; production then applies the plans' sizes (CLOUD.md, "The object store"). |
-| `/api/marketplace`, `/api/marketplace/…` | The lsuite Marketplace (MARKETPLACE.md, `marketplace.js` through `ai.js`): listings (public), submissions and uploads (app token), downloads (paid plan), review (admins: `LSUITE_ADMIN_EMAILS`, comma-separated emails). Stored under `LSUITE_DATA_DIR/marketplace/` (`production-marketplace/` in production), a temporary folder without it, or in lsuite Cloud's object store when set. Demo caps: `LSUITE_MARKET_MAX_FILE` (15 MB a bundle) and `LSUITE_MARKET_TOTAL` (80 MB in all, not with an object store); the cloud's disk reserve applies. |
-| `/api/apps` | The four apps for the lsuite launcher (CLOUD.md), public: `{apps: [{id, name, kind, summary, page, repo, version, published, platforms}]}` from `DOWNLOADS`, `REPOS` and the versions `%VERSION:<app>%` uses (the builds when configured); `Cache-Control: public, max-age=300`. |
-| `/pass`, `/marketplace`, `/account`, `/account/connect`, `/account/checkout` | lsuite Pass, the marketplace and the account pages (session cookie `lsuite_session`, HttpOnly, SameSite=Lax). `/ai` (and `/ai/`) is a 301 to `/pass`. |
+| `/api/apps/<app>/latest`, `…/latest.json`, `…/releases/latest`, `…/files/<tag>/<name>` | The apps' builds (DISTRIBUTION.md, `builds.js`), public (no token, nothing to sign in to): the newest release of `<app>-v*` in the private `ludovic111/lsuite-builds` (no drafts or pre-releases, newest by semver), with `latest.json` and `SHA256SUMS(.sig)` read on the server (cached 5 min) and every download address rewritten to the file route, which answers a 302 to GitHub's short-lived address (the file never passes through the site, the token never leaves it). Needs `LSUITE_BUILDS_TOKEN` (a fine-grained token, read-only on `lsuite-builds`; never in Git): without it 503; GitHub errors 502. |
+| `/api/ai/…`, `/api/account/…`, `/api/cloud…`, `/api/marketplace…`, `/api/billing/…` | Gone since 2026-10-10 (lsuite is free): a JSON 410 (`not_found_error`) telling older apps and launchers to update. Any other unknown `/api/…` is a JSON 404. |
+| `/api/apps` | The four apps for the lsuite launcher, public: `{apps: [{id, name, kind, summary, page, repo, version, published, platforms}]}` from `DOWNLOADS`, `REPOS` and the versions `%VERSION:<app>%` uses (the builds when configured); `Cache-Control: public, max-age=300`. |
+| `/plugins` | Plugins in every lsuite app (`pages/plugins.html`). `/marketplace[/…]` is a 301 to it. |
+| `/ai`, `/pass`, `/account[/…]` | 301 to `/` (the pages of lsuite Pass and the accounts, removed 2026-10-10). |
 | `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
 | `/health` | `ok`, for Railway's health check. |
 | `/robots.txt`, `/sitemap.xml` | Generated for the request's origin. |

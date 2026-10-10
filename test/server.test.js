@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { hostRedirect, osFor, supportTarget, downloadTarget, renderPage, handle, appVersions, versionOf, marketplaceHtml, plansHtml, DOWNLOADS, APP_NAMES, PAGES } from '../server.js';
+import { hostRedirect, osFor, supportTarget, downloadTarget, renderPage, handle, appVersions, versionOf, DOWNLOADS, APP_NAMES, PAGES, GONE } from '../server.js';
 
 test('ryolune.com lands on the ryolune page, path and query kept', () => {
   assert.equal(hostRedirect('ryolune.com', '/', 'lsuite.xyz'), 'https://lsuite.xyz/ryolune');
@@ -42,14 +42,14 @@ test('the four apps come only through the lsuite app: their pages and download r
     assert.ok(html.includes('<a class="btn btn--primary" href="/launcher/download"'), `${app}: lsuite's download is the primary button`);
     assert.ok(html.includes('href="/launcher">About the lsuite app'), `${app}: links /launcher`);
     assert.ok(html.includes(`<a class="btn btn--primary" href="#downloads">Get ${app}</a>`), `${app}: the hero leads there`);
-    assert.ok(html.includes('free lsuite account'), `${app}: the account is free`);
+    assert.ok(html.includes('no account') && !/free lsuite account|Sign in/.test(html.replace(/<div class="releases[\s\S]*?<\/section>/, '')), `${app}: no account`);
     assert.ok(html.includes(`Version 9.8.7`) && html.includes(`${app} 9.8.7 ·`), `${app}: version shown`);
     assert.ok(!html.includes('First public build coming'), app);
   }
   assert.equal(await downloadTarget('photoshop', 'macos-arm64'), null);
   const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '1.0.1', kimchi: '1.0.2', nori: '1.0.4', folio: '1.0.5' });
   assert.ok(home.includes('<a class="btn btn--primary" href="/launcher/download">Download lsuite'));
-  assert.ok(home.includes('come through the lsuite app with a free account'));
+  assert.ok(home.includes('come through the lsuite app, no account needed'));
   for (const v of ['1.0.1', '1.0.2', '1.0.4', '1.0.5']) assert.ok(home.includes(`Beta · v${v}`), v);
 
   const server = createServer((req, res) => handle(req, res));
@@ -71,26 +71,15 @@ test('the four apps come only through the lsuite app: their pages and download r
       assert.equal(res.headers.get('location'), '/', path);
     }
     assert.ok(!(await (await get('/sitemap.xml')).text()).includes('/zenith'), 'not in the sitemap');
-    // GET /api/apps stays public; the builds need an app token (and, here, LSUITE_BUILDS_TOKEN).
+    // GET /api/apps and the builds are public (the builds need LSUITE_BUILDS_TOKEN on the server).
     const list = await get('/api/apps');
     assert.equal(list.status, 200);
     assert.deepEqual((await list.json()).apps.map((a) => a.id), APP_NAMES);
-    const signedOut = await get('/api/apps/kimchi/latest');
-    assert.equal(signedOut.status, 401);
-    assert.equal((await signedOut.json()).error.message, 'Sign in to lsuite to get the apps: the account is free.');
-    let jar = '';
-    const post = async (path, body) => {
-      const res = await fetch(base + path, { method: 'POST', headers: { 'content-type': 'application/json', ...(jar ? { cookie: jar } : {}) }, body: JSON.stringify(body) });
-      jar = res.headers.get('set-cookie')?.split(';')[0] ?? jar;
-      return res;
-    };
-    await post('/api/account/session', { email: 'grace@example.com', name: 'Grace' });
-    const { code } = await (await post('/api/account/connect', { app: 'lsuite' })).json();
-    const { token } = await (await post('/api/account/token', { code })).json();
-    assert.equal((await get('/api/apps/kimchi/latest', { cookie: jar })).status, 401, 'the site cookie is not an app token');
-    const unset = await get('/api/apps/kimchi/latest', { authorization: `Bearer ${token}` });
-    assert.equal(unset.status, 503);
-    assert.deepEqual((await unset.json()).error, { type: 'api_error', message: "App downloads aren't set up on this server yet." });
+    for (const headers of [{}, { authorization: 'Bearer lsk_old-account-token' }]) {
+      const unset = await get('/api/apps/kimchi/latest', headers);
+      assert.equal(unset.status, 503);
+      assert.deepEqual((await unset.json()).error, { type: 'api_error', message: "App downloads aren't set up on this server yet." });
+    }
   } finally {
     server.close();
   }
@@ -105,8 +94,8 @@ test('beta apps: every page says Beta and Linux, the nav lists all four, only ma
     assert.ok(!/\/Applications\//.test(html), `${app}: no macOS paths`);
     for (const other of ['ryolune', 'kimchi', 'nori', 'folio']) assert.ok(html.includes(`href="/${other}" data-app="${other}"`), `${app}: nav has ${other}`);
     assert.ok(html.includes('id="changelog"'), `${app}: changelog`);
-    assert.ok(html.includes('id="ai"'), `${app}: lsuite AI`);
-    assert.ok(html.includes('href="/pass"') && !html.includes('href="/ai'), `${app}: lsuite Pass, never /ai`);
+    assert.ok(!html.includes('id="ai"') && !/href="\/(?:ai|pass|account|marketplace)\b/.test(html), `${app}: no lsuite Pass, account or marketplace`);
+    assert.ok(html.includes('href="/plugins"'), `${app}: links the plugins page`);
   }
   const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', nori: '7.7.7' });
   for (const app of ['ryolune', 'kimchi', 'nori', 'folio']) assert.ok(home.includes(`class="card app-${app}`), `home card ${app}`);
@@ -147,49 +136,47 @@ test('assets are served wherever the site lives, dotfiles inside it never', asyn
   }
 });
 
-test('lsuite Pass and the account pages: plans from the API, scripts as files, flow steps unlisted', async () => {
-  const pass = await renderPage('pass/index.html', 'https://lsuite.xyz', {});
-  for (const plan of ['free', 'plus', 'pro', 'studio']) assert.ok(pass.includes(`data-plan="${plan}"`), plan);
-  assert.ok(pass.includes('href="/account/checkout?plan=pro"'));
-  assert.ok(pass.includes('data-app="pass" aria-current="page"'), 'Pass is current in the nav');
-  assert.ok(pass.includes('<link rel="canonical" href="https://lsuite.xyz/pass">'));
-  for (const part of ['lsuite AI', 'lsuite Cloud', 'lsuite Marketplace']) assert.ok(pass.includes(part), part);
-  for (const logo of ['claude', 'openai', 'ollama', 'gemini']) assert.ok(pass.includes(`/assets/img/logos/${logo}.svg`), logo);
-  // Each paid plan: credits, models, storage and the marketplace.
-  const cards = plansHtml().split(/<div class="plan(?:"| plan--lit")/).slice(1);
-  assert.equal(cards.length, 4);
-  for (const card of cards.slice(1)) for (const item of ['credits</b> a month of lsuite AI', 'Claude', 'lsuite Cloud', 'The lsuite Marketplace']) assert.ok(card.includes(item), item);
-  assert.ok(!cards[0].includes('The lsuite Marketplace'));
-  for (const page of ['index.html', 'partials/nav.html', 'partials/foot.html', 'pages/launcher.html', 'account/index.html', 'account/checkout.html', 'account/connect.html']) {
-    const html = page.startsWith('partials/') ? await (await import('node:fs/promises')).readFile(new URL(`../${page}`, import.meta.url), 'utf8') : await renderPage(page, 'https://lsuite.xyz', {});
-    assert.ok(!/href="\/ai[#"]/.test(html), `${page}: links /pass, not /ai`);
-  }
-  for (const page of ['account/index.html', 'account/connect.html', 'account/checkout.html']) {
+test('lsuite is free: no Pass, accounts, cloud or marketplace; their addresses moved or gone', async () => {
+  for (const page of ['index.html', 'pages/launcher.html', 'pages/plugins.html', 'ryolune/index.html', 'kimchi/index.html', 'nori/index.html', 'folio/index.html']) {
     const html = await renderPage(page, 'https://lsuite.xyz', {});
-    assert.match(html, /<script src="\/assets\/account\.js\?v=[0-9a-f]{10}" defer><\/script>/, page);
-    assert.ok(!/<script>(?!\s*$)|on(click|submit)=/i.test(html), `${page}: no inline script`);
-    assert.ok(html.includes('noindex'), page);
+    assert.ok(!/href="\/(?:ai|pass|account|marketplace)\b/.test(html), `${page}: no link to a page that left`);
+    assert.ok(!/lsuite Pass|lsuite Cloud|lsuite Marketplace/.test(html.replace(/<div class="releases[\s\S]*?<\/section>/, '')), `${page}: none of the paid parts, outside past release notes`);
   }
-  const checkout = await renderPage('account/checkout.html', 'https://lsuite.xyz', {});
-  assert.ok(checkout.includes('Demo — no payment is taken'));
+  for (const path of ['/pass', '/marketplace', '/account', '/account/connect', '/account/checkout']) assert.equal(PAGES[path], undefined, path);
+
+  const plugins = await renderPage('pages/plugins.html', 'https://lsuite.xyz', {});
+  assert.ok(!/<!-- include:|%ORIGIN%/.test(plugins));
+  assert.ok(plugins.includes('data-app="plugins" aria-current="page"'), 'Plugins is current in the nav');
+  assert.ok(plugins.includes('<link rel="canonical" href="https://lsuite.xyz/plugins">'));
+  for (const id of ['what', 'build', 'safety', 'faq']) assert.ok(plugins.includes(`id="${id}"`), id);
+  assert.ok(plugins.includes('plugin.publishLocal') && !plugins.includes('market.'));
+  assert.ok(!/<script>(?!\s*$)|on(click|load|submit)=/i.test(plugins), 'no inline script');
 
   const server = createServer((req, res) => handle(req, res));
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   try {
     const base = `http://127.0.0.1:${server.address().port}`;
-    for (const path of ['/pass', '/marketplace', '/account', '/account/connect', '/account/checkout']) assert.equal((await fetch(base + path)).status, 200, path);
-    for (const path of ['/ai', '/ai/', '/ai/index.html']) {
-      const moved = await fetch(base + path, { redirect: 'manual' });
+    const get = (path, init = {}) => fetch(base + path, { redirect: 'manual', ...init });
+    assert.equal((await get('/plugins')).status, 200);
+    for (const path of ['/ai', '/ai/', '/pass', '/pass/', '/pass/index.html', '/account', '/account/connect?app=kimchi', '/account/checkout']) {
+      const moved = await get(path);
       assert.equal(moved.status, 301, path);
-      assert.equal(moved.headers.get('location'), '/pass', path);
+      assert.equal(moved.headers.get('location'), '/', path);
     }
-    assert.equal((await fetch(`${base}/ai?ref=app`, { redirect: 'manual' })).headers.get('location'), '/pass?ref=app');
-    assert.equal((await fetch(`${base}/pass/`, { redirect: 'manual' })).headers.get('location'), '/pass');
-    const sitemap = await (await fetch(`${base}/sitemap.xml`)).text();
-    assert.ok(sitemap.includes('/pass</loc>') && sitemap.includes('/marketplace</loc>') && sitemap.includes('/account</loc>'));
-    assert.ok(!sitemap.includes('/ai</loc>'));
-    assert.ok(!sitemap.includes('/account/connect') && !sitemap.includes('/account/checkout'));
-    assert.match(await (await fetch(`${base}/robots.txt`)).text(), /Disallow: \/account\//);
+    for (const path of ['/marketplace', '/marketplace/', '/marketplace?app=kimchi']) assert.equal((await get(path)).headers.get('location'), '/plugins', path);
+    // Older apps and launchers still calling the paid parts' APIs get a JSON 410 saying why.
+    for (const [method, path] of [['GET', '/api/ai/plans'], ['POST', '/api/ai/v1/messages'], ['GET', '/api/account/me'], ['POST', '/api/account/token'], ['GET', '/api/cloud/files'], ['GET', '/api/marketplace'], ['POST', '/api/billing/webhook']]) {
+      const res = await get(path, { method });
+      assert.equal(res.status, 410, path);
+      assert.match(res.headers.get('content-type'), /application\/json/);
+      assert.deepEqual((await res.json()).error, { type: 'not_found_error', message: GONE });
+    }
+    assert.equal((await get('/api/nothing')).status, 404);
+    assert.equal((await get('/api/aim')).status, 404, 'only those prefixes are gone');
+    const sitemap = await (await get('/sitemap.xml')).text();
+    assert.ok(sitemap.includes('/plugins</loc>'));
+    for (const path of ['/pass', '/marketplace', '/account', '/ai']) assert.ok(!sitemap.includes(`${path}</loc>`), path);
+    assert.ok(!(await (await get('/robots.txt')).text()).includes('/account'));
   } finally {
     server.close();
   }
@@ -234,7 +221,8 @@ test('the launcher: its page, its downloads from launcher-v tags, and never one 
   assert.ok(html.includes('Version 0.1.1'));
   assert.ok(html.includes('<link rel="canonical" href="https://lsuite.xyz/launcher">'));
   for (const platform of Object.keys(DOWNLOADS.launcher.patterns)) assert.ok(html.includes(`href="/launcher/download/${platform}"`), platform);
-  for (const shot of ['apps', 'cloud', 'account']) {
+  assert.ok(html.includes('id="plugins"') && !html.includes('id="cloud"') && !html.includes('id="account"'));
+  for (const shot of ['apps']) {
     assert.ok(html.includes(`src="/assets/img/launcher/${shot}.webp" width="2000" height="1250"`), shot);
     assert.ok(html.includes(`srcset="/assets/img/launcher/${shot}-light.webp"`), shot);
   }
@@ -261,26 +249,4 @@ test('the launcher: its page, its downloads from launcher-v tags, and never one 
   } finally {
     server.close();
   }
-});
-
-test('the marketplace page: approved plugins as cards, filtered by app without a script, an empty state', async () => {
-  const html = await renderPage('marketplace/index.html', 'https://lsuite.xyz', {}, false, new URLSearchParams('app=kimchi'));
-  assert.ok(!/<!-- include:|%ORIGIN%/.test(html));
-  assert.ok(html.includes('data-app="marketplace" aria-current="page"'));
-  assert.ok(html.includes('The first plugins are on their way — publish yours'));
-  assert.ok(html.includes('href="/marketplace?app=kimchi#plugins" aria-current="page"'));
-  for (const id of ['publish', 'pass', 'safety']) assert.ok(html.includes(`id="${id}"`), id);
-  assert.ok(html.includes('market.publish path='));
-  assert.ok(!/<script>(?!\s*$)|on(click|load|submit)=/i.test(html), 'no inline script');
-
-  const listing = (over) => ({ id: 'com.example.tape-warmth', app: 'ryolune', name: 'Tape <warmth>', kind: 'effect', description: 'Saturation.', version: '1.2.0', abi: 1, author: { name: 'Ada', verified: false }, platforms: { 'macos-arm64': { size: 1, sha256: 'a' }, 'linux-x86_64': { size: 1, sha256: 'b' } }, downloads: 1234, updatedAt: '2026-10-07T12:00:00Z', notes: '', ...over });
-  const cards = marketplaceHtml([listing(), listing({ id: 'xyz.lsuite.nori.duotone', app: 'nori', name: 'Duotone', author: { name: 'lsuite', verified: true }, platforms: { 'windows-x86_64': { size: 1, sha256: 'c' } } })]);
-  assert.equal((cards.match(/<article class="plugin"/g) ?? []).length, 2);
-  assert.ok(cards.includes('Tape &lt;warmth&gt;'), 'escaped');
-  assert.ok(cards.includes('src="/assets/img/icons/ryolune.webp"') && cards.includes('src="/assets/img/icons/nori.webp"'));
-  assert.ok(cards.includes('by Ada') && cards.includes('<span class="badge badge--sm">by lsuite</span>'));
-  assert.ok(cards.includes('<dd>macOS Apple silicon, Linux</dd>') && cards.includes('<dd>Windows</dd>'));
-  assert.ok(cards.includes('<dd>1,234</dd>') && cards.includes('<dd>1.2.0</dd>'));
-  assert.ok(cards.includes('href="/marketplace#plugins" aria-current="page"'), 'every app');
-  assert.ok(!cards.includes('The first plugins'));
 });

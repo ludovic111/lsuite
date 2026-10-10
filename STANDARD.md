@@ -45,13 +45,11 @@ Ship `docs/AI_CONTROL.md` (how to drive the app) and the generated `docs/COMMAND
 ## 3. Automatic updates
 
 - The app checks for an update when it starts and offers it in one click (or installs it in the
-  background where the platform allows), **through lsuite.xyz** with the lsuite account's token
-  (DISTRIBUTION.md, decided 2026-10-07): kimchi, nori and folio read
+  background where the platform allows), **through lsuite.xyz**, with nothing to sign in to
+  (DISTRIBUTION.md, decided 2026-10-07, free since 2026-10-10): kimchi, nori and folio read
   `<server>/api/apps/<app>/latest.json`, ryolune `<server>/api/apps/<app>/releases/latest`
-  and its `SHA256SUMS(.sig)`. `<server>` is `LSUITE_ACCOUNT_SERVER` or the account's server, else
-  `https://lsuite.xyz`; the token comes from `~/.lsuite/account.json` (`LSUITE_HOME`), sent as
-  `Authorization: Bearer`. Signed out, the check says "Sign in to lsuite (in the lsuite app) to get
-  updates" instead of failing. The builds live in the private `ludovic111/lsuite-builds` (tag
+  and its `SHA256SUMS(.sig)`. `<server>` is `LSUITE_SERVER`, else
+  `https://lsuite.xyz`; no token is sent. The builds live in the private `ludovic111/lsuite-builds` (tag
   `<app>-v<version>`), where the release workflow uploads them.
 - Updates are **signed** (Ed25519 / minisign or the Tauri updater key) and verified before
   anything is replaced; the previous copy is kept until the new one starts.
@@ -89,12 +87,11 @@ The apps are separate programs but must be usable as one suite, by a person and 
   `https://lsuite.xyz/<app>`. GitHub "website" field is that page.
 - Support/donate links go to `https://lsuite.xyz/<app>/support` (redirects to GitHub Sponsors).
 - **The apps are free**, every feature, for everyone. They are **downloaded through lsuite**: the
-  ready-made builds come only through the lsuite app (section 10), with a **free lsuite account**
+  ready-made builds come only through the lsuite app (section 10), with **no account**
   (DISTRIBUTION.md); the source stays open, and anyone may build an app from it. The app's page
-  says "Get <app> in the lsuite app" and `lsuite.xyz/<app>/download` leads to `/launcher`. The one
-  thing lsuite sells is optional: **lsuite Pass** (section 9; lsuite AI, lsuite Cloud and the
-  lsuite Marketplace). Still **no telemetry**: an app talks to lsuite only to check for updates
-  (section 3) and when the person signed in to lsuite AI and asked the agent something.
+  says "Get <app> in the lsuite app" and `lsuite.xyz/<app>/download` leads to `/launcher`. lsuite sells
+  nothing (since 2026-10-10: no plan, no account). Still **no telemetry**: an app talks to lsuite
+  only to check for updates (section 3).
 - The app's page lives in the lsuite repo (`<app>/index.html`). **Each release updates it**:
   version, what changed, screenshots (`assets/img/<app>/`), notes on getting it.
 
@@ -124,30 +121,24 @@ Every app has plugins: its stock plugins, the plugin formats of its trade it can
 (each shown with its maker's logo), and plugins written in Rust that a person gets by asking their
 agent. One **Plugins** area per app (Stock, Installed, Formats, Build with your agent), the same
 `plugin.*` commands in every app, a frozen `repr(C)` SDK per app, bundles in
-`~/.lsuite/plugins/<app>/`. The contract: [PLUGINS.md](PLUGINS.md). Bundles travel between people on
-the **lsuite Marketplace** (every version reviewed, installed by the launcher; the app only has to
-pick them up on `plugin.rescan`): [MARKETPLACE.md](MARKETPLACE.md).
+`~/.lsuite/plugins/<app>/`. The contract: [PLUGINS.md](PLUGINS.md). A bundle is a folder: people share it
+like any file and install it with `plugin.install`; the launcher lists and removes the installed
+ones (the app picks changes up on `plugin.rescan`).
 
-## 9. lsuite AI and lsuite Pass
+## 9. No account, no plan
 
-lsuite Pass ([PASS.md](PASS.md)) is the one optional plan: lsuite AI, lsuite Cloud and the lsuite
-Marketplace. In the apps, what they show is lsuite AI, the provider:
-
-One account for the whole suite (`~/.lsuite/account.json`), signed in through the browser with a
-loopback redirect, and an Anthropic-compatible endpoint on lsuite.xyz, so an app reaches it with
-the Anthropic provider it already has. lsuite AI is the first provider in every agent ("No setup.
-Sign in and your agent works."), with `account.*` commands; bringing your own stays free and is
-never pushed aside, and a used-up allowance is said in one line, never a silent switch. A demo for
-now: no payment is taken. The contract: [AI.md](AI.md).
+Since 2026-10-10 lsuite is entirely free: no lsuite account, no lsuite Pass, no lsuite AI provider,
+no lsuite Cloud, no marketplace. An app has no `account.*` commands, no sign-in, and its agent's
+providers are the person's own (Claude Code, Codex, API keys, local models). An old
+`~/.lsuite/account.json` is ignored, never deleted.
 
 ## 10. The launcher
 
 **lsuite** (`launcher/` in the lsuite repo, started 2026-10-07) is the suite's own native app, in
 Rust and GPUI like the apps: it installs, updates, opens and removes the four apps from their
-signed builds, the only way to get them (through lsuite.xyz with a free account, DISTRIBUTION.md;
-the release keys are built in), holds the shared lsuite account (lsuite
-Pass), manages lsuite Cloud ([CLOUD.md](CLOUD.md)) and, from its next release, installs and
-publishes marketplace plugins ([MARKETPLACE.md](MARKETPLACE.md)). It reads the discovery files of section 4 and never
+signed builds, the only way to get them (through lsuite.xyz, no account, DISTRIBUTION.md; the
+release keys are built in), and, from 0.3.0, lists every app's installed plugins and hands plugin
+requests to the right app's agent. It reads the discovery files of section 4 and never
 touches a copy it didn't install outside the usual places. It meets this standard's shape: one
 command registry, `lsuite-cli`, `lsuite-mcp` (agents held to `settings.agent`), design v2. Released
 as `launcher-vX.Y.Z` in the lsuite repo (0.1.1 is the latest), signed with its own key.
@@ -155,10 +146,8 @@ as `launcher-vX.Y.Z` in the lsuite repo (0.1.1 is the latest), signed with its o
 ## Status (2026-10-07)
 
 All four apps have public beta releases: ryolune 0.15.3, kimchi 0.10.0, nori 0.1.0 and
-folio 0.1.0. Plugins and the shared account flows ship in those releases.
-lsuite Pass (lsuite AI, lsuite Cloud, the lsuite Marketplace) remains an explicit demo until the
-owner creates and connects billing, model-provider and verified-email accounts; the approved
-monthly prices are $12 / $29 / $79 USD.
+folio 0.1.0, with plugins. Those releases still carry the lsuite account and lsuite AI sign-in;
+the next ones remove them (lsuite is free since 2026-10-10).
 
 | | ryolune | kimchi | nori | folio |
 | --- | --- | --- | --- | --- |
@@ -170,7 +159,7 @@ monthly prices are $12 / $29 / $79 USD.
 | Open files | ✅ JSON, DAWproject | ✅ JSON projects | ✅ `.nori` ZIP, PSD, OpenRaster, SVG, IDML, PDF-compatible AI, 8-bit XCF | ✅ `.folio` ZIP, Office and OpenDocument |
 | Design v2 | ✅ | ✅ | ✅ | ✅ |
 | Plugins | ✅ 35 stock, CLAP, VST3, AU, Rust SDK | ✅ audio, frei0r, LUTs, Rust SDK | ✅ tile filters, Rust SDK | ✅ spreadsheet functions, Rust SDK |
-| lsuite AI | ✅ demo | ✅ demo | ✅ demo | ✅ demo |
+| No account (free) | 🟡 next release | 🟡 next release | 🟡 next release | 🟡 next release |
 | Updates | Release updater | Release updater | Signed release updater | Signed release updater |
 | Updates through lsuite.xyz | 🟡 0.16.0 in review | 🟡 0.11.0 in review | 🟡 0.2.0 in review | 🟡 0.2.0 in review |
 | Agent harness ([HARNESS.md](HARNESS.md)) | 🟡 13 skills, looks with loudness ([#34](https://github.com/ludovic111/ryolune/pull/34)) | 🟡 13 skills, frame sheets with loudness ([#16](https://github.com/ludovic111/kimchi/pull/16)) | 🟡 11 skills, contrast, bleed and resolution checks ([#1](https://github.com/ludovic111/nori/pull/1)) | 🟡 12 skills, pages, slides and sheets as images ([#1](https://github.com/ludovic111/folio/pull/1)) |

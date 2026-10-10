@@ -1,9 +1,8 @@
 // Dependency-free server for lsuite.xyz. Railway runs `npm start`.
 //
 // Pages are plain HTML (`index.html`, `<app>/index.html`) with two includes, `<!-- include:nav -->`
-// and `<!-- include:foot -->`, filled from `partials/` when served (and `<!-- include:plans -->`,
-// `<!-- include:marketplace -->` from the API's data). Everything static lives in `assets/`. Old
-// app domains (ryolune.com) answer with a 301 to the app's page here.
+// and `<!-- include:foot -->`, filled from `partials/` when served. Everything static lives in
+// `assets/`. Old app domains (ryolune.com) answer with a 301 to the app's page here.
 import { createServer } from 'node:http';
 import { createReadStream } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
@@ -11,10 +10,6 @@ import { dirname, extname, join, normalize, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
-import { liveConfig } from './live.js';
-import { createAccounts, plansDocument } from './ai.js';
-import { objectStoreConfig } from './cloud.js';
-import { MARKET_APPS, PLATFORMS } from './marketplace.js';
 import { createBuilds } from './builds.js';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -37,8 +32,8 @@ const TYPES = {
 };
 
 /**
- * The pages, by path. Each app page is `<app>/index.html`; the launcher's is `pages/launcher.html`,
- * as `launcher/` holds its Rust workspace (never served: only `/assets/` is static).
+ * The pages, by path. Each app page is `<app>/index.html`; the others are in `pages/` (`launcher/`
+ * holds the launcher's Rust workspace, never served: only `/assets/` is static).
  */
 export const PAGES = {
   '/': 'index.html',
@@ -47,66 +42,9 @@ export const PAGES = {
   '/nori': 'nori/index.html',
   '/folio': 'folio/index.html',
   '/launcher': 'pages/launcher.html',
-  '/pass': 'pass/index.html',
-  '/marketplace': 'marketplace/index.html',
-  '/account': 'account/index.html',
-  '/account/connect': 'account/connect.html',
-  '/account/checkout': 'account/checkout.html',
+  '/plugins': 'pages/plugins.html',
   '/design': 'design/index.html',
 };
-/** Pages that stay out of the sitemap (steps of a flow, not places to land). */
-const UNLISTED = new Set(['/account/connect', '/account/checkout']);
-
-const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-
-/**
- * The plans of lsuite Pass (`/api/ai/plans`) as cards (`<!-- include:plans -->`): per paid plan,
- * lsuite AI's credits and models, lsuite Cloud's storage and the lsuite Marketplace.
- */
-export function plansHtml() {
-  const { plans } = plansDocument();
-  const cards = plans.map((p) => {
-    const free = p.id === 'free';
-    const items = free
-      ? ['Every feature of every app', 'Your subscriptions and keys, as they are', 'Browse the marketplace', 'Nothing to pay, ever']
-      : [
-          `<b>${p.credits.toLocaleString('en-US')} credits</b> a month of lsuite AI`,
-          escapeHtml(p.families.join(', ')),
-          ...(p.storage ? [`<b>${escapeHtml(p.storageLabel)}</b> lsuite Cloud`] : []),
-          ...(p.marketplace ? ['The lsuite Marketplace'] : []),
-          ...(p.priority ? ['Priority when it’s busy'] : []),
-        ];
-    const action = free
-      ? `<a class="btn" href="/account">Create a free account</a>`
-      : `<a class="btn${p.id === 'pro' ? ' btn--primary' : ''}" href="/account/checkout?plan=${p.id}">Choose ${escapeHtml(p.name)}</a>`;
-    return `<div class="plan${p.id === 'pro' ? ' plan--lit' : ''}" data-plan="${p.id}"><div class="plan__head"><h3>${escapeHtml(p.name)}</h3><span class="plan__price">${free ? '<b>$0</b>' : `<b>$${p.price}</b> / month`}</span></div><p class="plan__say">${escapeHtml(p.summary)}</p><ul class="plan__list">${items.map((i) => `<li><span>${i}</span></li>`).join('')}</ul>${action}</div>`;
-  });
-  return `<div class="plans">${cards.join('')}</div>`;
-}
-
-const PLATFORM_NAMES = { 'macos-arm64': 'macOS Apple silicon', 'macos-x86_64': 'macOS Intel', 'linux-x86_64': 'Linux', 'windows-x86_64': 'Windows' };
-
-/**
- * The marketplace's approved plugins (`GET /api/marketplace`'s `plugins`) as cards, with links
- * filtering by app (`/marketplace?app=<app>`, no script) and an empty state
- * (`<!-- include:marketplace -->`). `app`: the filter, or null for every app.
- */
-export function marketplaceHtml(plugins, app = null) {
-  const link = (id, label, icon) =>
-    `<a href="/marketplace${id ? `?app=${id}` : ''}#plugins"${(id ?? null) === app ? ' aria-current="page"' : ''}>${icon ? `<img src="/assets/img/icons/${id}.webp" width="18" height="18" alt="">` : ''}${label}</a>`;
-  const filters = `<nav class="filters" aria-label="Plugins by app">${link(null, 'Every app')}${MARKET_APPS.map((id) => link(id, id, true)).join('')}</nav>`;
-  if (!plugins.length) {
-    const what = app ? `No ${escapeHtml(app)} plugins yet.` : 'No plugins yet.';
-    return `${filters}<div class="empty"><p class="empty__title">The first plugins are on their way — publish yours</p><p class="muted">${what} Build one with your app's agent and publish it: every version is reviewed before anyone can install it.</p><a class="btn" href="#publish">Publish a plugin</a></div>`;
-  }
-  const cards = plugins.map((p) => {
-    const platforms = Object.keys(PLATFORMS).filter((k) => p.platforms[k]).map((k) => PLATFORM_NAMES[k]);
-    const author = p.author.verified ? `lsuite <span class="badge badge--sm">by lsuite</span>` : escapeHtml(p.author.name);
-    return `<article class="plugin" data-plugin="${escapeHtml(p.id)}"><div class="plugin__top"><img src="/assets/img/icons/${escapeHtml(p.app)}.webp" width="28" height="28" alt=""><span class="plugin__app">${escapeHtml(p.app)}</span><span class="plugin__kind">${escapeHtml(p.kind)}</span></div><h3 class="plugin__name">${escapeHtml(p.name)}</h3><p class="plugin__by">by ${author}</p><p class="plugin__say">${escapeHtml(p.description)}</p><dl class="plugin__meta"><dt>Version</dt><dd>${escapeHtml(p.version)}</dd><dt>Platforms</dt><dd>${platforms.map(escapeHtml).join(', ')}</dd><dt>Downloads</dt><dd>${Number(p.downloads).toLocaleString('en-US')}</dd></dl><p class="plugin__id"><code>${escapeHtml(p.id)}</code></p></article>`;
-  });
-  return `${filters}<div class="plugins">${cards.join('')}</div>`;
-}
-
 /** The design system's files, served as they are (design/DESIGN.md explains them). */
 const DESIGN_FILES = new Set(['/design/tokens.css', '/design/tokens.json', '/design/preview.js']);
 
@@ -276,7 +214,7 @@ export async function appVersions(apps, source = builds) {
 }
 
 /**
- * `GET /api/apps`: the suite's apps for the lsuite launcher (CLOUD.md), with the version of each
+ * `GET /api/apps`: the suite's apps for the lsuite launcher, with the version of each
  * one's latest published release and the platforms `/<app>/download/<platform>` knows.
  */
 export async function appsDocument(origin, versions) {
@@ -380,26 +318,15 @@ async function stampOf(path) {
   }
 }
 
-/**
- * A page as served: includes filled, its app marked current in the nav, versions stamped. `query`:
- * the request's search parameters (the marketplace's `?app=` filter).
- */
-export async function renderPage(file, origin, versions, production = process.env.LSUITE_MODE === 'production', query = new URLSearchParams()) {
+/** A page as served: includes filled, its app marked current in the nav, versions stamped. */
+export async function renderPage(file, origin, versions) {
   let html = await readFile(join(ROOT, file), 'utf8');
-  html = html.replace(/<!-- demo:start -->([\s\S]*?)<!-- demo:end -->/g, (_, content) => production ? '' : content)
-    .replace(/<!-- live:start -->([\s\S]*?)<!-- live:end -->/g, (_, content) => production ? content : '');
   for (const name of ['nav', 'foot']) {
     if (html.includes(`<!-- include:${name} -->`)) {
       html = html.replace(`<!-- include:${name} -->`, (await readFile(join(ROOT, 'partials', `${name}.html`), 'utf8')).trim());
     }
   }
-  if (html.includes('<!-- include:plans -->')) html = html.replace('<!-- include:plans -->', plansHtml());
-  if (html.includes('<!-- include:marketplace -->')) {
-    const app = MARKET_APPS.includes(query.get('app')) ? query.get('app') : null;
-    const { plugins } = await accounts.marketplace.catalogue(app);
-    html = html.replace('<!-- include:marketplace -->', () => marketplaceHtml(plugins, app));
-  }
-  // The page's app is its path's first segment (`/kimchi`, `/launcher`, `/account/connect`).
+  // The page's app is its path's first segment (`/kimchi`, `/launcher`, `/plugins`).
   const route = Object.keys(PAGES).find((path) => PAGES[path] === file);
   const app = route ? route.split('/')[1] || null : file.includes('/') ? file.split('/')[0] : null;
   if (app) html = html.replaceAll(`data-app="${app}"`, `data-app="${app}" aria-current="page"`);
@@ -461,27 +388,17 @@ async function notFound(req, res) {
 }
 
 /**
- * lsuite accounts and lsuite Pass (PASS.md, `ai.js`): accounts in `LSUITE_DATA_DIR/accounts.json`
- * (memory when unset), lsuite AI's model requests forwarded in production, lsuite Cloud and the
- * lsuite Marketplace's files in the data dir (or an object store), admins from `LSUITE_ADMIN_EMAILS`.
+ * The apps' builds (DISTRIBUTION.md, `builds.js`): `/api/apps/<app>/…`, public, read from the
+ * private `ludovic111/lsuite-builds` with `LSUITE_BUILDS_TOKEN` (unset: 503).
  */
-export const accounts = createAccounts({
-  mode: process.env.LSUITE_MODE || 'demo',
-  live: liveConfig(),
-  dataDir: process.env.LSUITE_DATA_DIR || null,
-  anthropicKey: process.env.LSUITE_ANTHROPIC_API_KEY || '',
-  // lsuite Cloud's blobs in an S3-compatible store (`LSUITE_CLOUD_S3_*`, CLOUD.md), else on the data dir.
-  cloudStore: objectStoreConfig(),
-});
+export const builds = createBuilds({ token: process.env.LSUITE_BUILDS_TOKEN || '', origin: originOf });
 /**
- * The apps' builds (DISTRIBUTION.md, `builds.js`): `/api/apps/<app>/…` for signed-in apps, read
- * from the private `ludovic111/lsuite-builds` with `LSUITE_BUILDS_TOKEN` (unset: 503).
+ * The APIs lsuite had while it sold lsuite Pass (accounts, lsuite AI, lsuite Cloud, the lsuite
+ * Marketplace, billing), removed on 2026-10-10 when lsuite became entirely free. Older apps and
+ * launchers that still call them get 410 with this, in the shape of the other API errors.
  */
-export const builds = createBuilds({
-  token: process.env.LSUITE_BUILDS_TOKEN || '',
-  auth: accounts.appAccount,
-  origin: accounts.publicOrigin,
-});
+const GONE_API = /^\/api\/(?:ai|account|cloud|marketplace|billing)(?:\/|$)/;
+export const GONE = 'lsuite is free now: there are no accounts, plans, cloud or marketplace any more. Update the lsuite app to its latest version.';
 const DOWNLOAD_ROUTE = new RegExp(`^/(${Object.keys(DOWNLOADS).join('|')})/download(?:/([\\w-]+))?$`);
 const SUPPORT_ROUTE = new RegExp(`^/(?:(?:${APP_NAMES.join('|')})/)?support$`);
 
@@ -497,7 +414,9 @@ export async function handle(req, res) {
     if (await builds.handle(req, res, new URL(req.url, 'http://localhost'))) return;
   }
   if (String(req.url ?? '').startsWith('/api/')) {
-    if (await accounts.handle(req, res, new URL(req.url, 'http://localhost'))) return;
+    const path = String(req.url).split('?')[0];
+    const message = GONE_API.test(path) ? GONE : `No API at ${req.method} ${path}.`;
+    return send(res, GONE_API.test(path) ? 410 : 404, JSON.stringify({ type: 'error', error: { type: 'not_found_error', message } }), TYPES['.json'], 'no-store');
   }
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     return send(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', 'no-store');
@@ -519,8 +438,10 @@ export async function handle(req, res) {
   const bare = pathname.replace(/\/index\.html$/, '/').replace(/(.)\/+$/, '$1');
   if (bare !== pathname && PAGES[bare]) return redirect(res, 301, bare + url.search, 'public, max-age=3600');
 
-  // The subscription's page was /ai until it became lsuite Pass (2026-10-07).
-  if (/^\/ai(\/|\/index\.html)?$/.test(pathname)) return redirect(res, 301, '/pass' + url.search, 'public, max-age=86400');
+  // lsuite Pass and the accounts left on 2026-10-10 (lsuite is free): their pages land on the home
+  // page, and the marketplace's on the page about building plugins.
+  if (/^\/(?:ai|pass|account)(?:\/.*)?$/.test(pathname)) return redirect(res, 301, '/', 'public, max-age=86400');
+  if (/^\/marketplace(?:\/.*)?$/.test(pathname)) return redirect(res, 301, '/plugins', 'public, max-age=86400');
 
   // ryolune was called Ondera until 0.11.
   if (pathname === '/ondera' || pathname.startsWith('/ondera/')) {
@@ -531,7 +452,7 @@ export async function handle(req, res) {
   if (pathname === '/zenith' || pathname.startsWith('/zenith/')) return redirect(res, 301, '/', 'public, max-age=86400');
 
   if (PAGES[pathname]) {
-    const html = await renderPage(PAGES[pathname], originOf(req), undefined, undefined, url.searchParams);
+    const html = await renderPage(PAGES[pathname], originOf(req));
     return send(res, 200, html, TYPES['.html'], 'no-cache', req);
   }
 
@@ -543,11 +464,11 @@ export async function handle(req, res) {
   if (pathname === '/favicon.ico') return redirect(res, 301, '/assets/img/lsuite.svg', 'public, max-age=86400');
 
   if (pathname === '/robots.txt') {
-    return send(res, 200, `User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /account/\n\nSitemap: ${originOf(req)}/sitemap.xml\n`, TYPES['.txt'], 'public, max-age=3600', req);
+    return send(res, 200, `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${originOf(req)}/sitemap.xml\n`, TYPES['.txt'], 'public, max-age=3600', req);
   }
   if (pathname === '/sitemap.xml') {
     const urls = await Promise.all(
-      Object.entries(PAGES).filter(([path]) => !UNLISTED.has(path)).map(async ([path, file]) => {
+      Object.entries(PAGES).map(async ([path, file]) => {
         const { mtime } = await stat(join(ROOT, file));
         return `  <url><loc>${originOf(req)}${path}</loc><lastmod>${mtime.toISOString().slice(0, 10)}</lastmod></url>`;
       }),

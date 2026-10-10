@@ -1,8 +1,8 @@
 # lsuite.xyz
 
-The suite's site; see README.md (layout, routes, domains) and STANDARD.md (the contract every
-lsuite app meets, with a status table), PLUGINS.md (plugins), PASS.md (lsuite Pass) with AI.md,
-CLOUD.md and MARKETPLACE.md (its three parts' contracts).
+The suite's site; see README.md (layout, routes, domains), STANDARD.md (the contract every
+lsuite app meets, with a status table), PLUGINS.md (plugins), DISTRIBUTION.md (getting the apps)
+and HARNESS.md (the agent harness).
 Each app repo (`../ryolune`, `../kimchi`, `../nori`, `../folio`)
 has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 
@@ -19,42 +19,34 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   → `/launcher#downloads`). Their files were removed from every release (launcher, lsuite-builds
   and the apps' public releases); the release workflows keep the macOS/Windows matrix lines
   commented out. Past changelog cards still describe what those versions shipped.
+- **Entirely free, no account** (owner's decision, 2026-10-10): lsuite Pass (lsuite AI, lsuite
+  Cloud, the lsuite Marketplace), the lsuite account and every page and API of theirs were removed
+  (`ai.js`, `cloud.js`, `marketplace.js`, `live.js`, PASS.md, AI.md, CLOUD.md, MARKETPLACE.md).
+  `/ai`, `/pass`, `/account[/…]` are 301s to `/`, `/marketplace` to `/plugins` (`pages/plugins.html`:
+  plugins built by your agent, PLUGINS.md); `/api/ai|account|cloud|marketplace|billing…` answer a
+  JSON 410. The nav has Plugins after the apps; no Account button. Never bring back plans, credits,
+  sign-in or "demo" wording. The apps and the launcher drop their account, lsuite AI provider,
+  cloud and marketplace in their next releases (PRs `free-suite` / `free-launcher`, 2026-10-10).
 - **The apps come only through the lsuite app** (DISTRIBUTION.md, owner's decision 2026-10-07,
-  like Creative Cloud): a free lsuite account gets every app; the source stays open. Each app page
+  like Creative Cloud), with no account; the source stays open. Each app page
   has "Get <app> in the lsuite app" (`#downloads`, primary button `/launcher/download`, then
   `/launcher`) instead of downloads, and `/<app>/download[/…]` is a 302 to `/launcher`. The builds
   live in the private `ludovic111/lsuite-builds` (one release per version, tag `<app>-v<version>`),
   served by `builds.js` (`/api/apps/<app>/latest`, `latest.json`, `releases/latest`,
-  `files/<tag>/<name>`: app token required, 302 to GitHub's signed address) with
+  `files/<tag>/<name>`: public, 302 to GitHub's signed address) with
   `LSUITE_BUILDS_TOKEN` (Railway; 503 without it). `%VERSION:<app>%` and `/api/apps` read the
   versions there when the token is set (else the public releases while they last, then
   `FALLBACK_VERSIONS`): ryolune 0.15.3, kimchi 0.10.0, nori 0.1.0 and folio 0.1.0.
   The apps' public GitHub releases become drafts once launcher 0.2.0 and each app's next version
   (whose updater reads lsuite.xyz) are out; the changelog cards' "Full notes" links to them will
   need another target then.
-- **lsuite Pass** (PASS.md, owner's decision 2026-10-07) is the paid subscription, renamed from
-  "lsuite AI": one optional plan for everything extra, the apps staying free. It holds **lsuite AI**
-  (AI.md: the agents; the apps' provider keeps that name, and the API paths `/api/ai/…`,
-  `/api/account/…` don't change), **lsuite Cloud** (CLOUD.md) and the **lsuite Marketplace**
-  (MARKETPLACE.md). Tiers Free / Plus $12 / Pro $29 / Studio $79, still a demo (no payment taken).
-  Pages: `/pass` (`pass/index.html`; `/ai` is a 301 to it), `/marketplace`, `/account`,
-  `/account/connect`, `/account/checkout`. Say lsuite Pass for the subscription, lsuite AI for the
-  agents, models and credits. Nav: Pass and Marketplace after the apps; footer and home link both.
-- **lsuite Marketplace** (MARKETPLACE.md, `marketplace.js`, 2026-10-07): plugins anyone with an
-  account publishes, every version reviewed by an admin (`LSUITE_ADMIN_EMAILS`; an admin's own are
-  approved at once and marked "by lsuite"), installed with a paid plan. Bundles in
-  `<data>/marketplace/` (or the cloud's object store), 15 MB each and 80 MB in all in the demo.
-  `/marketplace` lists the approved plugins server-side; `/account` has "Your plugins" and, for
-  admins, "Review". The launcher's Marketplace area and `lsuite-cli market.*` are being built.
 - The site wears **design system v2** (`design/DESIGN.md`). All app names are lowercase.
   Real native-app captures are in `assets/img/<app>/`; each hero uses light and dark images.
   All four marks come from the app repositories' own generated icons. App capabilities and
   command counts describe the new beta builds; public download versions follow GitHub Releases.
 - **lsuite launcher** (`launcher/`, 2026-10-07, see its README): a Rust/GPUI app that installs and
-  updates the four apps from their signed releases, manages the lsuite account (lsuite Pass) and **lsuite
-  Cloud** (CLOUD.md, `cloud.js`, `/api/cloud`, two-way synced folders; storage per plan decided:
-  50 GB / 250 GB / 1 TB, demo 100 MB per account; an S3-compatible store is supported for
-  production). Its page is
+  updates the four apps from their signed releases and, from 0.3.0, lists their plugins and asks an
+  app's agent to build one (no account, cloud or marketplace any more). Its page is
   `/launcher` (`pages/launcher.html`), downloads from `launcher-v*` releases of this repository
   (0.1.0 and 0.1.1 published 2026-10-07; 0.2.0, which installs the apps through lsuite.xyz with an account, published 2026-10-08 and the latest; `launcher/CHANGELOG.md`),
   built by kimchi's suite release workflow (launcher/README.md, Releasing).

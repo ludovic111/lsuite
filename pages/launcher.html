@@ -3,20 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>lsuite launcher — install and update every lsuite app, your account and your cloud in one app · lsuite</title>
-  <meta name="description" content="lsuite is the suite's launcher: one free, open-source app to install and update ryolune, kimchi, nori and folio from their signed releases, sign in to your lsuite account once for every app, and keep files in lsuite Cloud. Download for Linux; macOS and Windows are coming soon.">
+  <title>lsuite launcher — install and update every lsuite app, and their plugins, in one app · lsuite</title>
+  <meta name="description" content="lsuite is the suite's launcher: one free, open-source app to install and update ryolune, kimchi, nori and folio from their signed releases, and keep the plugins you build in one place. No account. Download for Linux; macOS and Windows are coming soon.">
   <meta name="theme-color" content="#050505" media="(prefers-color-scheme: dark)">
   <meta name="theme-color" content="#f0f0f0" media="(prefers-color-scheme: light)">
   <link rel="canonical" href="%ORIGIN%/launcher">
   <link rel="icon" href="/assets/img/icons/lsuite.webp" type="image/webp">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="lsuite">
-  <meta property="og:title" content="lsuite launcher — every lsuite app, your account and your cloud in one app">
-  <meta property="og:description" content="Install and update every lsuite app from its signed releases, sign in once for all of them, and keep your files in lsuite Cloud. Free and MIT licensed. Download for Linux; macOS and Windows are coming soon.">
+  <meta property="og:title" content="lsuite launcher — every lsuite app and its plugins in one app">
+  <meta property="og:description" content="Install and update every lsuite app from its signed releases, and keep the plugins your agent builds in one place. Free, no account, MIT licensed. Download for Linux; macOS and Windows are coming soon.">
   <meta property="og:url" content="%ORIGIN%/launcher">
   <meta property="og:image" content="%ORIGIN%/assets/img/og/lsuite.png">
   <meta name="twitter:card" content="summary_large_image">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"lsuite","url":"%ORIGIN%/launcher","description":"A free, open-source launcher in beta that installs and updates every lsuite app, holds the lsuite account and manages lsuite Cloud.","applicationCategory":"UtilitiesApplication","operatingSystem":"Linux","softwareVersion":"%VERSION:launcher%","downloadUrl":"https://github.com/ludovic111/lsuite/releases","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isPartOf":{"@type":"WebSite","name":"lsuite","url":"%ORIGIN%/"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"lsuite","url":"%ORIGIN%/launcher","description":"A free, open-source launcher in beta that installs and updates every lsuite app and lists their plugins.","applicationCategory":"UtilitiesApplication","operatingSystem":"Linux","softwareVersion":"%VERSION:launcher%","downloadUrl":"https://github.com/ludovic111/lsuite/releases","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"license":"https://opensource.org/licenses/MIT","isPartOf":{"@type":"WebSite","name":"lsuite","url":"%ORIGIN%/"}}</script>
   <link rel="preload" href="/assets/fonts/chakra-petch-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/design/tokens.css?v=1">
   <link rel="stylesheet" href="/assets/styles.css?v=1">
@@ -36,7 +36,7 @@
         <span class="badge">Beta</span>
       </div>
       <h1 class="display reveal" style="--d:1">Every lsuite app.<br><span class="neg">One place</span> to keep them.</h1>
-      <p class="lede reveal" style="--d:2">lsuite is the suite's launcher, and where you get the apps: sign in with a free lsuite account and it installs and updates ryolune, kimchi, nori and folio from their signed builds, signs every app in to your account at once, and keeps your files in lsuite Cloud. A native Rust app like the others, and like them, everything you can click is a command your agent can run.</p>
+      <p class="lede reveal" style="--d:2">lsuite is the suite's launcher, and where you get the apps: it installs and updates ryolune, kimchi, nori and folio from their signed builds, with no account, and keeps the plugins you build for them in one place. A native Rust app like the others, and like them, everything you can click is a command your agent can run.</p>
       <div class="hero__actions reveal" style="--d:3">
         <a class="btn btn--primary" href="#downloads" data-download="launcher" data-href-linux="/launcher/download/linux-x86_64"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12M6 11l6 6 6-6M5 20h14"/></svg><span data-os>Download lsuite</span></a>
         <a class="btn" href="#downloads">All platforms</a>
@@ -53,9 +53,9 @@
     <div class="wrap">
       <div class="stats reveal">
         <div><b>5</b><span>apps, installed and kept up to date</span></div>
-        <div><b>1</b><span>sign-in for every lsuite app</span></div>
+        <div><b>0</b><span>accounts to create</span></div>
         <div><b>Linux</b><span>in the beta; macOS and Windows coming soon</span></div>
-        <div><b>0</b><span>telemetry, and the account is free</span></div>
+        <div><b>0</b><span>telemetry, and nothing to pay</span></div>
       </div>
     </div>
   </section>
@@ -75,32 +75,18 @@
     </div>
   </section>
 
-  <section class="section" id="account" aria-labelledby="account-title">
-    <div class="wrap split">
-      <div class="stack">
-        <span class="eyebrow">lsuite account</span>
-        <h2 class="h2 reveal" id="account-title">Sign in once. Every app is signed in.</h2>
-        <p class="lede reveal" style="--d:1">The launcher holds the same lsuite account every app reads: sign in through your browser or with a key, and with <a href="/pass">lsuite Pass</a> the agents in all four apps work through lsuite AI. It shows your plan, the month's allowance and your cloud storage; plans are chosen on lsuite.xyz.</p>
-        <p class="muted reveal" style="--d:2">A free account is all the apps need. They stay free; lsuite Pass is the one optional thing lsuite sells. A demo for now: no payment is taken.</p>
-      </div>
-      <figure class="shot reveal" style="--d:1"><picture><source srcset="/assets/img/launcher/account-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/launcher/account.webp" width="2000" height="1250" alt="The lsuite AI account in the launcher: plan, allowance and cloud storage." loading="lazy"></picture></figure>
-    </div>
-  </section>
-
-  <section class="section" id="cloud" aria-labelledby="cloud-title">
+  <section class="section" id="plugins" aria-labelledby="plugins-title">
     <div class="wrap">
       <div class="section__head">
-        <span class="eyebrow">lsuite Cloud</span>
-        <h2 class="h2 reveal" id="cloud-title">Your files, on every computer.</h2>
-        <p class="lede reveal" style="--d:1">lsuite Cloud comes with lsuite Pass, and the launcher is where you manage it. Your documents stay plain files on your disk; nothing goes to the cloud unless you put it there.</p>
+        <span class="eyebrow">Plugins</span>
+        <h2 class="h2 reveal" id="plugins-title">Every app's plugins, in one place.</h2>
+        <p class="lede reveal" style="--d:1">From its next release, the launcher's Plugins area lists the plugins installed for each app and hands a plugin request to the right app's agent: describe it, and the agent writes it in Rust, builds it and loads it. <a href="/plugins">How plugins work</a>.</p>
       </div>
-      <figure class="shot reveal"><picture><source srcset="/assets/img/launcher/cloud-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/launcher/cloud.webp" width="2000" height="1250" alt="Folders and files in lsuite Cloud, in the launcher." loading="lazy"></picture></figure>
-      <div class="grid grid--3" style="margin-top: 24px;">
-        <div class="cell reveal"><span class="cell__k">Files</span><h3>Upload and download</h3><p>Upload files or whole folders, or drop them on the window. Downloads are checked against their SHA-256.</p></div>
-        <div class="cell reveal" style="--d:1"><span class="cell__k">Folders</span><h3>Organise</h3><p>New folder, rename, move and delete, with a confirmation before anything goes. Usage against your plan, always in view.</p></div>
-        <div class="cell reveal" style="--d:2"><span class="cell__k">Sync</span><h3>A folder kept in step</h3><p>Pair a folder on your computer with one in the cloud and it syncs both ways. When both sides changed, both versions are kept.</p></div>
+      <div class="grid grid--3">
+        <div class="cell reveal"><span class="cell__k">See</span><h3>What's installed</h3><p>Each app's plugins from <code>~/.lsuite/plugins/&lt;app&gt;/</code>, with their name, version, kind and what they do.</p></div>
+        <div class="cell reveal" style="--d:1"><span class="cell__k">Build</span><h3>Ask for one</h3><p>Pick the app, describe the plugin, and the agent follows the app's plugin recipe until it's built and loaded.</p></div>
+        <div class="cell reveal" style="--d:2"><span class="cell__k">Tidy</span><h3>Remove what you don't use</h3><p>One click, with a confirmation. The app's own Plugins area keeps its on/off switch for each one.</p></div>
       </div>
-      <p class="fine reveal" style="margin-top: 18px;">Plus comes with 50 GB, Pro with 250 GB, Studio with 1 TB. <a href="/pass#plans">See the plans</a>.</p>
     </div>
   </section>
 
@@ -109,8 +95,8 @@
       <div class="stack">
         <span class="eyebrow">Agent and scripts</span>
         <h2 class="h2 reveal" id="agents-title">Your agent can set up the suite.</h2>
-        <p class="lede reveal" style="--d:1">Every action is a command, the same from the window, <code>lsuite-cli</code> and <code>lsuite-mcp</code>: install an app, update them all, upload a folder to the cloud.</p>
-        <p class="muted reveal" style="--d:2">You decide what an agent may do. Installing and cloud uploads are on; removing apps, deleting cloud files and signing in or out stay off until you turn them on in Settings › Agents.</p>
+        <p class="lede reveal" style="--d:1">Every action is a command, the same from the window, <code>lsuite-cli</code> and <code>lsuite-mcp</code>: install an app, update them all, list the plugins.</p>
+        <p class="muted reveal" style="--d:2">You decide what an agent may do. Installing is on; removing apps and plugins stays off until you turn it on in Settings › Agents.</p>
       </div>
       <div class="code reveal" style="--d:1"><pre><span class="line"><span class="c"># install or update from a script</span></span>
 <span class="line">lsuite-cli apps.install app=kimchi</span>
@@ -146,12 +132,11 @@
     <div class="wrap">
       <div class="section__head"><span class="eyebrow">Questions</span><h2 class="h2 reveal" id="faq-title">Before you install.</h2></div>
       <div class="faq reveal">
-        <details><summary>Do I need the launcher to get the apps?</summary><p>Yes: the ready-made builds of the four apps come through it. Install the ones you want, update them all at once, and hold the one account they share. Their source stays open (MIT), so you can always build an app yourself.</p></details>
-        <details><summary>Do I need an account?</summary><p>A free one, to get the apps and their updates: no plan, no payment. lsuite Pass (lsuite AI, lsuite Cloud and the lsuite Marketplace) is optional.</p></details>
+        <details><summary>Do I need the launcher to get the apps?</summary><p>Yes: the ready-made builds of the four apps come through it. Install the ones you want and update them all at once. Their source stays open (MIT), so you can always build an app yourself.</p></details>
+        <details><summary>Do I need an account?</summary><p>No. lsuite is free, with nothing to sign in to: the launcher, the apps, their updates and their plugins.</p></details>
         <details><summary>How do I know a download is genuine?</summary><p>The launcher carries each app's release key and checks every file's signature before it installs. If a signature doesn't match, nothing is replaced. Its own updates are signed the same way.</p></details>
-        <details><summary>What does lsuite Cloud cost?</summary><p>It comes with lsuite Pass: 50 GB with Plus, 250 GB with Pro, 1 TB with Studio. On Free you can still list, download and delete files already there. A demo for now: no payment is taken and storage is capped small.</p></details>
         <details><summary>Will it touch the copies I built myself?</summary><p>No. Copies outside the usual places, such as builds from source, are listed and left alone.</p></details>
-        <details><summary>Does it send anything about me?</summary><p>No telemetry. It asks lsuite.xyz for the apps and their builds, your account and your cloud files, and GitHub for its own updates. Nothing else.</p></details>
+        <details><summary>Does it send anything about me?</summary><p>No telemetry. It asks lsuite.xyz for the apps and their builds, and GitHub for its own updates. Nothing else.</p></details>
       </div>
     </div>
   </section>

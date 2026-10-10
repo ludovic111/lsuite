@@ -1,10 +1,9 @@
-// The apps' builds (DISTRIBUTION.md, builds.js) against a fake GitHub API: every route, auth,
+// The apps' builds (DISTRIBUTION.md, builds.js) against a fake GitHub API: every route, public,
 // rewriting, caching, the token kept on the server, 503 without it, 404s and 502s.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'node:http';
-import { createAccounts } from '../ai.js';
-import { createBuilds, compareSemver, buildVersion, SIGN_IN, NOT_SET_UP, BUILDS_REPO } from '../builds.js';
+import { createBuilds, compareSemver, buildVersion, NOT_SET_UP, BUILDS_REPO } from '../builds.js';
 import { appVersions, appsDocument, APP_NAMES } from '../server.js';
 
 const GH_TOKEN = 'github_pat_secret';
@@ -100,33 +99,18 @@ async function fakeGitHub() {
   return { base, seen, state, idOf, close: () => new Promise((r) => server.close(r)) };
 }
 
-/** The site: accounts and builds on one server, as server.js wires them, with a clock for the cache. */
+/** The builds on a server, as server.js wires them, with a clock for the cache. */
 async function start(gh, options = {}) {
-  const accounts = createAccounts({ demoDelayMs: 0 });
   const clock = { t: 1_000_000 };
-  const builds = createBuilds({ token: GH_TOKEN, api: gh?.base, auth: accounts.appAccount, origin: accounts.publicOrigin, now: () => clock.t, ...options });
+  const builds = createBuilds({ token: GH_TOKEN, api: gh?.base, now: () => clock.t, ...options });
   const server = createServer(async (req, res) => {
-    const url = new URL(req.url, 'http://localhost');
-    if (await builds.handle(req, res, url)) return;
-    if (await accounts.handle(req, res, url)) return;
+    if (await builds.handle(req, res, new URL(req.url, 'http://localhost'))) return;
     res.writeHead(404).end();
   });
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
   const base = `http://127.0.0.1:${server.address().port}`;
-  let jar = '';
-  const post = async (path, body, headers = {}) => {
-    const res = await fetch(base + path, { method: 'POST', headers: { 'content-type': 'application/json', ...(jar ? { cookie: jar } : {}), ...headers }, body: JSON.stringify(body) });
-    const set = res.headers.get('set-cookie');
-    if (set) jar = set.split(';')[0];
-    return res;
-  };
-  // A free account (no plan) connects the lsuite app: its token gets the apps.
-  assert.equal((await post('/api/account/session', { email: 'ada@example.com', name: 'Ada' })).status, 200);
-  const { code } = await (await post('/api/account/connect', { app: 'lsuite' })).json();
-  const { token } = await (await post('/api/account/token', { code })).json();
-  const get = (path, { auth = token, headers = {}, method = 'GET' } = {}) =>
-    fetch(base + path, { method, redirect: 'manual', headers: { ...(auth ? { authorization: `Bearer ${auth}` } : {}), ...headers } });
-  return { base, builds, clock, get, token, get jar() { return jar; }, close: () => new Promise((r) => server.close(r)) };
+  const get = (path, { headers = {}, method = 'GET' } = {}) => fetch(base + path, { method, redirect: 'manual', headers });
+  return { base, builds, clock, get, close: () => new Promise((r) => server.close(r)) };
 }
 
 async function error(res, status, type, message) {
@@ -152,17 +136,14 @@ test('semver of the tags', () => {
   assert.equal(compareSemver('2.1.3', '2.1.3'), 0);
 });
 
-test('every route needs an app token: none, a bad one or the site cookie get 401', async () => {
+test('every route is public: no token, and an old app still sending one, both get the build', async () => {
   const gh = await fakeGitHub();
   const t = await start(gh);
   try {
     for (const path of ROUTES) {
-      await error(await t.get(path, { auth: null }), 401, 'authentication_error', SIGN_IN);
-      await error(await t.get(path, { auth: 'lsk_not-a-token' }), 401, 'authentication_error', SIGN_IN);
-      await error(await t.get(path, { auth: null, headers: { cookie: t.jar } }), 401, 'authentication_error', SIGN_IN);
+      assert.ok([200, 302].includes((await t.get(path)).status), path);
+      assert.ok([200, 302].includes((await t.get(path, { headers: { authorization: 'Bearer lsk_old-account-token' } })).status), path);
     }
-    // x-api-key, the other way apps send their token, works too.
-    assert.equal((await t.get('/api/apps/kimchi/latest', { auth: null, headers: { 'x-api-key': t.token } })).status, 200);
     await error(await t.get('/api/apps/kimchi/latest', { method: 'POST' }), 405, 'invalid_request_error');
     assert.equal(gh.seen.authOnApi.filter(Boolean).length, gh.seen.authOnApi.length, 'GitHub always got the server token');
   } finally {
@@ -175,7 +156,6 @@ test('without LSUITE_BUILDS_TOKEN: 503, and no versions', async () => {
   const t = await start(null, { token: '', fetch: () => { throw new Error('no GitHub without a token'); } });
   try {
     for (const path of ROUTES) await error(await t.get(path), 503, 'api_error', NOT_SET_UP);
-    await error(await t.get('/api/apps/kimchi/latest', { auth: null }), 401, 'authentication_error', SIGN_IN);
     assert.equal(t.builds.configured, false);
     assert.equal(await t.builds.version('kimchi'), null);
   } finally {

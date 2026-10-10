@@ -1,6 +1,6 @@
-// The apps' builds (DISTRIBUTION.md): the four apps come only through the lsuite app, with a free
-// lsuite account. Their builds live in the private repository `ludovic111/lsuite-builds`, one
-// release per app version tagged `<app>-v<version>`; this serves them to signed-in apps with the
+// The apps' builds (DISTRIBUTION.md): the four apps come only through the lsuite app, free, with
+// nothing to sign in to. Their builds live in the private repository `ludovic111/lsuite-builds`,
+// one release per app version tagged `<app>-v<version>`; this serves them to anyone with the
 // server's read-only `LSUITE_BUILDS_TOKEN`, which never leaves the server.
 //
 //   GET /api/apps/<app>/latest            the newest release, its rewritten latest.json and checksums
@@ -18,7 +18,6 @@ const API_HEADERS = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'no
 const SMALL_FILE = 1024 * 1024;
 const TEXTS = { manifest: 'latest.json', sha256sums: 'SHA256SUMS', sha256sumsSig: 'SHA256SUMS.sig' };
 
-export const SIGN_IN = 'Sign in to lsuite to get the apps: the account is free.';
 export const NOT_SET_UP = "App downloads aren't set up on this server yet.";
 
 class BuildsError extends Error {
@@ -89,15 +88,14 @@ function json(res, req, status, body, headers = {}) {
   res.end(req.method === 'HEAD' ? undefined : text);
 }
 
-/** An error in the shape of AI.md (`{type: "error", error: {type, message}}`). */
+/** An error in the shape of every lsuite API error (`{type: "error", error: {type, message}}`). */
 function fail(res, req, status, type, message) {
   json(res, req, status, { type: 'error', error: { type, message } });
 }
 
 /**
- * The builds service. `token`: `LSUITE_BUILDS_TOKEN` (unset: every route answers 503). `auth(req)`:
- * the account of an app's token, or null (the site's cookie isn't one). `origin(req)`: the public
- * origin download addresses are written on. `repo`, `apps`, `api`, `fetch`, `ttl` (ms), `now`.
+ * The builds service. `token`: `LSUITE_BUILDS_TOKEN` (unset: every route answers 503).
+ * `origin(req)`: the public origin download addresses are written on. `repo`, `apps`, `api`, `fetch`, `ttl` (ms), `now`.
  */
 export function createBuilds(options = {}) {
   const token = String(options.token ?? '').trim();
@@ -107,7 +105,6 @@ export function createBuilds(options = {}) {
   const fetchImpl = options.fetch ?? fetch;
   const ttl = options.ttl ?? 5 * 60 * 1000;
   const now = options.now ?? Date.now;
-  const auth = options.auth ?? (() => null);
   const originOf = options.origin ?? ((req) => `http://${String(req.headers.host ?? 'localhost').replace(/[^\w.:-]/g, '')}`);
   const timeout = options.timeoutMs ?? 8000;
   const headers = (accept) => ({ Accept: accept, Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'lsuite-site' });
@@ -239,7 +236,6 @@ export function createBuilds(options = {}) {
     try {
       if (!m) throw missing(`No API at ${req.method} ${url?.pathname ?? raw}.`);
       if (req.method !== 'GET' && req.method !== 'HEAD') return fail(res, req, 405, 'invalid_request_error', 'Use GET.'), true;
-      if (!(await auth(req))) return fail(res, req, 401, 'authentication_error', SIGN_IN), true;
       const app = m[1];
       if (!apps.includes(app)) throw missing(`There's no lsuite app called ${JSON.stringify(app)}. The apps: ${apps.join(', ')}.`);
       if (!token) return fail(res, req, 503, 'api_error', NOT_SET_UP), true;
