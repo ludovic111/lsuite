@@ -9,11 +9,6 @@ Downloaded on 2026-10-06.
 
 | File | Names | Downloaded from |
 | --- | --- | --- |
-| `claude.svg` | Claude, Claude Code, the Anthropic API | https://claude.ai/favicon.svg (unchanged) |
-| `openai.svg`, `openai-dark.svg` | OpenAI, Codex | https://cdn.oaistatic.com/assets/favicon-o20kmmos.svg (the ChatGPT favicon; its tile left out, the mark in its own two fills) |
-| `gemini.svg` | Google Gemini | https://www.gstatic.com/lamda/images/gemini_sparkle_aurora_33f86dc0c0257da337c63.svg (unchanged) |
-| `ollama.svg`, `ollama-dark.svg` | Ollama | Simple Icons 16.34.0, `icons/ollama.svg`, in its brand colour (#000000) and white |
-| `openrouter.svg` | OpenRouter | Simple Icons 16.34.0, `icons/openrouter.svg`, in its brand colour (#94A3B8) |
 | `premiere-pro.svg` | Adobe Premiere Pro (kimchi opens its timelines) | https://commons.wikimedia.org/wiki/File:Adobe_Premiere_Pro_CC_icon.svg (Adobe's icon; unchanged) |
 | `final-cut-pro.png` | Final Cut Pro (kimchi opens FCPXML) | https://commons.wikimedia.org/wiki/File:FinalCutProACS2026.png (Apple's icon, 75 × 75; unchanged) |
 | `resolve.svg`, `resolve-dark.svg` | DaVinci Resolve (kimchi opens OTIO and EDL) | Simple Icons 16.34.0, `icons/davinciresolve.svg`, in its brand colour (#233A51) and white |

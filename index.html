@@ -36,7 +36,7 @@
         <span class="pill">agent-native</span>
       </div>
       <h1 class="display reveal" style="--d:1">Every tool you make things with.<br>Your AI <span class="neg">drives</span>.</h1>
-      <p class="lede reveal" style="--d:2">lsuite combines every kind of creative and office tool in one free, open-source suite: <a class="c-ryolune" href="/ryolune">ryolune</a> for music, <a class="c-kimchi" href="/kimchi">kimchi</a> for video, <a class="c-nori" href="/nori">nori</a> for images and design, <a class="c-folio" href="/folio">folio</a> for documents, sheets and slides. All in beta. Everything you can click is a command, so you, a script or your agent can run the whole thing. The apps are free; <a href="/pass">lsuite Pass</a> is there if you'd rather not set up a model, want your files in the cloud or plugins others made.</p>
+      <p class="lede reveal" style="--d:2">lsuite combines every kind of creative and office tool in one free, open-source suite: <a class="c-ryolune" href="/ryolune">ryolune</a> for music, <a class="c-kimchi" href="/kimchi">kimchi</a> for video, <a class="c-nori" href="/nori">nori</a> for images and design, <a class="c-folio" href="/folio">folio</a> for documents, sheets and slides. All in beta. Everything you can click is a command, so you, a script or your agent can run the whole thing. Free, every app and every feature, with nothing to sign in to.</p>
       <div class="hero__actions reveal" style="--d:3">
         <a class="btn btn--primary" href="/launcher/download">Download lsuite <span class="arrow" aria-hidden="true">↓</span></a>
         <a class="btn" href="#apps">Meet the apps</a>
@@ -66,7 +66,7 @@
       <div class="section__head">
         <span class="eyebrow eyebrow--plain">The apps</span>
         <h2 class="h2 reveal" id="apps-title">Four apps. One way of working.</h2>
-        <p class="lede reveal" style="--d:1">Each app does the work of the tools you'd pay for, in the open, and each one is drivable end to end by your agent. All four are in beta and free, and come through the lsuite app with a free account: for Linux, with macOS and Windows coming soon.</p>
+        <p class="lede reveal" style="--d:1">Each app does the work of the tools you'd pay for, in the open, and each one is drivable end to end by your agent. All four are in beta and free, and come through the lsuite app, no account needed: for Linux, with macOS and Windows coming soon.</p>
       </div>
 
       <div class="apps">
@@ -117,17 +117,6 @@
           <div class="card__shot"><picture><source srcset="/assets/img/folio/document-light.webp" media="(prefers-color-scheme: light)"><img src="/assets/img/folio/document.webp" width="1600" height="1000" alt="A report with a live spreadsheet table and chart in folio." loading="lazy"></picture></div>
           <div class="card__foot"><span>Beta · v%VERSION:folio% · Linux</span><span class="link">Open <span class="arrow" aria-hidden="true">→</span></span></div>
         </a>
-
-        <a class="card card--ai reveal" href="/pass">
-          <div class="card__top">
-            <img src="/assets/img/lsuite.svg" width="44" height="44" alt="">
-            <span class="card__name">lsuite Pass</span>
-            <span class="card__kind">Optional</span>
-          </div>
-          <p class="card__say">AI, cloud and plugins. One pass.</p>
-          <p class="card__text">lsuite AI, so the agent works the moment you sign in; lsuite Cloud for your files; and the lsuite Marketplace of reviewed plugins. Bringing your own model stays free. A demo for now: no payment is taken.</p>
-          <div class="card__foot"><span>Plans from $12 / month · demo</span><span class="link">See the Pass <span class="arrow" aria-hidden="true">→</span></span></div>
-        </a>
       </div>
     </div>
   </section>
@@ -137,24 +126,23 @@
       <div class="band reveal">
         <span class="eyebrow eyebrow--plain">The lsuite launcher</span>
         <h2 class="h2" id="launcher-title">All four apps, from one app.</h2>
-        <p class="lede" style="margin-inline:auto">The apps come through lsuite, with a free lsuite account: it installs and updates every app from its signed builds, signs you in once for all of them, and keeps your files in lsuite Cloud. Free, for Linux; macOS and Windows are coming soon.</p>
+        <p class="lede" style="margin-inline:auto">The apps come through lsuite, the suite's own app: it installs and updates every app from its signed builds, and keeps the plugins you build in one place. Free, with no account, for Linux; macOS and Windows are coming soon.</p>
         <div class="hero__actions" style="justify-content:center">
           <a class="btn btn--primary" href="/launcher">Get the lsuite launcher <span class="arrow" aria-hidden="true">→</span></a>
-          <a class="btn" href="/launcher#cloud">About lsuite Cloud</a>
+          <a class="btn" href="/launcher#plugins">Plugins in the launcher</a>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section" id="marketplace" aria-labelledby="marketplace-title">
+  <section class="section" id="plugins" aria-labelledby="plugins-title">
     <div class="wrap">
       <div class="band reveal">
-        <span class="eyebrow eyebrow--plain">The lsuite Marketplace</span>
-        <h2 class="h2" id="marketplace-title">Plugins, made by the people who use lsuite.</h2>
-        <p class="lede" style="margin-inline:auto">Ask your app's agent for a plugin, then share it: anyone can publish, every version is reviewed before anyone can install it, and installing comes with lsuite Pass.</p>
+        <span class="eyebrow eyebrow--plain">Plugins</span>
+        <h2 class="h2" id="plugins-title">The plugin you need, built by your agent.</h2>
+        <p class="lede" style="margin-inline:auto">Describe an effect, a filter or a function in a sentence: the app's agent writes it in Rust, builds it and loads it, without a restart. In all four apps, free.</p>
         <div class="hero__actions" style="justify-content:center">
-          <a class="btn btn--primary" href="/marketplace">Browse the plugins <span class="arrow" aria-hidden="true">→</span></a>
-          <a class="btn" href="/marketplace#publish">Publish a plugin</a>
+          <a class="btn btn--primary" href="/plugins">Build a plugin <span class="arrow" aria-hidden="true">→</span></a>
         </div>
       </div>
     </div>
@@ -182,7 +170,7 @@
         <div class="cell reveal" style="--d:2">
           <span class="cell__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></span>
           <h3>Your model, your leash</h3>
-          <p>Use the subscription or keys you already have (Claude Code, Codex, Anthropic, OpenAI), a local model, or lsuite AI with <a href="/pass">lsuite Pass</a>. Permissions decide what an agent may touch.</p>
+          <p>Use the subscription or keys you already have (Claude Code, Codex, Anthropic, OpenAI) or a local model. Permissions decide what an agent may touch.</p>
         </div>
         <div class="cell reveal" style="--d:3">
           <span class="cell__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 14.3 7.2 16.9l.9-5.4L4.2 7.7l5.4-.8z"/></svg></span>
@@ -239,17 +227,6 @@
               <td><span class="yes">Yes</span><small>Filters in Rust, built by your agent</small></td>
               <td><span class="yes">Yes</span><small>Built by your agent</small></td>
             </tr>
-            <tr>
-              <th scope="row">lsuite Marketplace</th>
-              <td colspan="4"><span class="yes">All four</span><small>Share the plugins your agent builds, install the ones others made: every version reviewed. <a href="/marketplace">Browse the plugins</a>.</small></td>
-            </tr>
-            <tr>
-              <th scope="row">lsuite AI</th>
-              <td><span class="yes">Demo</span><small>One shared account</small></td>
-              <td><span class="yes">Demo</span><small>One shared account</small></td>
-              <td><span class="yes">Demo</span><small>One shared account</small></td>
-              <td><span class="yes">Demo</span><small>One shared account</small></td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -272,7 +249,7 @@
       <div class="section__head">
         <span class="eyebrow eyebrow--plain">Free, for real</span>
         <h2 class="h2 reveal" id="free-title">A whole suite without the subscription.</h2>
-        <p class="lede reveal" style="--d:1">Every lsuite app is free and open source: no trial, no tiers, every feature and every update for everyone, and code that is yours to read, fork and build. The one thing lsuite sells is optional: <a href="/pass">lsuite Pass</a>, for agents that work without any setup, cloud storage and reviewed plugins.</p>
+        <p class="lede reveal" style="--d:1">Every lsuite app is free and open source: no trial, no tiers, every feature and every update for everyone, and code that is yours to read, fork and build. Nothing to buy, nothing to sign in to.</p>
       </div>
       <div class="versus reveal">
         <div class="versus__them">
@@ -290,10 +267,10 @@
           <h3>lsuite</h3>
           <ul>
             <li><b>Price</b><span>Free. Donations, if you want</span></li>
-            <li><b>Account</b><span>Only for lsuite Pass, if you want it. No telemetry</span></li>
+            <li><b>Account</b><span>None. No telemetry</span></li>
             <li><b>Your files</b><span>On your disk, in open formats</span></li>
             <li><b>Source</b><span>MIT on GitHub, Rust inside</span></li>
-            <li><b>AI</b><span>Any model: yours, local, or lsuite AI</span></li>
+            <li><b>AI</b><span>Any model: yours, or a local one</span></li>
             <li><b>Automation</b><span>Every action, by CLI or MCP</span></li>
           </ul>
         </div>
