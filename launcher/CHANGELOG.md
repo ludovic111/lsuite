@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 (unreleased)
+## 0.3.0 (2026-10-11)
 
 - **macOS is back**, Apple Silicon and Intel (`lsuite-macos-arm64.dmg`, `lsuite-macos-x86_64.dmg`,
   and `.app.tar.gz` for updates), next to Linux; Windows is coming soon. On a Mac the launcher
