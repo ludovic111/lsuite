@@ -22,10 +22,5 @@
   <key>NSRequiresAquaSystemAppearance</key><false/>
   <key>NSPrincipalClass</key><string>NSApplication</string>
   <key>NSHumanReadableCopyright</key><string>MIT licence. Part of lsuite.</string>
-  <key>NSDesktopFolderUsageDescription</key><string>lsuite uploads, downloads and syncs the folders you choose on your Desktop.</string>
-  <key>NSDocumentsFolderUsageDescription</key><string>lsuite uploads, downloads and syncs the folders you choose in Documents.</string>
-  <key>NSDownloadsFolderUsageDescription</key><string>lsuite saves the files you download from your cloud in Downloads.</string>
-  <key>NSRemovableVolumesUsageDescription</key><string>lsuite syncs the folders you choose on external drives.</string>
-  <key>NSNetworkVolumesUsageDescription</key><string>lsuite syncs the folders you choose on network drives.</string>
 </dict>
 </plist>

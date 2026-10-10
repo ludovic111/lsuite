@@ -31,7 +31,7 @@ pub fn page(_window: &mut Window, cx: &mut App) -> AnyElement {
     let platform = s.apps["platform"].as_str().unwrap_or("").to_string();
     let apps_dir = s.apps["appsDir"].as_str().unwrap_or("").to_string();
     let home = lsuite_core::paths::lsuite_home().display().to_string();
-    let server = lsuite_core::account::server();
+    let server = lsuite_core::util::server();
     let mcp = crate::app::mcp_command();
     let a = &set.agent;
     let u = s.update.clone();
@@ -59,14 +59,7 @@ pub fn page(_window: &mut Window, cx: &mut App) -> AnyElement {
                     .gap(px(12.))
                     .child(toggle("set-check", "Look for new versions when the launcher starts", "checkOnStart", set.check_on_start, cx))
                     .child(toggle("set-auto", "Install them by themselves (apps that are closed)", "autoUpdate", set.auto_update, cx))
-                    .child(toggle("set-glass", "Reduce transparency", "reduceTransparency", set.reduce_transparency, cx))
-                    .child(div().flex().items_center().justify_between().gap(px(10.)).child("Sync synced folders every").child(segmented(
-                        "sync-every",
-                        vec![(0u64, "Only when asked".into()), (5u64, "5 min".into()), (15u64, "15 min".into()), (60u64, "Hour".into())],
-                        set.sync_every_minutes,
-                        |v, _, cx| cx.store().update(cx, |s, cx| s.set_setting("syncEveryMinutes", json!(v), cx)),
-                        cx,
-                    ).w(px(360.)))),
+                    .child(toggle("set-glass", "Reduce transparency", "reduceTransparency", set.reduce_transparency, cx)),
                 cx,
             ))
             .child(block(
@@ -77,10 +70,7 @@ pub fn page(_window: &mut Window, cx: &mut App) -> AnyElement {
                     .flex_col()
                     .gap(px(12.))
                     .child(toggle("agent-install", "Install and update apps", "agent.install", a.install, cx))
-                    .child(toggle("agent-remove", "Remove apps", "agent.remove", a.remove, cx))
-                    .child(toggle("agent-cloud-write", "Upload, create folders, move and rename in the cloud", "agent.cloudWrite", a.cloud_write, cx))
-                    .child(toggle("agent-cloud-delete", "Delete in the cloud", "agent.cloudDelete", a.cloud_delete, cx))
-                    .child(toggle("agent-account", "Sign in and out", "agent.account", a.account, cx))
+                    .child(toggle("agent-remove", "Remove apps and plugins", "agent.remove", a.remove, cx))
                     .child(div().flex().flex_col().gap(px(6.)).mt(px(4.)).child(caps("Connect an agent", cx)).child(match &mcp {
                         Some(line) => code_line("set-mcp", line.clone(), cx).into_any_element(),
                         None => div().text_size(px(sz::SM)).text_color(t.text_3).child("lsuite-mcp sits next to the launcher in a release build.").into_any_element(),
@@ -97,7 +87,7 @@ pub fn page(_window: &mut Window, cx: &mut App) -> AnyElement {
                     .child(info("Version", format!("lsuite {} · {platform}", lsuite_core::VERSION), cx))
                     .child(info("Updates", update_line, cx))
                     .child(info("Apps go in", apps_dir.clone(), cx))
-                    .child(info("Account and discovery", home, cx))
+                    .child(info("Plugins and discovery", home, cx))
                     .child(info("Server", server, cx))
                     .child(div().flex().gap(px(8.)).mt(px(4.)).child(Button::new("check-self", "Check for updates").with_icon("refresh-cw").small().on_click(|_, _, cx| cx.store().update(cx, |s, cx| s.run_result("app.checkUpdates", json!({}), cx, |s, r, cx| match r {
                         Ok(v) => {

@@ -1,6 +1,6 @@
 [package]
 name = "lsuite-core"
-description = "The lsuite launcher's core: command registry, app installer, lsuite AI account and lsuite Cloud client"
+description = "The lsuite launcher's core: command registry, app installer, plugins and the lsuite agent"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -14,7 +14,6 @@ flate2.workspace = true
 futures.workspace = true
 minisign-verify.workspace = true
 parking_lot.workspace = true
-percent-encoding.workspace = true
 rand.workspace = true
 reqwest.workspace = true
 semver.workspace = true
@@ -25,7 +24,6 @@ tar.workspace = true
 toml.workspace = true
 tokio.workspace = true
 tracing.workspace = true
-url.workspace = true
 zip.workspace = true
 
 [target.'cfg(unix)'.dependencies]

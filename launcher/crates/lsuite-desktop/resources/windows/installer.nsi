@@ -110,5 +110,5 @@ Section "Uninstall"
   RMDir "$INSTDIR"
   Delete "$SMPROGRAMS\${PRODUCT}.lnk"
   DeleteRegKey HKCU "${UNINSTKEY}"
-  ; The apps it installed, the account (%USERPROFILE%\.lsuite) and synced folders stay.
+  ; The apps it installed and their plugins (%USERPROFILE%\.lsuite) stay.
 SectionEnd

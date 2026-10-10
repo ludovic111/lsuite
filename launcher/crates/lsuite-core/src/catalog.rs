@@ -44,7 +44,7 @@ pub struct App {
 
 impl App {
     pub fn page(&self) -> String {
-        format!("{}/{}", crate::account::server(), self.id)
+        format!("{}/{}", crate::util::server(), self.id)
     }
 
     pub fn releases_page(&self) -> String {

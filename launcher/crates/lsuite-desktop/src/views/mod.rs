@@ -1,11 +1,9 @@
 //! The pages (one module each) and what floats above them.
 
-pub mod account;
 pub mod agent;
 pub mod apps;
-pub mod cloud;
-pub mod market;
 pub mod overlays;
+pub mod plugins;
 pub mod settings;
 
 use gpui::{AnyElement, App, ClipboardItem, Div, FontWeight, SharedString, div, prelude::*, px};
@@ -49,11 +47,6 @@ pub fn code_line(id: impl Into<SharedString>, text: String, cx: &App) -> Div {
             cx.write_to_clipboard(ClipboardItem::new_string(copy.clone()));
             cx.store().update(cx, |s, cx| s.toast(ToastKind::Info, "Copied.", cx));
         }))
-}
-
-/// `2026-10-07T09:50:37Z` → `7 Oct 2026 11:50` in local time.
-pub fn when(iso: &str) -> String {
-    chrono::DateTime::parse_from_rfc3339(iso).map(|d| d.with_timezone(&chrono::Local).format("%-d %b %Y %H:%M").to_string()).unwrap_or_default()
 }
 
 /// An empty state: a dithered fade, a title, a line and actions.

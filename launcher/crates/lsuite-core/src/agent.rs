@@ -5,14 +5,14 @@
 //! looks up the commands it needs, calls them, and looks at the result (`harness.look`) before it
 //! says it's done. With four apps and some 800 commands, it doesn't get every command at once:
 //! its tools are `app_brief`, `app_skill`, `app_tools` (the app's commands, filtered), `app_call`,
-//! `app_look`, and the launcher's own commands (apps, cloud, marketplace) as `lsuite_call`.
+//! `app_look`, and the launcher's own commands (apps, plugins) as `lsuite_call`.
 //!
 //! Two ways to run it:
 //! - **Claude Code** (`claude` on the computer, no key needed): Claude Code runs the loop, with
 //!   every installed app's MCP server and the launcher's own (`lsuite mcp`) and the suite brief
 //!   appended to its prompt.
-//! - **lsuite AI** (a Pass plan) or **Anthropic** (`ANTHROPIC_API_KEY`): the launcher runs the
-//!   loop itself against the Messages API, through MCP clients of the apps' servers.
+//! - **Anthropic** (`ANTHROPIC_API_KEY`): the launcher runs the loop itself against the Messages
+//!   API, through MCP clients of the apps' servers.
 //!
 //! The conversation lives in [`Launcher::agent`]; the window draws it and `agent.*` commands drive it.
 
@@ -26,7 +26,7 @@ use serde_json::{Value, json};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, ChildStdin, ChildStdout, Command};
 
-use crate::{CmdResult, Launcher, account, catalog, install, registry, util};
+use crate::{CmdResult, Launcher, catalog, install, registry, util};
 
 /// Steps of one run at most (a step is one model answer).
 pub const MAX_STEPS: usize = 40;
@@ -41,6 +41,8 @@ How you work:
 4. Moving work between apps: export a file from one app (an audio mix, a video, a picture, a PDF) and import it in the next; say where the file is.
 5. Look at what you made before you say it's done: app_look shows you the app's picture of the work (a frame, a page, a slide, a bar range) with its numbers (loudness, contrast, formula errors). Compare it with the request and fix what's off, up to three passes.
 6. Finish with a short report: what you made, in which app and file, and anything the person should check. Every app keeps your changes as one undo step per turn.
+
+Building a plugin ("Build a <app> plugin: …"): use that app's plugin.* commands and follow its recipe: plugin.guide first, then plugin.new, plugin.build until it is green (fix from its structured errors), then plugin.publishLocal, which installs and loads it. Say what the plugin does and how to find it in the app.
 
 If an app refuses an action for its own permissions (Settings › Agent in that app), tell the person exactly which setting to turn on; don't try to get around it.
 
@@ -70,18 +72,15 @@ pub struct State {
 }
 
 /// Which way the agent can run on this computer, best first.
-pub fn providers(l: &Launcher) -> Value {
-    let pass = account::read().is_some_and(|a| a.plan != "free" && !a.plan.is_empty());
+pub fn providers() -> Value {
     let claude = which("claude");
     let key = std::env::var("ANTHROPIC_API_KEY").is_ok_and(|k| !k.trim().is_empty());
     let mut list = vec![];
     if claude.is_some() {
         list.push(json!({ "id": "claude-code", "name": "Claude Code", "ready": true, "note": "Your Claude Code, with every app's tools" }));
     }
-    list.push(json!({ "id": "lsuite", "name": "lsuite AI", "ready": pass, "note": if pass { "Your lsuite Pass" } else { "Comes with lsuite Pass" } }));
     list.push(json!({ "id": "anthropic", "name": "Anthropic API", "ready": key, "note": if key { "ANTHROPIC_API_KEY" } else { "Set ANTHROPIC_API_KEY" } }));
     let default = list.iter().find(|p| p["ready"] == true).and_then(|p| p["id"].as_str()).map(str::to_string);
-    let _ = l;
     json!({ "providers": list, "default": default })
 }
 
@@ -118,8 +117,8 @@ fn push(l: &Launcher, e: Entry) {
 
 /// Runs the agent on `prompt` until it finishes (or is stopped). Returns its last answer.
 pub async fn run(l: &Arc<Launcher>, prompt: &str, provider: Option<&str>) -> CmdResult<Value> {
-    let p = providers(l);
-    let chosen = provider.map(str::to_string).or_else(|| p["default"].as_str().map(str::to_string)).ok_or("No way to run the agent here: install Claude Code, or sign in with lsuite Pass.")?;
+    let p = providers();
+    let chosen = provider.map(str::to_string).or_else(|| p["default"].as_str().map(str::to_string)).ok_or("No way to run the agent here: install Claude Code, or set ANTHROPIC_API_KEY.")?;
     {
         let mut st = l.agent.lock();
         if st.running {
@@ -133,7 +132,8 @@ pub async fn run(l: &Arc<Launcher>, prompt: &str, provider: Option<&str>) -> Cmd
     let task = tokio::spawn(async move {
         match chosen2.as_str() {
             "claude-code" => run_claude_code(&l2, &prompt2).await,
-            other => run_messages(&l2, &prompt2, other).await,
+            "anthropic" => run_messages(&l2, &prompt2).await,
+            other => Err(format!("There's no agent provider called {other}.")),
         }
     });
     l.agent.lock().stop = Some(task.abort_handle());
@@ -386,7 +386,7 @@ fn tool_defs() -> Value {
         { "name": "app_tools", "description": "The app's commands (name, description, parameters), filtered by a word when given.", "input_schema": { "type": "object", "properties": { "app": app, "filter": { "type": "string" } }, "required": ["app"] } },
         { "name": "app_call", "description": "Runs one of the app's commands (a tool name from app_tools) with its arguments.", "input_schema": { "type": "object", "properties": { "app": app, "tool": { "type": "string" }, "arguments": { "type": "object" } }, "required": ["app", "tool"] } },
         { "name": "app_look", "description": "The app's picture of the current work (an image you see) with its numbers.", "input_schema": { "type": "object", "properties": { "app": app, "arguments": { "type": "object" } }, "required": ["app"] } },
-        { "name": "lsuite_call", "description": "One of the lsuite app's own commands: apps.list, apps.install, apps.open, cloud.*, market.*. Arguments as JSON.", "input_schema": { "type": "object", "properties": { "command": { "type": "string" }, "arguments": { "type": "object" } }, "required": ["command"] } }
+        { "name": "lsuite_call", "description": "One of the lsuite app's own commands: apps.list, apps.install, apps.open, plugins.list. Arguments as JSON.", "input_schema": { "type": "object", "properties": { "command": { "type": "string" }, "arguments": { "type": "object" } }, "required": ["command"] } }
     ])
 }
 
@@ -422,20 +422,10 @@ fn find_tool<'a>(tools: &'a [Value], names: &[&str]) -> Option<&'a str> {
     tools.iter().filter_map(|t| t["name"].as_str()).find(|n| names.iter().any(|w| n.eq_ignore_ascii_case(w) || n.replace('.', "_").eq_ignore_ascii_case(&w.replace('.', "_"))))
 }
 
-async fn run_messages(l: &Arc<Launcher>, prompt: &str, provider: &str) -> CmdResult<String> {
-    let (url, key, model) = match provider {
-        "lsuite" => {
-            let acc = account::read().ok_or("Sign in with lsuite Pass to use lsuite AI.")?;
-            let me = account::me(&acc.server, &acc.token).await?;
-            let model = me["defaultModel"].as_str().map(str::to_string).ok_or("Your plan has no lsuite AI models: choose a Pass plan.")?;
-            (format!("{}/api/ai/v1/messages", acc.server), acc.token, model)
-        }
-        "anthropic" => {
-            let key = std::env::var("ANTHROPIC_API_KEY").map_err(|_| "Set ANTHROPIC_API_KEY to use the Anthropic API.")?;
-            ("https://api.anthropic.com/v1/messages".to_string(), key, std::env::var("LSUITE_AGENT_MODEL").unwrap_or_else(|_| "claude-sonnet-5-5".into()))
-        }
-        other => return Err(format!("There's no agent provider called {other}.")),
-    };
+async fn run_messages(l: &Arc<Launcher>, prompt: &str) -> CmdResult<String> {
+    let key = std::env::var("ANTHROPIC_API_KEY").map_err(|_| "Set ANTHROPIC_API_KEY to use the Anthropic API.")?;
+    let url = "https://api.anthropic.com/v1/messages";
+    let model = std::env::var("LSUITE_AGENT_MODEL").unwrap_or_else(|_| "claude-sonnet-5-5".into());
     // The installed apps' MCP servers, started as needed.
     let servers: BTreeMap<String, (PathBuf, Vec<String>)> = app_servers().into_iter().map(|(a, p, args)| (a, (p, args))).collect();
     let mut clients: BTreeMap<String, McpClient> = BTreeMap::new();
@@ -447,11 +437,11 @@ async fn run_messages(l: &Arc<Launcher>, prompt: &str, provider: &str) -> CmdRes
     let mut answer = String::new();
     for _ in 0..MAX_STEPS {
         let body = json!({ "model": model, "max_tokens": 8192, "system": system, "tools": tool_defs(), "messages": messages });
-        let r = http.post(&url).header("x-api-key", &key).header("anthropic-version", "2023-06-01").json(&body).send().await.map_err(|e| format!("Couldn't reach the model ({e})."))?;
+        let r = http.post(url).header("x-api-key", &key).header("anthropic-version", "2023-06-01").json(&body).send().await.map_err(|e| format!("Couldn't reach the model ({e})."))?;
         let status = r.status().as_u16();
         let v: Value = r.json().await.unwrap_or(Value::Null);
         if status != 200 {
-            return Err(account::error_line(status, &v));
+            return Err(util::error_line(status, &v));
         }
         let content = v["content"].as_array().cloned().unwrap_or_default();
         messages.push(json!({ "role": "assistant", "content": content }));

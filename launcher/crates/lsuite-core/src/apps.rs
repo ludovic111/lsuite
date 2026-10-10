@@ -82,7 +82,7 @@ pub fn list(l: &Launcher) -> Value {
 /// Apps the site lists (`GET /api/apps`) that this build of the launcher doesn't know: shown
 /// with their page only, never installed (their keys aren't built in).
 async fn others() -> Vec<Value> {
-    let url = format!("{}/api/apps", crate::account::server());
+    let url = format!("{}/api/apps", util::server());
     let Ok(r) = util::client().get(url).send().await else { return vec![] };
     let Ok(v) = r.json::<Value>().await else { return vec![] };
     v["apps"]
@@ -100,7 +100,7 @@ pub fn stale(l: &Launcher) -> bool {
     APPS.iter().any(|a| latest.get(a.id).is_none_or(|x| (chrono::Utc::now() - x.checked_at).num_seconds() > RECHECK_SECS))
 }
 
-/// Asks GitHub for every app's latest release (all at once).
+/// Asks lsuite.xyz for every app's latest release (all at once).
 pub async fn check(l: &Arc<Launcher>) -> Value {
     let checks = APPS.iter().map(|a| async move { (a.id, release::latest(a, l.platform).await) });
     let (results, others) = futures::future::join(futures::future::join_all(checks), others()).await;

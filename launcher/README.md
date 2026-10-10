@@ -1,10 +1,10 @@
 # lsuite (the launcher)
 
 Part of [lsuite](https://lsuite.xyz). One native app to install, update, open and remove the
-lsuite apps (ryolune, kimchi, nori, folio), to hold the **lsuite AI** account they all
-share, and to manage **lsuite Cloud**, the storage that comes with an lsuite AI plan
-([CLOUD.md](../CLOUD.md)). Written in Rust like the apps: the window is GPUI (the same pinned Zed
-commit as kimchi, nori and folio) and wears the lsuite design system v2.
+lsuite apps (ryolune, kimchi, nori, folio), to see and remove the plugins installed for them and
+build new ones with your agent, and to run the lsuite agent across them. Everything is free and
+needs no account. Written in Rust like the apps: the window is GPUI (the same pinned Zed commit as
+kimchi, nori and folio) and wears the lsuite design system v2.
 
 **Beta: Linux only.** lsuite is released for Linux x86_64 (AppImage and tar.gz) while it is in
 beta; macOS and Windows are coming soon. Their code paths below stay in the source, but no builds
@@ -14,8 +14,8 @@ are made or shipped for them.
 crates/lsuite-core     everything: the command registry (registry.rs), the app catalogue and its
                        release keys (catalog.rs), signed release lookup and verified downloads
                        (release.rs), install / update / remove / open (install.rs, apps.rs), the
-                       shared lsuite AI account (account.rs), the lsuite Cloud client (cloud.rs),
-                       settings and the event stream (events.rs)
+                       installed plugins (plugins.rs), the lsuite agent (agent.rs), settings and
+                       the event stream (events.rs)
 crates/lsuite-desktop  the window (package and binary `lsuite`): store.rs, app.rs, views/
 crates/lsuite-cli      `lsuite-cli <command> key=value…`
 crates/lsuite-mcp      `lsuite-mcp`, the commands as MCP tools (stdio)
@@ -31,8 +31,8 @@ cargo test --workspace                   # core tests, incl. install/update/remo
 
 ## What it does
 
-- **Apps.** Each app comes from its own GitHub releases. Nothing is installed unless it checks
-  against the release key built into the launcher: kimchi, nori and folio sign each file with
+- **Apps.** Each app comes through lsuite.xyz, with no account (Getting the apps, below).
+  Nothing is installed unless it checks against the release key built into the launcher: kimchi, nori and folio sign each file with
   minisign (`latest.json`, the signature names the version); ryolune signs
   `SHA256SUMS` with Ed25519. Where apps go: `/Applications` (or `~/Applications`) on macOS,
   `~/.local/share/lsuite/apps/<app>/` on Linux (with an app-menu entry), the app's installer on
@@ -42,43 +42,32 @@ cargo test --workspace                   # core tests, incl. install/update/remo
   touched. What is installed comes from the launcher's own record
   (`~/.lsuite/launcher/installed.json`), each app's discovery file (`~/.lsuite/apps/<app>.json`)
   and the usual places.
-- **Account.** The same `~/.lsuite/account.json` every app reads (AI.md): signing in here signs in
-  every lsuite app, through the browser (loopback, `app=lsuite`) or with a key. Shows the plan,
-  the month's allowance, the cloud storage and the plans (chosen on lsuite.xyz).
-- **Cloud.** Browse folders, upload files or whole folders (or drop them on the window),
-  download files or folders (checked against their SHA-256), rename, move, new folder, delete
-  with confirmation. Usage against the plan's quota.
-- **Agents.** Every action is a command (`apps.*`, `account.*`, `cloud.*`, `settings.*`, `app.*`),
+- **Plugins.** For each installed app, the lsuite plugins in `~/.lsuite/plugins/<app>/<id>/`
+  (PLUGINS.md), read from each bundle's `plugin.toml` (name, version, kind, description), with
+  Remove (the folder is deleted after a confirmation; a running app is asked to `plugin.rescan`).
+  **Build a plugin** asks the lsuite agent, in your words, to "Build a <app> plugin: …": it uses
+  that app's `plugin.*` commands (guide, new, build, publishLocal) and the new plugin shows up here.
+- **Agents.** Every action is a command (`apps.*`, `plugins.*`, `agent.*`, `settings.*`, `app.*`),
   the same from the window, `lsuite-cli` and `lsuite-mcp`. Agents are held to
-  `settings.agent`: installing and cloud uploads are on, removing apps, deleting cloud files and
-  signing in or out are off until the person turns them on (Settings › Agents).
+  `settings.agent`: installing and updating apps is on, removing apps and plugins is off until
+  the person turns it on (Settings › Agents).
   `claude mcp add lsuite -- /path/to/lsuite-mcp`.
 
 ## Environment
 
 | Variable | Does |
 | --- | --- |
-| `LSUITE_HOME` | Replaces `~/.lsuite` (account, discovery files, the launcher's state). |
+| `LSUITE_HOME` | Replaces `~/.lsuite` (discovery files, plugins, the launcher's state). |
 | `LSUITE_APPS_DIR` | Where apps are installed (and, on Linux, their menu entries and icons). |
-| `LSUITE_ACCOUNT_SERVER` | The lsuite server (default `https://lsuite.xyz`; `http://127.0.0.1:4321` for a local site). |
-| `LSUITE_GITHUB` | Another host for releases (tests). Signatures are still checked against the built-in keys. |
+| `LSUITE_SERVER` | Where the apps come from (default `https://lsuite.xyz`; `http://127.0.0.1:4321` for a local site). |
+| `LSUITE_GITHUB` | Another host for the launcher's own releases (tests). Signatures are still checked against the built-in key. |
 | `LSUITE_PLATFORM` | Pretend to be another platform (`macos-arm64`…), for tests. |
 | `LSUITE_NO_UPDATE=1` | No release check at start. |
 | `LSUITE_WINDOW_SIZE=1600x1000` | The window's size at start (screenshots). |
-| `LSUITE_NO_PICKER=1` | Never open the system file picker (headless sessions): uploads ask for a path, downloads go to Downloads. |
+| `ANTHROPIC_API_KEY` | Lets the lsuite agent run on the Anthropic API (`LSUITE_AGENT_MODEL` picks the model). |
 
 Testing the window on Linux: `vscreen start target/debug/lsuite`, `vscreen shot`, with
 `LSUITE_HOME` and `LSUITE_APPS_DIR` pointing at scratch folders.
-
-## Synced folders
-
-`cloud.syncAdd local=<folder> remote=<cloud folder>` (or **Sync a folder** on the Cloud page) keeps
-a folder in step with the cloud both ways; the window syncs every few minutes
-(`syncEveryMinutes`), `cloud.syncNow` any time. A file changed on both sides is kept twice
-(`name (conflict <computer> <date>).ext`); deletions go across, but files deleted here because
-they were deleted in the cloud are kept in `~/.lsuite/launcher/sync-trash/`; a first sync never
-deletes; a sync that would delete more than half of a folder stops (`force=true` to go on).
-Files only: empty folders aren't synced. See `crates/lsuite-core/src/sync.rs`.
 
 ## Updates of the launcher itself
 
@@ -95,21 +84,18 @@ The **Agent** area (and `lsuite-cli agent.run prompt=…`) runs one agent across
 skills (`harness.*`, or the app's MCP instructions and prompts on older versions), looks up the
 commands it needs, does the work, looks at the result (`harness.look`) and fixes it before it
 reports. It runs on **Claude Code** (every installed app's MCP server plus `lsuite mcp`, the suite
-brief appended; no key needed), on **lsuite AI** (a Pass plan) or on the **Anthropic API**
-(`ANTHROPIC_API_KEY`); with the last two the launcher runs the loop itself through MCP clients.
-An app can still refuse an action for its own agent permissions; the agent says which setting.
-
-## The marketplace
-
-The **Marketplace** area and `market.*` (MARKETPLACE.md): browse, install and update plugins
-(with lsuite Pass; files checked against the listing's SHA-256, unpacked into
-`~/.lsuite/plugins/<app>/<id>/`, a running app asked to `plugin.rescan`), and publish a bundle
-folder for review (`market.publish`, `agent.publish` for agents, off by default).
+brief appended; no key needed) or on the **Anthropic API** (`ANTHROPIC_API_KEY`), where the
+launcher runs the loop itself through MCP clients. An app can still refuse an action for its own
+agent permissions; the agent says which setting.
 
 ## Getting the apps
 
-Since 0.2.0 the apps come through lsuite.xyz with the account (DISTRIBUTION.md): `apps.*` need a
-free lsuite account; files are checked against the keys built into the launcher as before.
+The apps come only through the launcher (DISTRIBUTION.md), free and with no account. The launcher
+asks `<server>/api/apps/<app>/latest` and downloads from `<server>/api/apps/<app>/files/<tag>/<name>`
+(which sends it on to a short-lived address), with no Authorization header; `<server>` is
+`LSUITE_SERVER`, else `https://lsuite.xyz`. Files are checked against the keys built into the
+launcher, so the server can't change a build unnoticed. An `account.json` left in `~/.lsuite` by
+launcher 0.2 is ignored.
 
 ## Releasing
 
@@ -139,5 +125,5 @@ people install by hand.
 - Beta: Linux only. macOS and Windows are coming soon; the launcher has no builds for them yet.
 - Apps installed by their Windows installers go where the installer puts them
   (`%LOCALAPPDATA%\<app>`), whatever `LSUITE_APPS_DIR` says.
-- The file picker needs the system's portal on Linux; without one, uploads ask for a path
-  (`LSUITE_NO_PICKER=1` forces that).
+- Building plugins needs the lsuite agent (Claude Code or `ANTHROPIC_API_KEY`) and Rust, which
+  the app's plugin kit checks for.

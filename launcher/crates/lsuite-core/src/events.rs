@@ -1,18 +1,18 @@
-//! What the core tells its clients while it works: progress of long tasks (downloads, installs,
-//! uploads) and which part of the state changed. The window listens; the CLI prints progress.
+//! What the core tells its clients while it works: progress of long tasks (downloads, installs)
+//! and which part of the state changed. The window listens; the CLI prints progress.
 
 use serde::Serialize;
 
 #[derive(Clone, Debug, Serialize, PartialEq)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum Event {
-    /// A task advanced. `task` is stable for its whole life (`install:kimchi`, `upload:<path>`).
+    /// A task advanced. `task` is stable for its whole life (`install:kimchi`, `update:lsuite`).
     #[serde(rename_all = "camelCase")]
     Progress { task: String, label: String, done: u64, total: Option<u64> },
     /// A task finished (`ok` false: `message` is the error).
     #[serde(rename_all = "camelCase")]
     TaskDone { task: String, ok: bool, message: String },
-    /// Something the clients show changed: `apps`, `account`, `cloud` or `settings`.
+    /// Something the clients show changed: `apps`, `plugins`, `agent`, `update` or `settings`.
     Changed { what: String },
 }
 

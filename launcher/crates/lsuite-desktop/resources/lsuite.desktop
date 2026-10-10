@@ -2,10 +2,10 @@
 Type=Application
 Name=lsuite
 GenericName=App launcher
-Comment=Install and update the lsuite apps, your lsuite AI account and lsuite Cloud
+Comment=Install and update the lsuite apps and their plugins
 Exec=lsuite
 Icon=lsuite
 Terminal=false
 Categories=Utility;
-Keywords=lsuite;launcher;cloud;ryolune;kimchi;nori;folio;
+Keywords=lsuite;launcher;plugins;ryolune;kimchi;nori;folio;
 StartupWMClass=xyz.lsuite.launcher
