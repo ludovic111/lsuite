@@ -1,9 +1,9 @@
 name: Launcher
 
-# The lsuite launcher (launcher/): tests on macOS, Windows and Linux, then real installs of the
-# apps from their signed releases with lsuite-cli on each system (the macOS .app.tar.gz and zip
-# paths, the Windows installer and portable zip, the Linux AppImage and tar.gz), into a scratch
-# folder. Releases are built by the suite release workflow (see launcher/README.md, Releasing).
+# The lsuite launcher (launcher/): tests on Linux and macOS, then real installs of the apps from
+# their signed releases with lsuite-cli on each system (the macOS .app.tar.gz and zip paths, the
+# Linux AppImage and tar.gz), into a scratch folder. Releases are built by the suite release
+# workflow (see launcher/README.md, Releasing).
 on:
   push:
     branches: [main]
@@ -27,8 +27,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Linux only. macOS and Windows only when started by hand: gh workflow run launcher.yml --ref <branch>.
-        include: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '[{"name":"Linux","os":"ubuntu-22.04"},{"name":"macOS","os":"macos-14"},{"name":"Windows","os":"windows-latest"}]' || '[{"name":"Linux","os":"ubuntu-22.04"}]') }}
+        # Linux on every push and pull request. macOS only when started by hand
+        # (gh workflow run launcher.yml --ref <branch>), on the owner's Mac mini, a self-hosted
+        # runner (vars.MAC_RUNNER=macos-latest sends it back to GitHub): a pull request, from a
+        # fork or not, never reaches it. Windows is coming soon: its steps are kept below; add
+        # {"name":"Windows","os":"windows-latest"} to the list to run them.
+        include: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('[{{"name":"Linux","os":"ubuntu-22.04"}},{{"name":"macOS","os":"{0}"}}]', vars.MAC_RUNNER || 'ludovics-mac-mini') || '[{"name":"Linux","os":"ubuntu-22.04"}]') }}
     defaults:
       run:
         shell: bash
@@ -43,8 +47,15 @@ jobs:
       HAS_BUILDS: ${{ secrets.LSUITE_BUILDS_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The Mac mini runs as the owner's account: keep its warm target/ between runs.
+          clean: ${{ runner.environment == 'github-hosted' }}
+          persist-credentials: false
+      - name: Scratch folders
+        working-directory: .
+        run: rm -rf scratch && mkdir -p scratch
       - name: Linux build dependencies
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && runner.environment == 'github-hosted'
         working-directory: .
         run: |
           sudo apt-get update
@@ -55,6 +66,7 @@ jobs:
         with:
           components: clippy
       - uses: Swatinem/rust-cache@v2
+        if: runner.environment == 'github-hosted'
         with:
           workspaces: launcher -> target
       - name: Clippy
@@ -63,6 +75,14 @@ jobs:
         run: cargo test --workspace --locked
       - name: Build the CLI
         run: cargo build --locked -p lsuite-cli
+      - name: Launcher bundle (macOS, ad-hoc signed)
+        if: runner.os == 'macOS'
+        run: |
+          bash scripts/bundle-macos.sh "$(rustc -vV | sed -n 's/^host: //p')"
+          ls -l target/dist
+          app=$(ls -d target/dist/*-apple-darwin/lsuite.app)
+          "$app/Contents/MacOS/lsuite" --version
+          "$app/Contents/MacOS/lsuite-cli" app.version
 
       - name: Local site
         if: env.HAS_BUILDS == 'true'
@@ -70,7 +90,8 @@ jobs:
         env:
           LSUITE_BUILDS_TOKEN: ${{ secrets.LSUITE_BUILDS_TOKEN }}
         run: |
-          (PORT=4499 LSUITE_DATA_DIR="$RUNNER_TEMP/site" node server.js > "$RUNNER_TEMP/site.log" 2>&1 &)
+          PORT=4499 LSUITE_DATA_DIR="$RUNNER_TEMP/site" nohup node server.js > "$RUNNER_TEMP/site.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/site.pid"
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:4499/health > /dev/null && break; sleep 1; done
           echo "LSUITE_SERVER=http://127.0.0.1:4499" >> "$GITHUB_ENV"
           # The builds route is public since the site went free; a site that still asks for an
@@ -92,15 +113,26 @@ jobs:
         if: runner.os == 'macOS' && env.HAS_BUILDS == 'true' && env.SITE_FREE == 'true'
         run: |
           cli=target/debug/lsuite-cli
-          $cli apps.install app=folio      # .app.tar.gz, minisign
-          $cli apps.install app=ryolune    # zip through ditto, signed SHA256SUMS
-          test -x "$LSUITE_APPS_DIR/folio.app/Contents/MacOS/folio"
-          test -x "$LSUITE_APPS_DIR/ryolune.app/Contents/MacOS/ryolune"
-          codesign --verify --deep --strict "$LSUITE_APPS_DIR/folio.app"
-          "$LSUITE_APPS_DIR/folio.app/Contents/MacOS/folio" --version
-          $cli apps.list | grep -q '"installed": 2'
-          $cli apps.uninstall app=ryolune
-          test ! -e "$LSUITE_APPS_DIR/ryolune.app"
+          # An app whose latest release has no macOS build yet is skipped, not failed.
+          installed=()
+          for app in folio ryolune; do    # .app.tar.gz with minisign; zip through ditto with signed SHA256SUMS
+            if out=$($cli apps.install app=$app 2>&1); then
+              installed+=("$app")
+            elif grep -q "no macOS build\|don't list" <<< "$out"; then
+              echo "::notice::$app has no macOS build in its latest release yet: $out"
+            else
+              echo "$out"; exit 1
+            fi
+          done
+          for app in ${installed[@]+"${installed[@]}"}; do
+            test -x "$LSUITE_APPS_DIR/$app.app/Contents/MacOS/$app"
+            if [ "$app" = folio ]; then
+              codesign --verify --deep --strict "$LSUITE_APPS_DIR/folio.app"
+              "$LSUITE_APPS_DIR/folio.app/Contents/MacOS/folio" --version
+            fi
+            $cli apps.uninstall app=$app
+            test ! -e "$LSUITE_APPS_DIR/$app.app"
+          done
 
       - name: Real installs (Windows)
         if: runner.os == 'Windows' && env.HAS_BUILDS == 'true' && env.SITE_FREE == 'true'
@@ -128,3 +160,10 @@ jobs:
           test -x "$LSUITE_APPS_DIR/nori/nori.AppImage"
           $cli apps.uninstall app=ryolune
           test ! -e "$LSUITE_APPS_DIR/ryolune"
+
+      - name: Clean up
+        if: always()
+        working-directory: .
+        run: |
+          if [ -f "$RUNNER_TEMP/site.pid" ]; then kill "$(cat "$RUNNER_TEMP/site.pid")" 2> /dev/null || true; rm -f "$RUNNER_TEMP/site.pid"; fi
+          rm -rf scratch "$RUNNER_TEMP/site"

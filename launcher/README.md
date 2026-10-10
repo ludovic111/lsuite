@@ -6,9 +6,10 @@ build new ones with your agent, and to run the lsuite agent across them. Everyth
 needs no account. Written in Rust like the apps: the window is GPUI (the same pinned Zed commit as
 kimchi, nori and folio) and wears the lsuite design system v2.
 
-**Beta: Linux only.** lsuite is released for Linux x86_64 (AppImage and tar.gz) while it is in
-beta; macOS and Windows are coming soon. Their code paths below stay in the source, but no builds
-are made or shipped for them.
+**Linux and macOS.** lsuite is released for Linux x86_64 (AppImage and tar.gz) and macOS, Apple
+Silicon and Intel (`lsuite-macos-arm64.dmg` / `lsuite-macos-x86_64.dmg`, and the
+`.app.tar.gz` the updater uses). Windows is coming soon: its code paths stay in the source, but no
+builds are made or shipped for it.
 
 ```
 crates/lsuite-core     everything: the command registry (registry.rs), the app catalogue and its
@@ -21,6 +22,7 @@ crates/lsuite-cli      `lsuite-cli <command> key=value…`
 crates/lsuite-mcp      `lsuite-mcp`, the commands as MCP tools (stdio)
 docs/COMMANDS.md       generated from the registry (`cargo run -p lsuite-cli -- docs`)
 scripts/gen-mark.py    the mark and the app icon (brand/, resources/)
+scripts/bundle-*.sh    release packaging (bundle-macos.sh: lsuite.app, the .dmg and the .app.tar.gz)
 ```
 
 ```bash
@@ -102,10 +104,16 @@ launcher 0.2 is ignored.
 1. Set the version in `Cargo.toml` (`[workspace.package]`), `cargo run -p lsuite-cli -- docs`,
    commit and push to `main` of ludovic111/lsuite.
 2. Build and sign with the suite release workflow (it holds `LSUITE_UPDATE_SIGNING_KEY`, and the
-   Apple Developer ID and notarization secrets for when macOS returns):
+   Apple Developer ID and notarization secrets):
    `gh workflow run suite-build.yml -R ludovic111/kimchi -f app=lsuite -f ref=<full commit SHA>`
-   (Linux AppImage and tar.gz during the beta, each update file signed with `lsuite-release
-   sign`; the macOS and Windows matrix lines are commented out until they ship).
+   (Linux AppImage and tar.gz on ubuntu-22.04; on the Mac mini, a self-hosted runner, the macOS
+   `.dmg` and `.app.tar.gz` for aarch64 and x86_64 through `scripts/bundle-macos.sh`, signed
+   with Developer ID and notarized, the keychain made by `scripts/prepare-apple-signing.sh` and
+   undone by `scripts/cleanup-apple-signing.sh`; each update file signed with `lsuite-release
+   sign`; the Windows matrix line stays commented out until it ships). The files:
+   `lsuite-macos-arm64.dmg`, `lsuite-macos-x86_64.dmg`, `lsuite-macos-arm64.app.tar.gz`,
+   `lsuite-macos-x86_64.app.tar.gz`, `lsuite-linux-x86_64.AppImage`, `lsuite-linux-x86_64.tar.gz`,
+   with `.sig` files beside the updater ones.
 3. Download the artifacts into one folder, write `latest.json` and the checksums, and publish:
    ```bash
    gh run download <run id> -R ludovic111/kimchi -D dist && mv dist/*/* dist/
@@ -122,7 +130,7 @@ people install by hand.
 
 ## Limits
 
-- Beta: Linux only. macOS and Windows are coming soon; the launcher has no builds for them yet.
+- Windows is coming soon; the launcher has no Windows builds yet.
 - Apps installed by their Windows installers go where the installer puts them
   (`%LOCALAPPDATA%\<app>`), whatever `LSUITE_APPS_DIR` says.
 - Building plugins needs the lsuite agent (Claude Code or `ANTHROPIC_API_KEY`) and Rust, which

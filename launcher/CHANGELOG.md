@@ -2,6 +2,11 @@
 
 ## 0.3.0 (unreleased)
 
+- **macOS is back**, Apple Silicon and Intel (`lsuite-macos-arm64.dmg`, `lsuite-macos-x86_64.dmg`,
+  and `.app.tar.gz` for updates), next to Linux; Windows is coming soon. On a Mac the launcher
+  installs and updates the apps' macOS builds (their `darwin` entries, or ryolune's zip) as
+  `<app>.app` in `/Applications` (or `~/Applications` when it can't write there), opens them, and
+  updates itself in place.
 - **lsuite is fully free, with no account.** The apps install and update from lsuite.xyz without
   signing in (`LSUITE_SERVER` picks another server; signatures are checked as before). The
   Account area, sign-in and sign-out, `account.*`, plans and lsuite Pass are gone; an old
