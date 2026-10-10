@@ -2,7 +2,7 @@
   "name": "lsuite-site",
   "private": true,
   "version": "0.1.0",
-  "description": "lsuite.xyz: the site of lsuite (ryolune, kimchi, zenith, nori, folio). Static pages served by a dependency-free Node server.",
+  "description": "lsuite.xyz: the site of lsuite (ryolune, kimchi, nori, folio). Static pages served by a dependency-free Node server.",
   "type": "module",
   "engines": {
     "node": ">=22"

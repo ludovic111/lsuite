@@ -1,7 +1,7 @@
 # lsuite (the launcher)
 
 Part of [lsuite](https://lsuite.xyz). One native app to install, update, open and remove the
-lsuite apps (ryolune, kimchi, zenith, nori, folio), to hold the **lsuite AI** account they all
+lsuite apps (ryolune, kimchi, nori, folio), to hold the **lsuite AI** account they all
 share, and to manage **lsuite Cloud**, the storage that comes with an lsuite AI plan
 ([CLOUD.md](../CLOUD.md)). Written in Rust like the apps: the window is GPUI (the same pinned Zed
 commit as kimchi, nori and folio) and wears the lsuite design system v2.
@@ -33,7 +33,7 @@ cargo test --workspace                   # core tests, incl. install/update/remo
 
 - **Apps.** Each app comes from its own GitHub releases. Nothing is installed unless it checks
   against the release key built into the launcher: kimchi, nori and folio sign each file with
-  minisign (`latest.json`, the signature names the version); ryolune and zenith sign
+  minisign (`latest.json`, the signature names the version); ryolune signs
   `SHA256SUMS` with Ed25519. Where apps go: `/Applications` (or `~/Applications`) on macOS,
   `~/.local/share/lsuite/apps/<app>/` on Linux (with an app-menu entry), the app's installer on
   Windows. A new version is unpacked next to the old one and swapped in; the old copy stays if

@@ -1,17 +1,17 @@
-// The apps' builds (DISTRIBUTION.md): the five apps come only through the lsuite app, with a free
+// The apps' builds (DISTRIBUTION.md): the four apps come only through the lsuite app, with a free
 // lsuite account. Their builds live in the private repository `ludovic111/lsuite-builds`, one
 // release per app version tagged `<app>-v<version>`; this serves them to signed-in apps with the
 // server's read-only `LSUITE_BUILDS_TOKEN`, which never leaves the server.
 //
 //   GET /api/apps/<app>/latest            the newest release, its rewritten latest.json and checksums
 //   GET /api/apps/<app>/latest.json       the rewritten latest.json alone (kimchi, nori, folio)
-//   GET /api/apps/<app>/releases/latest   the release in GitHub's shape (ryolune, zenith)
+//   GET /api/apps/<app>/releases/latest   the release in GitHub's shape (ryolune)
 //   GET /api/apps/<app>/files/<tag>/<name>  302 to GitHub's short-lived download address
 //
 // Dependency-free. Options for tests: `fetch`, `api` (GitHub's base URL), `ttl`, `now`.
 
 export const BUILDS_REPO = 'ludovic111/lsuite-builds';
-export const BUILD_APPS = ['ryolune', 'kimchi', 'zenith', 'nori', 'folio'];
+export const BUILD_APPS = ['ryolune', 'kimchi', 'nori', 'folio'];
 
 const API_HEADERS = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'no-referrer' };
 /** The small files read on the server (`latest.json`, `SHA256SUMS`, `SHA256SUMS.sig`), at most this big. */
@@ -263,8 +263,8 @@ export function createBuilds(options = {}) {
       }
       if (m[2] === 'releases/latest') {
         return json(res, req, 200, {
-          // `v<version>`, as the app's own releases were tagged, so ryolune's and zenith's updaters
-          // parse it unchanged; the builds tag stays in the download addresses.
+          // `v<version>`, as the app's own releases were tagged, so ryolune's updater parses it
+          // unchanged; the builds tag stays in the download addresses.
           tag_name: `v${found.version}`,
           name: found.release.name ?? tag,
           body: found.release.body ?? '',

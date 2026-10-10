@@ -49,7 +49,7 @@ the demo: 100 MB per account), managed from the lsuite launcher: see [CLOUD.md](
 
 1. The app listens on `127.0.0.1:<random port>` and opens
    `<server>/account/connect?app=<app>&port=<port>&state=<random>` in the browser (`<app>`: one of
-   the five, or `lsuite` for the launcher).
+   the four, or `lsuite` for the launcher).
 2. The person signs in or creates the account there (demo: email and name), picks a plan if
    they have none (demo checkout), and presses **Connect <app>**.
 3. The page sends the browser to `http://127.0.0.1:<port>/callback?code=<code>&state=<state>`;

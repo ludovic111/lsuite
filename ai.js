@@ -55,7 +55,7 @@ const PLAN = Object.fromEntries(PLANS.map((p) => [p.id, p]));
 const FAMILY_NAMES = { haiku: 'Claude Haiku', sonnet: 'Claude Sonnet', opus: 'Claude Opus', fable: 'Claude Fable' };
 
 /** The apps that may ask for a sign-in (`/account/connect?app=`); `lsuite` is the launcher. */
-export const APPS = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori', folio: 'folio', lsuite: 'lsuite' };
+export const APPS = { ryolune: 'ryolune', kimchi: 'kimchi', nori: 'nori', folio: 'folio', lsuite: 'lsuite' };
 
 export const modelsOf = (plan) => MODELS.filter((m) => PLAN[plan]?.families.includes(m.family));
 

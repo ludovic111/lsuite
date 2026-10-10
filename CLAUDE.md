@@ -3,16 +3,17 @@
 The suite's site; see README.md (layout, routes, domains) and STANDARD.md (the contract every
 lsuite app meets, with a status table), PLUGINS.md (plugins), PASS.md (lsuite Pass) with AI.md,
 CLOUD.md and MARKETPLACE.md (its three parts' contracts).
-Each app repo (`../ryolune`, `../kimchi`, `../zenith`, `../nori`, `../folio`)
+Each app repo (`../ryolune`, `../kimchi`, `../nori`, `../folio`)
 has an "lsuite" section in its CLAUDE.md with its remaining gaps.
 
-## Current availability (2026-10-07)
+## Current availability (2026-10-10)
 
-- **Five apps, all in beta** (owner's decision on the night of 2026-10-06): ryolune (music),
-  kimchi (video), zenith (code), nori (image and design: Photoshop + Illustrator + InDesign in one
-  document) and folio (office: documents, spreadsheets and presentations). The suite's line: every
-  kind of creative and office tool, combined, free and open source, driven by your agent.
-- **Linux only during the beta** (owner's decision, 2026-10-08): the launcher and the five apps
+- **Four apps, all in beta** (owner's decision on the night of 2026-10-06; the code app was
+  dropped on 2026-10-10 and its old addresses redirect to the home page): ryolune (music),
+  kimchi (video), nori (image and design: Photoshop + Illustrator + InDesign in one document) and
+  folio (office: documents, spreadsheets and presentations). The suite's line: every kind of
+  creative and office tool, combined, free and open source, driven by your agent.
+- **Linux only during the beta** (owner's decision, 2026-10-08): the launcher and the four apps
   are built and shipped for Linux x86_64 only; macOS and Windows are "coming soon" everywhere on
   the site (hero lines, stats, the launcher's download tiles, `/launcher/download/<macos|windows…>`
   → `/launcher#downloads`). Their files were removed from every release (launcher, lsuite-builds
@@ -27,7 +28,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   `files/<tag>/<name>`: app token required, 302 to GitHub's signed address) with
   `LSUITE_BUILDS_TOKEN` (Railway; 503 without it). `%VERSION:<app>%` and `/api/apps` read the
   versions there when the token is set (else the public releases while they last, then
-  `FALLBACK_VERSIONS`): ryolune 0.15.3, kimchi 0.10.0, zenith 0.4.0, nori 0.1.0 and folio 0.1.0.
+  `FALLBACK_VERSIONS`): ryolune 0.15.3, kimchi 0.10.0, nori 0.1.0 and folio 0.1.0.
   The apps' public GitHub releases become drafts once launcher 0.2.0 and each app's next version
   (whose updater reads lsuite.xyz) are out; the changelog cards' "Full notes" links to them will
   need another target then.
@@ -47,10 +48,10 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   admins, "Review". The launcher's Marketplace area and `lsuite-cli market.*` are being built.
 - The site wears **design system v2** (`design/DESIGN.md`). All app names are lowercase.
   Real native-app captures are in `assets/img/<app>/`; each hero uses light and dark images.
-  All five marks come from the app repositories' own generated icons. App capabilities and
+  All four marks come from the app repositories' own generated icons. App capabilities and
   command counts describe the new beta builds; public download versions follow GitHub Releases.
 - **lsuite launcher** (`launcher/`, 2026-10-07, see its README): a Rust/GPUI app that installs and
-  updates the five apps from their signed releases, manages the lsuite account (lsuite Pass) and **lsuite
+  updates the four apps from their signed releases, manages the lsuite account (lsuite Pass) and **lsuite
   Cloud** (CLOUD.md, `cloud.js`, `/api/cloud`, two-way synced folders; storage per plan decided:
   50 GB / 250 GB / 1 TB, demo 100 MB per account; an S3-compatible store is supported for
   production). Its page is
@@ -69,17 +70,6 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
       is published (its release run failed on Apple notarization: the Apple developer agreement
       must be accepted, then re-run). Retake captures from the ryolune app (`ryolune-cli
       ui.screenshot --path <file>` while it runs) when they change.
-- [x] zenith page (2026-10-01): rewritten for the new zenith, a Mac app for coding with agents
-      (Claude Code and Codex threads, Rust server, Tauri app); `zmock` now illustrates a thread.
-      The old dashboard, Ask zenith, the agent team and the `zenith_*` MCP tools are gone: don't
-      advertise them. `assets/img/og/zenith.png` retaken from the new page (2026-10-01).
-- [x] zenith marked Coming soon (2026-10-02): zenith is not ready, so the site no longer offers
-      it. Its page is a preview (badge, future tense, no download, "Follow it on GitHub"), "What's
-      new in 0.2" is gone, the home card, lede and agent-readiness column say Coming soon, nav and
-      footer carry a "soon" marker, and `/zenith/download[/…]` redirects to `/zenith`. T3 Code is
-      used instead for now. When zenith ships: put back the download section, `%VERSION:zenith%`,
-      the `ZENITH` assets in `server.js` and the table cells, and retake `assets/img/og/zenith.png`
-      (its hero has no Coming soon badge).
 - [x] kimchi 0.5 page (2026-10-03): New in 0.5 (keyframes, 2D motion, 3D, templates, transitions,
       colour, local captions, reverse/freeze, GPU export), 122 commands, new captures from the
       real app (README, "Updating an app's page"), og image retaken. Home: kimchi's card, its
@@ -98,7 +88,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
       (`studio-2d[-light].webp`), `editor[-light].webp` (also the home card) is the editor with the
       path-traced product shot. The demo project is built by `kimchi-cli` in `~/.cache/kimchi-shots/`.
 - [ ] Keep the agent-readiness table on the home page and `STANDARD.md`'s status table in step
-      as kimchi and zenith close their gaps.
+      as kimchi closes its gaps.
 - [x] **Design system on the site itself** (2026-10-01): pages load `/design/tokens.css` before
       `assets/styles.css`, whose variables all map onto `--ls-*`; app pages set `data-app` on
       `<html>` (signature color, aurora backdrop); nav, cards, cells, tables, stats, downloads, FAQ,

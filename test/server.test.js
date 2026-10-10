@@ -17,7 +17,7 @@ test('ryolune.com lands on the ryolune page, path and query kept', () => {
 test('other hosts go to the canonical one; local hosts are served', () => {
   assert.equal(hostRedirect('www.lsuite.xyz', '/kimchi', 'lsuite.xyz'), 'https://lsuite.xyz/kimchi');
   assert.equal(hostRedirect('lsuite-production.up.railway.app', '/', 'lsuite.xyz'), 'https://lsuite.xyz/');
-  assert.equal(hostRedirect('lsuite.xyz', '/zenith', 'lsuite.xyz'), null);
+  assert.equal(hostRedirect('lsuite.xyz', '/nori', 'lsuite.xyz'), null);
   assert.equal(hostRedirect('localhost:4321', '/', 'lsuite.xyz'), null);
   assert.equal(hostRedirect('127.0.0.1:4321', '/', 'lsuite.xyz'), null);
   assert.equal(hostRedirect('anything.example', '/', ''), null);
@@ -30,8 +30,8 @@ test('platform from the user agent', () => {
   assert.equal(osFor('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)'), null);
 });
 
-test('the five apps come only through the lsuite app: their pages and download routes lead to it', async () => {
-  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) {
+test('the four apps come only through the lsuite app: their pages and download routes lead to it', async () => {
+  for (const app of ['ryolune', 'kimchi', 'nori', 'folio']) {
     for (const wanted of [undefined, 'macos-arm64', 'nope']) assert.equal(await downloadTarget(app, wanted, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'), '/launcher', app);
     assert.equal(DOWNLOADS[app].repo, `ludovic111/${app}`);
     assert.notEqual(DOWNLOADS[app].published, false);
@@ -47,10 +47,10 @@ test('the five apps come only through the lsuite app: their pages and download r
     assert.ok(!html.includes('First public build coming'), app);
   }
   assert.equal(await downloadTarget('photoshop', 'macos-arm64'), null);
-  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '1.0.1', kimchi: '1.0.2', zenith: '1.0.3', nori: '1.0.4', folio: '1.0.5' });
+  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '1.0.1', kimchi: '1.0.2', nori: '1.0.4', folio: '1.0.5' });
   assert.ok(home.includes('<a class="btn btn--primary" href="/launcher/download">Download lsuite'));
   assert.ok(home.includes('come through the lsuite app with a free account'));
-  for (const v of ['1.0.1', '1.0.2', '1.0.3', '1.0.4', '1.0.5']) assert.ok(home.includes(`Beta · v${v}`), v);
+  for (const v of ['1.0.1', '1.0.2', '1.0.4', '1.0.5']) assert.ok(home.includes(`Beta · v${v}`), v);
 
   const server = createServer((req, res) => handle(req, res));
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
@@ -64,6 +64,13 @@ test('the five apps come only through the lsuite app: their pages and download r
         assert.equal(res.headers.get('location'), '/launcher', path);
       }
     }
+    // An app that left the suite: its old addresses land on the home page.
+    for (const path of ['/zenith', '/zenith/', '/zenith/download', '/zenith/download/linux-x86_64']) {
+      const res = await get(path);
+      assert.equal(res.status, 301, path);
+      assert.equal(res.headers.get('location'), '/', path);
+    }
+    assert.ok(!(await (await get('/sitemap.xml')).text()).includes('/zenith'), 'not in the sitemap');
     // GET /api/apps stays public; the builds need an app token (and, here, LSUITE_BUILDS_TOKEN).
     const list = await get('/api/apps');
     assert.equal(list.status, 200);
@@ -89,20 +96,20 @@ test('the five apps come only through the lsuite app: their pages and download r
   }
 });
 
-test('beta apps: every page says Beta and Linux, the nav lists all five, only macOS and Windows are coming soon', async () => {
-  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) {
-    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
+test('beta apps: every page says Beta and Linux, the nav lists all four, only macOS and Windows are coming soon', async () => {
+  for (const app of ['ryolune', 'kimchi', 'nori', 'folio']) {
+    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', nori: '7.7.7' });
     assert.ok(html.includes('<span class="badge">Beta</span>'), app);
     assert.ok(!/class="badge">Coming soon/i.test(html), `${app}: not a coming-soon app`);
     assert.ok(html.includes('Linux, macOS and Windows coming soon'), `${app}: Linux, macOS and Windows coming soon`);
     assert.ok(!/\/Applications\//.test(html), `${app}: no macOS paths`);
-    for (const other of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) assert.ok(html.includes(`href="/${other}" data-app="${other}"`), `${app}: nav has ${other}`);
+    for (const other of ['ryolune', 'kimchi', 'nori', 'folio']) assert.ok(html.includes(`href="/${other}" data-app="${other}"`), `${app}: nav has ${other}`);
     assert.ok(html.includes('id="changelog"'), `${app}: changelog`);
-    assert.ok(html.includes('id="ai"') || app === 'zenith', `${app}: lsuite AI`);
+    assert.ok(html.includes('id="ai"'), `${app}: lsuite AI`);
     assert.ok(html.includes('href="/pass"') && !html.includes('href="/ai'), `${app}: lsuite Pass, never /ai`);
   }
-  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
-  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) assert.ok(home.includes(`class="card app-${app}`), `home card ${app}`);
+  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', nori: '7.7.7' });
+  for (const app of ['ryolune', 'kimchi', 'nori', 'folio']) assert.ok(home.includes(`class="card app-${app}`), `home card ${app}`);
   assert.ok(!/class="badge">Coming soon/i.test(home));
   assert.ok(!/· macOS|· Windows/.test(home), 'home cards: Linux only');
 });
@@ -114,15 +121,15 @@ test('donations only go to https', () => {
 });
 
 test('pages are rendered with their includes and the current app', async () => {
-  for (const app of ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']) {
-    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
+  for (const app of ['ryolune', 'kimchi', 'nori', 'folio']) {
+    const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', nori: '7.7.7' });
     assert.ok(!/%VERSION:/.test(html), `${app}: versions filled`);
     assert.ok(!html.includes('<!-- include:'), `${app}: includes filled`);
     assert.ok(html.includes(`data-app="${app}" aria-current="page"`), `${app}: current in nav`);
     assert.ok(!html.includes('%ORIGIN%'), `${app}: origin filled`);
     assert.match(html, /\/assets\/styles\.css\?v=[0-9a-f]{10}/);
   }
-  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', zenith: '7.7.7' });
+  const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', nori: '7.7.7' });
   assert.ok(!home.includes('aria-current'));
 });
 
@@ -188,8 +195,8 @@ test('lsuite Pass and the account pages: plans from the API, scripts as files, f
   }
 });
 
-test('the launcher: its page, its downloads from launcher-v tags, and never one of the five apps', async (t) => {
-  assert.deepEqual(APP_NAMES, ['ryolune', 'kimchi', 'zenith', 'nori', 'folio']);
+test('the launcher: its page, its downloads from launcher-v tags, and never one of the four apps', async (t) => {
+  assert.deepEqual(APP_NAMES, ['ryolune', 'kimchi', 'nori', 'folio']);
   assert.equal(PAGES['/launcher'], 'pages/launcher.html');
   assert.equal(versionOf('launcher-v0.1.1', 'launcher-v'), '0.1.1');
   assert.equal(versionOf('v0.15.3'), '0.15.3');

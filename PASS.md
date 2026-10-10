@@ -8,7 +8,7 @@ It holds three things, one lsuite account for all of them:
 | --- | --- | --- |
 | **lsuite AI** | The agents in every app with nothing to set up: Claude through lsuite's Anthropic-compatible endpoint, a monthly allowance of credits. The apps' provider keeps the name "lsuite AI". | [AI.md](AI.md) |
 | **lsuite Cloud** | Storage for your files, managed and synced from the lsuite launcher. | [CLOUD.md](CLOUD.md) |
-| **lsuite Marketplace** | Plugins for the five apps made by the people who use them and by lsuite, every version reviewed. Installing comes with a paid plan; anyone with an account can publish. | [MARKETPLACE.md](MARKETPLACE.md) |
+| **lsuite Marketplace** | Plugins for the four apps made by the people who use them and by lsuite, every version reviewed. Installing comes with a paid plan; anyone with an account can publish. | [MARKETPLACE.md](MARKETPLACE.md) |
 
 Bringing your own model (Claude Code, Codex, API keys, Ollama) stays free and is never pushed
 aside; documents stay plain files on disk; no telemetry.

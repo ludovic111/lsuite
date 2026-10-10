@@ -4,7 +4,7 @@
 
 const page = document.body.dataset.page;
 const params = new URLSearchParams(location.search);
-const APP_NAMES = { ryolune: 'ryolune', kimchi: 'kimchi', zenith: 'zenith', nori: 'nori', folio: 'folio', lsuite: 'lsuite launcher' };
+const APP_NAMES = { ryolune: 'ryolune', kimchi: 'kimchi', nori: 'nori', folio: 'folio', lsuite: 'lsuite launcher' };
 /** How /account/connect names the app in its sentences ("Connect the lsuite launcher"). */
 const CONNECT_NAMES = { ...APP_NAMES, lsuite: 'the lsuite launcher' };
 let plans = [];

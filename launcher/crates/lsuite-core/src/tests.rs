@@ -171,62 +171,62 @@ async fn installs_updates_and_removes_from_signed_releases() {
     let sk = ed25519_dalek::SigningKey::from_bytes(&[9u8; 32]);
     let key_hex: String = sk.verifying_key().as_bytes().iter().map(|b| format!("{b:02x}")).collect();
     let sums_app: &'static App = Box::leak(Box::new(App {
-        id: "zenith",
-        name: "zenith",
-        kind: "code",
-        kind_label: "Code",
+        id: "ryolune",
+        name: "ryolune",
+        kind: "music",
+        kind_label: "Music",
         summary: "test",
-        repo: "test/zenith",
-        signing: Signing::Checksums { public_key_hex: leak(key_hex), prefix: "zenith-ed25519" },
-        files: &[("linux-x86_64", "zenith-linux-x86_64.tar.gz")],
+        repo: "test/ryolune",
+        signing: Signing::Checksums { public_key_hex: leak(key_hex), prefix: "ryolune-ed25519" },
+        files: &[("linux-x86_64", "ryolune-linux-x86_64.tar.gz")],
     }));
-    let archive = targz(&[("zenith", b"#!/bin/sh\necho zenith\n"), ("zenith-cli", b"#!/bin/sh\n")]);
+    let archive = targz(&[("ryolune", b"#!/bin/sh\necho ryolune\n"), ("ryolune-cli", b"#!/bin/sh\n")]);
     let sha: String = {
         use sha2::Digest;
         sha2::Sha256::digest(&archive).iter().map(|b| format!("{b:02x}")).collect()
     };
-    let sums = format!("{sha}  zenith-linux-x86_64.tar.gz\n");
+    let sums = format!("{sha}  ryolune-linux-x86_64.tar.gz\n");
     use ed25519_dalek::Signer;
-    let sig = format!("zenith-ed25519 {}\n", base64::engine::general_purpose::STANDARD.encode(sk.sign(sums.as_bytes()).to_bytes()));
-    let zenith_latest = |sums: &str| json!({ "app": "zenith", "version": "0.4.0", "tag": "zenith-v0.4.0", "manifest": null, "sha256sums": sums, "sha256sumsSig": sig }).to_string().into_bytes();
+    let sig = format!("ryolune-ed25519 {}\n", base64::engine::general_purpose::STANDARD.encode(sk.sign(sums.as_bytes()).to_bytes()));
+    let ryolune_latest = |sums: &str| json!({ "app": "ryolune", "version": "0.4.0", "tag": "ryolune-v0.4.0", "manifest": null, "sha256sums": sums, "sha256sumsSig": sig }).to_string().into_bytes();
     {
         let mut r = routes.lock();
-        r.insert("/api/apps/zenith/latest".into(), (200, vec![], zenith_latest(&sums)));
-        r.insert("/api/apps/zenith/files/zenith-v0.4.0/zenith-linux-x86_64.tar.gz".into(), (200, vec![], archive.clone()));
+        r.insert("/api/apps/ryolune/latest".into(), (200, vec![], ryolune_latest(&sums)));
+        r.insert("/api/apps/ryolune/files/ryolune-v0.4.0/ryolune-linux-x86_64.tar.gz".into(), (200, vec![], archive.clone()));
     }
     let rel = release::latest(sums_app, linux).await.unwrap();
     assert_eq!(rel.version, "0.4.0");
     let rec = install::install(sums_app, &rel, linux, &mut p).await.unwrap();
-    assert_eq!(rec.executable, home.path().join("apps/zenith/zenith"));
-    assert!(home.path().join("apps/zenith/zenith-cli").is_file());
+    assert_eq!(rec.executable, home.path().join("apps/ryolune/ryolune"));
+    assert!(home.path().join("apps/ryolune/ryolune-cli").is_file());
     // A forged checksums file is refused.
-    routes.lock().insert("/api/apps/zenith/latest".into(), (200, vec![], zenith_latest(&format!("{}  zenith-linux-x86_64.tar.gz\n", "0".repeat(64)))));
+    routes.lock().insert("/api/apps/ryolune/latest".into(), (200, vec![], ryolune_latest(&format!("{}  ryolune-linux-x86_64.tar.gz\n", "0".repeat(64)))));
     assert!(release::latest(sums_app, linux).await.unwrap_err().contains("aren't signed"));
 
     // ---- Removing: refused while running, then done, documents untouched. ----
     let disc = home.path().join("lsuite/apps");
     std::fs::create_dir_all(&disc).unwrap();
-    let running = json!({ "format": 1, "app": "zenith", "version": "0.4.0", "appPath": rec.path, "executable": rec.executable, "running": { "pid": std::process::id() } });
-    std::fs::write(disc.join("zenith.json"), running.to_string()).unwrap();
+    let running = json!({ "format": 1, "app": "ryolune", "version": "0.4.0", "appPath": rec.path, "executable": rec.executable, "running": { "pid": std::process::id() } });
+    std::fs::write(disc.join("ryolune.json"), running.to_string()).unwrap();
     assert!(install::uninstall(sums_app, linux.os).unwrap_err().contains("is open"));
-    let closed = json!({ "format": 1, "app": "zenith", "version": "0.4.0", "appPath": rec.path, "executable": rec.executable, "running": null });
-    std::fs::write(disc.join("zenith.json"), closed.to_string()).unwrap();
+    let closed = json!({ "format": 1, "app": "ryolune", "version": "0.4.0", "appPath": rec.path, "executable": rec.executable, "running": null });
+    std::fs::write(disc.join("ryolune.json"), closed.to_string()).unwrap();
     install::uninstall(sums_app, linux.os).unwrap();
-    assert!(!home.path().join("apps/zenith").exists());
-    assert!(!disc.join("zenith.json").exists(), "the discovery file of the removed copy goes too");
-    assert!(install::find("zenith", linux.os).is_none());
+    assert!(!home.path().join("apps/ryolune").exists());
+    assert!(!disc.join("ryolune.json").exists(), "the discovery file of the removed copy goes too");
+    assert!(install::find("ryolune", linux.os).is_none());
     assert!(install::records().contains_key("folio"));
 
     // A copy outside the usual places (a build from source) is never removed.
     let dev = home.path().join("src/target/debug");
     std::fs::create_dir_all(&dev).unwrap();
-    std::fs::write(dev.join("zenith"), "dev").unwrap();
-    let devdisc = json!({ "format": 1, "app": "zenith", "version": "0.5.0-dev", "appPath": dev, "executable": dev.join("zenith"), "running": null });
-    std::fs::write(disc.join("zenith.json"), devdisc.to_string()).unwrap();
-    let f = install::find("zenith", linux.os).unwrap();
+    std::fs::write(dev.join("ryolune"), "dev").unwrap();
+    let devdisc = json!({ "format": 1, "app": "ryolune", "version": "0.5.0-dev", "appPath": dev, "executable": dev.join("ryolune"), "running": null });
+    std::fs::write(disc.join("ryolune.json"), devdisc.to_string()).unwrap();
+    let f = install::find("ryolune", linux.os).unwrap();
     assert!(!f.managed && !f.standard);
     assert!(install::uninstall(sums_app, linux.os).unwrap_err().contains("wasn't installed by the launcher"));
-    assert!(dev.join("zenith").exists());
+    assert!(dev.join("ryolune").exists());
 
     // The registry: unknown parameters, agents held to their permissions.
     let err = crate::call(&l, crate::Source::Window, "apps.install", json!({ "app": "folio", "version": "1" })).await.unwrap_err();

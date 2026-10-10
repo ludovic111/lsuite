@@ -36,7 +36,6 @@ async function fakeGitHub() {
     { tag_name: 'kimchi-v0.9.12', name: 'kimchi 0.9.12', body: 'Old.', draft: false, prerelease: false, assets: [asset('latest.json', JSON.stringify({ version: '0.9.12', platforms: {} }))] },
     { tag_name: 'kimchi-v0.11.0', name: 'kimchi 0.11.0', body: 'Draft.', draft: true, prerelease: false, assets: [asset('kimchi_0.11.0_aarch64.dmg', null, 9)] },
     { tag_name: 'kimchi-v0.12.0-rc.1', name: 'kimchi 0.12.0-rc.1', body: 'Pre.', draft: false, prerelease: true, assets: [] },
-    { tag_name: 'zenith-v1.0.0', name: 'zenith 1.0.0', body: '', draft: false, prerelease: false, assets: [asset('zenith-macos-arm64.zip', null, 7)] },
     { tag_name: 'kimchify-v9.0.0', name: 'not kimchi', body: '', draft: false, prerelease: false, assets: [] },
     {
       tag_name: 'kimchi-v0.10.0',
@@ -194,7 +193,7 @@ test('latest: the newest published release by semver, its manifest on the file r
     const body = await res.json();
     assert.deepEqual(Object.keys(body), ['app', 'version', 'tag', 'notes', 'files', 'manifest', 'sha256sums', 'sha256sumsSig']);
     assert.equal(body.app, 'kimchi');
-    assert.equal(body.version, '0.10.0', 'not the draft 0.11.0, the pre-release 0.12.0-rc.1, zenith or kimchify');
+    assert.equal(body.version, '0.10.0', 'not the draft 0.11.0, the pre-release 0.12.0-rc.1 or kimchify');
     assert.equal(body.tag, 'kimchi-v0.10.0');
     assert.equal(body.notes, '## New\n- Faster export.');
     assert.deepEqual(body.files[0], { name: 'kimchi_0.10.0_aarch64.dmg', size: 52_000_000 });
@@ -263,9 +262,6 @@ test("releases/latest: GitHub's shape, every asset on the file route", async () 
       })),
     });
     // tag_name as the apps' own releases had it (`v…`); the builds tag in the addresses and in /latest.
-    const zenith = await (await t.get('/api/apps/zenith/releases/latest')).json();
-    assert.equal(zenith.tag_name, 'v1.0.0');
-    assert.equal(zenith.assets[0].browser_download_url, `${t.base}/api/apps/zenith/files/zenith-v1.0.0/zenith-macos-arm64.zip`);
     assert.equal((await (await t.get('/api/apps/ryolune/latest')).json()).tag, 'ryolune-v0.16.0');
   } finally {
     await t.close();
@@ -294,8 +290,8 @@ test("files: 302 to GitHub's short-lived address, never the file or the token; o
     await error(await t.get('/api/apps/kimchi/files/kimchi-v0.10.0/nope.dmg'), 404, 'not_found_error');
     await error(await t.get('/api/apps/kimchi/files/kimchi-v9.9.9/latest.json'), 404, 'not_found_error');
     await error(await t.get('/api/apps/kimchi/files/kimchi-v0.11.0/kimchi_0.11.0_aarch64.dmg'), 404, 'not_found_error', 'kimchi has no release kimchi-v0.11.0.');
-    await error(await t.get('/api/apps/kimchi/files/zenith-v1.0.0/zenith-macos-arm64.zip'), 404, 'not_found_error', "zenith-v1.0.0 isn't a release of kimchi.");
-    await error(await t.get('/api/apps/zenith/files/kimchi-v0.10.0/latest.json'), 404, 'not_found_error');
+    await error(await t.get('/api/apps/kimchi/files/ryolune-v0.16.0/ryolune-macos-arm64.zip'), 404, 'not_found_error', "ryolune-v0.16.0 isn't a release of kimchi.");
+    await error(await t.get('/api/apps/ryolune/files/kimchi-v0.10.0/latest.json'), 404, 'not_found_error');
     await error(await t.get('/api/apps/kimchi/files/kimchi-v0.10.0/%E0%A4%A'), 404, 'not_found_error');
     await error(await t.get('/api/apps/kimchi/files/kimchi-v0.10.0/a/b'), 404, 'not_found_error');
   } finally {
@@ -374,7 +370,7 @@ test("the pages' versions and GET /api/apps read the builds when configured, els
     const versions = await appVersions(APP_NAMES, builds);
     const { apps } = await appsDocument('https://lsuite.xyz', versions);
     assert.equal(apps.find((a) => a.id === 'kimchi').version, '0.10.0');
-    assert.equal(apps.find((a) => a.id === 'zenith').version, '1.0.0');
+    assert.equal(apps.find((a) => a.id === 'ryolune').version, '0.16.0');
     // GitHub down and nothing cached: the fallback versions.
     gh.state.fail = true;
     const cold = createBuilds({ token: GH_TOKEN, api: gh.base });

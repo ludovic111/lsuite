@@ -74,7 +74,6 @@ pub fn app_icon(id: &str) -> Option<&'static [u8]> {
     Some(match id {
         "ryolune" => include_bytes!("../assets/icons/ryolune.png"),
         "kimchi" => include_bytes!("../assets/icons/kimchi.png"),
-        "zenith" => include_bytes!("../assets/icons/zenith.png"),
         "nori" => include_bytes!("../assets/icons/nori.png"),
         "folio" => include_bytes!("../assets/icons/folio.png"),
         _ => return None,

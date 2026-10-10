@@ -55,7 +55,7 @@ pub fn page(_window: &mut Window, cx: &mut App) -> AnyElement {
                     .gap(px(20.))
                     .child(lede(
                         "Every lsuite app, signed and up to date.",
-                        "Music, video, code, image and office: free, open source and driven by your agent. Each one comes from its own GitHub releases, and every download is checked against the app's signing key before anything is replaced.",
+                        "Music, video, image and office: free, open source and driven by your agent. Each one comes from its own GitHub releases, and every download is checked against the app's signing key before anything is replaced.",
                         cx,
                     ))
                     .child(div().flex().flex_col().items_end().gap(px(4.)).flex_none().child(tag(format!("{os} · {}", platform.split('-').nth(1).unwrap_or("")), false, cx)).child(div().font_family(MONO).text_size(px(sz::XS)).text_color(t.text_3).child(format!("{installed} of {} installed", apps.len())))),

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Writes the lsuite launcher's mark and app icon: a lowercase l cut square beside the suite, four
 tiles, the last one dissolving into ordered dither (the grain of the interface), in one colour.
-A sibling of the apps' marks (ryolune, kimchi, zenith, nori, folio).
+A sibling of the apps' marks (ryolune, kimchi, nori, folio).
 
     brand/mark.svg                                ink on paper
     brand/icon.svg                                the app icon (macOS icon grid)

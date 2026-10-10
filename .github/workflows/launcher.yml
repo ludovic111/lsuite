@@ -124,9 +124,9 @@ jobs:
         if: runner.os == 'Linux' && env.HAS_BUILDS == 'true'
         run: |
           cli=target/debug/lsuite-cli
-          $cli apps.install app=zenith     # tar.gz, signed SHA256SUMS
+          $cli apps.install app=ryolune    # tar.gz, signed SHA256SUMS
           $cli apps.install app=nori       # AppImage, minisign
-          "$LSUITE_APPS_DIR/zenith/zenith" --version
+          test -x "$LSUITE_APPS_DIR/ryolune/ryolune"
           test -x "$LSUITE_APPS_DIR/nori/nori.AppImage"
-          $cli apps.uninstall app=zenith
-          test ! -e "$LSUITE_APPS_DIR/zenith"
+          $cli apps.uninstall app=ryolune
+          test ! -e "$LSUITE_APPS_DIR/ryolune"
