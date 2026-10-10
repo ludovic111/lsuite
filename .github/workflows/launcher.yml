@@ -37,9 +37,9 @@ jobs:
       LSUITE_HOME: ${{ github.workspace }}/scratch/home
       LSUITE_APPS_DIR: ${{ github.workspace }}/scratch/apps
       LSUITE_NO_UPDATE: '1'
-      # The apps come through lsuite.xyz's builds route (DISTRIBUTION.md): the real installs run
-      # against this repository's own site, started below, reading the private builds with this
-      # secret. Without it they're skipped.
+      # The apps come through lsuite.xyz's builds route (DISTRIBUTION.md), no account needed: the
+      # real installs run against this repository's own site, started below, reading the private
+      # builds with this secret. Without it they're skipped.
       HAS_BUILDS: ${{ secrets.LSUITE_BUILDS_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
@@ -64,7 +64,7 @@ jobs:
       - name: Build the CLI
         run: cargo build --locked -p lsuite-cli
 
-      - name: Local site and a signed-in test account
+      - name: Local site
         if: env.HAS_BUILDS == 'true'
         working-directory: .
         env:
@@ -72,18 +72,16 @@ jobs:
         run: |
           (PORT=4499 LSUITE_DATA_DIR="$RUNNER_TEMP/site" node server.js > "$RUNNER_TEMP/site.log" 2>&1 &)
           for i in $(seq 1 30); do curl -sf http://127.0.0.1:4499/health > /dev/null && break; sleep 1; done
-          jar="$RUNNER_TEMP/jar"
-          curl -sf -c "$jar" -b "$jar" -H 'content-type: application/json' -d '{"email":"ci@example.com","name":"CI"}' http://127.0.0.1:4499/api/account/session > /dev/null
-          key=$(curl -sf -c "$jar" -b "$jar" -H 'content-type: application/json' -d '{}' http://127.0.0.1:4499/api/account/key | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s).key))')
-          echo "LSUITE_ACCOUNT_SERVER=http://127.0.0.1:4499" >> "$GITHUB_ENV"
-          echo "::add-mask::$key"
-          echo "CI_KEY=$key" >> "$GITHUB_ENV"
-
-      - name: Sign in
-        if: env.HAS_BUILDS == 'true'
-        run: |
-          cli=target/debug/lsuite-cli; [ -x "$cli" ] || cli=target/debug/lsuite-cli.exe
-          $cli account.signIn key=$CI_KEY > /dev/null
+          echo "LSUITE_SERVER=http://127.0.0.1:4499" >> "$GITHUB_ENV"
+          # The builds route is public since the site went free; a site that still asks for an
+          # account can't serve the launcher.
+          status=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:4499/api/apps/folio/latest)
+          if [ "$status" = 401 ]; then
+            echo "::notice::Real installs skipped: this checkout's site still asks for an account on /api/apps (the free site isn't merged yet)."
+            echo "SITE_FREE=false" >> "$GITHUB_ENV"
+          else
+            echo "SITE_FREE=true" >> "$GITHUB_ENV"
+          fi
 
       - name: Real installs skipped
         if: env.HAS_BUILDS != 'true'
@@ -91,7 +89,7 @@ jobs:
           echo "::notice::Real installs skipped: add the LSUITE_BUILDS_TOKEN secret (read access to ludovic111/lsuite-builds) to run them."
 
       - name: Real installs (macOS)
-        if: runner.os == 'macOS' && env.HAS_BUILDS == 'true'
+        if: runner.os == 'macOS' && env.HAS_BUILDS == 'true' && env.SITE_FREE == 'true'
         run: |
           cli=target/debug/lsuite-cli
           $cli apps.install app=folio      # .app.tar.gz, minisign
@@ -105,7 +103,7 @@ jobs:
           test ! -e "$LSUITE_APPS_DIR/ryolune.app"
 
       - name: Real installs (Windows)
-        if: runner.os == 'Windows' && env.HAS_BUILDS == 'true'
+        if: runner.os == 'Windows' && env.HAS_BUILDS == 'true' && env.SITE_FREE == 'true'
         run: |
           cli=target/debug/lsuite-cli.exe
           $cli apps.install app=ryolune    # portable zip, signed SHA256SUMS
@@ -121,7 +119,7 @@ jobs:
           test ! -e "$LSUITE_APPS_DIR/ryolune"
 
       - name: Real installs (Linux)
-        if: runner.os == 'Linux' && env.HAS_BUILDS == 'true'
+        if: runner.os == 'Linux' && env.HAS_BUILDS == 'true' && env.SITE_FREE == 'true'
         run: |
           cli=target/debug/lsuite-cli
           $cli apps.install app=ryolune    # tar.gz, signed SHA256SUMS
