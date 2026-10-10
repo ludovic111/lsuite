@@ -85,12 +85,13 @@ test('the four apps come only through the lsuite app: their pages and download r
   }
 });
 
-test('beta apps: every page says Beta and Linux, the nav lists all four, only macOS and Windows are coming soon', async () => {
+test('beta apps: every page says Beta, Linux and macOS, the nav lists all four, only Windows is coming soon', async () => {
   for (const app of ['ryolune', 'kimchi', 'nori', 'folio']) {
     const html = await renderPage(`${app}/index.html`, 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', nori: '7.7.7' });
     assert.ok(html.includes('<span class="badge">Beta</span>'), app);
     assert.ok(!/class="badge">Coming soon/i.test(html), `${app}: not a coming-soon app`);
-    assert.ok(html.includes('Linux, macOS and Windows coming soon'), `${app}: Linux, macOS and Windows coming soon`);
+    assert.ok(html.includes('Linux and macOS · Windows coming soon'), `${app}: Linux and macOS, Windows coming soon`);
+    assert.ok(!html.includes('macOS and Windows coming soon'), `${app}: macOS is not coming soon`);
     assert.ok(!/\/Applications\//.test(html), `${app}: no macOS paths`);
     for (const other of ['ryolune', 'kimchi', 'nori', 'folio']) assert.ok(html.includes(`href="/${other}" data-app="${other}"`), `${app}: nav has ${other}`);
     assert.ok(html.includes('id="changelog"'), `${app}: changelog`);
@@ -100,7 +101,7 @@ test('beta apps: every page says Beta and Linux, the nav lists all four, only ma
   const home = await renderPage('index.html', 'https://lsuite.xyz', { ryolune: '9.9.9', kimchi: '8.8.8', nori: '7.7.7' });
   for (const app of ['ryolune', 'kimchi', 'nori', 'folio']) assert.ok(home.includes(`class="card app-${app}`), `home card ${app}`);
   assert.ok(!/class="badge">Coming soon/i.test(home));
-  assert.ok(!/· macOS|· Windows/.test(home), 'home cards: Linux only');
+  assert.ok(!/· Windows/.test(home) && (home.match(/· Linux · macOS<\/span>/g) ?? []).length === 4, 'home cards: Linux and macOS');
 });
 
 test('donations only go to https', () => {
@@ -207,8 +208,11 @@ test('the launcher: its page, its downloads from launcher-v tags, and never one 
   assert.deepEqual(await appVersions(['launcher']), { launcher: '0.1.1' });
   assert.ok(asked[0].startsWith('https://api.github.com/repos/ludovic111/lsuite/releases?'));
   const base = 'https://github.com/ludovic111/lsuite/releases/download/launcher-v0.1.1/';
-  // Beta: Linux only. macOS and Windows land on the page's downloads, which say "coming soon".
-  for (const wanted of ['macos-arm64', 'macos-x86_64', 'windows-x86_64', 'windows-zip']) assert.equal(await downloadTarget('launcher', wanted), '/launcher#downloads', wanted);
+  // Beta: Linux and macOS. Windows lands on the page's downloads, which say "coming soon".
+  for (const wanted of ['windows-x86_64', 'windows-zip']) assert.equal(await downloadTarget('launcher', wanted), '/launcher#downloads', wanted);
+  assert.equal(await downloadTarget('launcher', 'macos-arm64'), `${base}lsuite-macos-arm64.dmg`);
+  assert.equal(await downloadTarget('launcher', 'macos-x86_64'), `${base}lsuite-macos-x86_64.dmg`);
+  assert.equal(await downloadTarget('launcher', undefined, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'), `${base}lsuite-macos-arm64.dmg`);
   assert.equal(await downloadTarget('launcher', 'linux-x86_64'), `${base}lsuite-linux-x86_64.AppImage`);
   assert.equal(await downloadTarget('launcher', 'linux-tar'), `${base}lsuite-linux-x86_64.tar.gz`);
   assert.equal(await downloadTarget('launcher', undefined, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'), '/launcher#downloads');

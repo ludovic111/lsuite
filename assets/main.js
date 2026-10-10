@@ -34,7 +34,7 @@ function ready() {
   }
 
   // "Download for <your OS>": buttons carry data-download="<app>" and per-OS hrefs. An OS with no
-  // href is coming soon (lsuite's beta is Linux only): the button says so and points at #downloads.
+  // href is coming soon (lsuite's beta is Linux and macOS; Windows comes later): the button says so and points at #downloads.
   const os = detectPlatform();
   if (os) {
     document.querySelectorAll('[data-download]').forEach((a) => {

@@ -13,12 +13,13 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   kimchi (video), nori (image and design: Photoshop + Illustrator + InDesign in one document) and
   folio (office: documents, spreadsheets and presentations). The suite's line: every kind of
   creative and office tool, combined, free and open source, driven by your agent.
-- **Linux only during the beta** (owner's decision, 2026-10-08): the launcher and the four apps
-  are built and shipped for Linux x86_64 only; macOS and Windows are "coming soon" everywhere on
-  the site (hero lines, stats, the launcher's download tiles, `/launcher/download/<macos|windows…>`
-  → `/launcher#downloads`). Their files were removed from every release (launcher, lsuite-builds
-  and the apps' public releases); the release workflows keep the macOS/Windows matrix lines
-  commented out. Past changelog cards still describe what those versions shipped.
+- **Linux and macOS during the beta** (Linux only from 2026-10-08; macOS back at the owner's
+  request on 2026-10-10): the launcher and the four apps are built for Linux x86_64 and macOS
+  (Apple silicon and Intel). The macOS jobs run on the Mac mini's self-hosted runners (label
+  `ludovics-mac-mini`, one per repo in `~/.actions-runners/<repo>`, own `RUSTUP_HOME`/`CARGO_HOME`;
+  `vars.MAC_RUNNER` overrides); Windows is "coming soon" everywhere on the site
+  (`/launcher/download/windows…` → `/launcher#downloads`), its matrix lines stay commented out.
+  Pages say "Linux and macOS · Windows coming soon"; flip them only once macOS builds are released.
 - **Entirely free, no account** (owner's decision, 2026-10-10): lsuite Pass (lsuite AI, lsuite
   Cloud, the lsuite Marketplace), the lsuite account and every page and API of theirs were removed
   (`ai.js`, `cloud.js`, `marketplace.js`, `live.js`, PASS.md, AI.md, CLOUD.md, MARKETPLACE.md).

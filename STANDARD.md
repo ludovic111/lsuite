@@ -55,8 +55,9 @@ Ship `docs/AI_CONTROL.md` (how to drive the app) and the generated `docs/COMMAND
   anything is replaced; the previous copy is kept until the new one starts.
 - `<APP>_NO_UPDATE=1` and a setting turn the check off. "Check for updates…" is also a command.
 - Release assets use stable names per platform so the lsuite app finds them (`launcher/` in the
-  lsuite repo): Linux x86_64 during the beta; macOS (arm64 and x86_64, signed and notarized) and
-  Windows x86_64 are coming soon, and no builds are made for them until then. The
+  lsuite repo): Linux x86_64 and macOS (arm64 and x86_64, built on the Mac mini's runner, signed
+  and notarized when the Apple secrets are set) during the beta; Windows x86_64 is coming soon,
+  and no builds are made for it until then. The
   existing `<APP>_UPDATE_URL` overrides keep working for tests.
 
 ## 4. Apps work together
@@ -165,7 +166,8 @@ the next ones remove them (lsuite is free since 2026-10-10).
 | Agent harness ([HARNESS.md](HARNESS.md)) | 🟡 13 skills, looks with loudness ([#34](https://github.com/ludovic111/ryolune/pull/34)) | 🟡 13 skills, frame sheets with loudness ([#16](https://github.com/ludovic111/kimchi/pull/16)) | 🟡 11 skills, contrast, bleed and resolution checks ([#1](https://github.com/ludovic111/nori/pull/1)) | 🟡 12 skills, pages, slides and sheets as images ([#1](https://github.com/ludovic111/folio/pull/1)) |
 | Evals | 🟡 13 jobs; 2 run, passed | 🟡 12 jobs; 3 run, passed | 🟡 12 jobs; 2 run, passed | 🟡 11 jobs; 2 run, passed |
 
-While lsuite is in beta, every app ships for Linux only (owner's decision, 2026-10-08): AppImages
-update in place, and tarballs and Linux system packages link to verified release downloads. macOS
-and Windows are coming soon. nori’s physical tablet and Adobe interoperability checks
+While lsuite is in beta, every app ships for Linux and macOS (Linux only from 2026-10-08, macOS
+back on 2026-10-10): AppImages update in place, macOS app bundles are replaced from their
+`.app.tar.gz`, and tarballs and Linux system packages link to verified release downloads. Windows
+is coming soon. nori’s physical tablet and Adobe interoperability checks
 remain beta validation limits, detailed in its release notes.

@@ -89,8 +89,7 @@ export function osFor(userAgent = '') {
  * Each app's downloads (and the launcher's): its repository, an asset pattern per platform, and the
  * platform each OS gets by default. `/launcher/download/<platform>` looks the asset up in the latest
  * published release; a platform with no matching asset goes to the release page. While lsuite is in
- * beta only Linux is built: macOS and Windows visitors land on `/launcher#downloads` ("coming
- * soon"). The four apps come only through the lsuite app (DISTRIBUTION.md): their `/<app>/download[/…]` lands on
+ * beta, Linux and macOS are built: Windows visitors land on `/launcher#downloads` ("coming soon"). The four apps come only through the lsuite app (DISTRIBUTION.md): their `/<app>/download[/…]` lands on
  * `/launcher`, and their tables only say which platforms `GET /api/apps` lists. `published:
  * false` keeps an app's route table ready before its first release (the route lands on the app's
  * page). `tagPrefix`: the release tags (`v` by default), for a repository that releases more than one thing.
@@ -100,46 +99,56 @@ export const DOWNLOADS = {
   ryolune: {
     repo: 'ludovic111/ryolune',
     patterns: {
+      'macos-arm64': /\/ryolune-macos-arm64\.zip$/,
+      'macos-x86_64': /\/ryolune-macos-x86_64\.zip$/,
       'linux-x86_64': /\/ryolune-linux-x86_64\.tar\.gz$/,
     },
-    byOs: { linux: 'linux-x86_64' },
+    byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
   },
   kimchi: {
     repo: 'ludovic111/kimchi',
     patterns: {
+      'macos-arm64': /_aarch64\.dmg$/,
+      'macos-x86_64': /_x64\.dmg$/,
       'linux-appimage': /_amd64\.AppImage$/,
       'linux-deb': /_amd64\.deb$/,
       'linux-rpm': /\.x86_64\.rpm$/,
     },
-    byOs: { linux: 'linux-appimage' },
+    byOs: { macos: 'macos-arm64', linux: 'linux-appimage' },
   },
   // Published image and design app builds.
   nori: {
     repo: 'ludovic111/nori',
     published: true,
     patterns: {
+      'macos-arm64': /\/nori_aarch64\.dmg$/,
+      'macos-x86_64': /\/nori_x64\.dmg$/,
       'linux-x86_64': /\/nori_amd64\.AppImage$/,
     },
-    byOs: { linux: 'linux-x86_64' },
+    byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
   },
   // Published office app builds.
   folio: {
     repo: 'ludovic111/folio',
     published: true,
     patterns: {
+      'macos-arm64': /\/folio-macos-arm64\.(zip|dmg)$/,
+      'macos-x86_64': /\/folio-macos-x86_64\.(zip|dmg)$/,
       'linux-x86_64': /\/folio-linux-x86_64\.(tar\.gz|AppImage)$/,
     },
-    byOs: { linux: 'linux-x86_64' },
+    byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
   },
   // The lsuite launcher (`launcher/`), released from this site's repository as `launcher-vX.Y.Z`.
   launcher: {
     repo: 'ludovic111/lsuite',
     tagPrefix: 'launcher-v',
     patterns: {
+      'macos-arm64': /\/lsuite-macos-arm64\.dmg$/,
+      'macos-x86_64': /\/lsuite-macos-x86_64\.dmg$/,
       'linux-x86_64': /\/lsuite-linux-x86_64\.AppImage$/,
       'linux-tar': /\/lsuite-linux-x86_64\.tar\.gz$/,
     },
-    byOs: { linux: 'linux-x86_64' },
+    byOs: { macos: 'macos-arm64', linux: 'linux-x86_64' },
   },
 };
 /** The four apps (`/api/apps`, `/<app>/support`). The launcher has downloads but isn't one of them. */
@@ -247,8 +256,8 @@ export async function downloadTarget(app, wanted, userAgent) {
   // GitHub's "latest" is the repository's; a tag prefix needs that release's own page.
   const releases = (tag) => (d.tagPrefix ? `https://github.com/${d.repo}/releases${tag ? `/tag/${tag}` : ''}` : `https://github.com/${d.repo}/releases/latest`);
   const pattern = d.patterns[wanted || d.byOs[osFor(userAgent)]];
-  // macOS and Windows are coming soon (beta: Linux only).
-  if (!pattern) return wanted && !/^(macos|windows)/.test(wanted) ? releases() : '/launcher#downloads';
+  // Windows is coming soon (beta: Linux and macOS).
+  if (!pattern) return wanted && !/^windows/.test(wanted) ? releases() : '/launcher#downloads';
   const release = await latestRelease(d.repo, d.tagPrefix);
   return release.urls.find((u) => pattern.test(u)) ?? releases(release.tag);
 }

@@ -8,9 +8,9 @@ in beta:
 The four apps come only through it, with no account ([DISTRIBUTION.md](DISTRIBUTION.md)):
 their builds live in the private `ludovic111/lsuite-builds`, served by `builds.js`.
 
-**Beta: Linux only.** While lsuite is in beta, the launcher and the four apps are built and
-shipped for Linux x86_64 only; macOS and Windows are coming soon (the site says so, and no builds
-are made for them).
+**Beta: Linux and macOS.** While lsuite is in beta, the launcher and the four apps are built and
+shipped for Linux x86_64 and macOS (Apple silicon and Intel; built on the owner's Mac mini runner,
+label `ludovics-mac-mini`); Windows is coming soon (the site says so, and no builds are made for it).
 
 | App | Kind | Page | Source |
 | --- | --- | --- | --- |
