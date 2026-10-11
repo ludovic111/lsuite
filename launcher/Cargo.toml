@@ -1,5 +1,5 @@
-# The lsuite launcher: install and update the lsuite apps, the lsuite AI account and lsuite Cloud.
-# lsuite-core holds everything (command registry, installer, account, cloud client); the window
+# The lsuite launcher: install and update the lsuite apps, their plugins and the lsuite agent.
+# lsuite-core holds everything (command registry, installer, plugins, agent); the window
 # (crates/lsuite-desktop, package and binary `lsuite`), lsuite-cli and lsuite-mcp are its clients.
 [workspace]
 resolver = "3"
@@ -7,7 +7,7 @@ members = ["crates/*"]
 default-members = ["crates/lsuite-desktop", "crates/lsuite-cli", "crates/lsuite-mcp"]
 
 [workspace.package]
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/ludovic111/lsuite"
@@ -26,7 +26,6 @@ flate2 = "1"
 futures = "0.3"
 minisign-verify = "0.2"
 parking_lot = "0.12"
-percent-encoding = "2"
 rand = "0.9"
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls", "gzip"] }
 semver = "1"
@@ -39,7 +38,6 @@ toml = "0.8"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync", "fs", "process", "io-util", "io-std", "net", "signal"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-url = "2"
 zip = { version = "8", default-features = false, features = ["deflate"] }
 
 [profile.dev.package."*"]

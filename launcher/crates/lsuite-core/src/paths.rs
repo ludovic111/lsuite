@@ -1,7 +1,7 @@
 //! Where the launcher keeps things.
 //!
-//! - `~/.lsuite/` (`LSUITE_HOME`): shared with every lsuite app: `account.json` (the lsuite
-//!   account) and `apps/<app>.json` (each app's discovery file, STANDARD.md section 4).
+//! - `~/.lsuite/` (`LSUITE_HOME`): shared with every lsuite app: `apps/<app>.json` (each app's
+//!   discovery file, STANDARD.md section 4) and `plugins/<app>/<id>/` (installed plugins).
 //! - `~/.lsuite/launcher/`: the launcher's own `settings.json`, `installed.json` (what it
 //!   installed and where) and `downloads/` (partial downloads, removed when done).
 //! - Where apps go ([`apps_dir`], `LSUITE_APPS_DIR` replaces it): `/Applications` when it can be

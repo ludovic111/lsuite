@@ -1,7 +1,27 @@
 # Changelog
 
-## Unreleased
+## 0.3.0 (2026-10-11)
 
+- **macOS is back**, Apple Silicon and Intel (`lsuite-macos-arm64.dmg`, `lsuite-macos-x86_64.dmg`,
+  and `.app.tar.gz` for updates), next to Linux; Windows is coming soon. On a Mac the launcher
+  installs and updates the apps' macOS builds (their `darwin` entries, or ryolune's zip) as
+  `<app>.app` in `/Applications` (or `~/Applications` when it can't write there), opens them, and
+  updates itself in place.
+- **lsuite is fully free, with no account.** The apps install and update from lsuite.xyz without
+  signing in (`LSUITE_SERVER` picks another server; signatures are checked as before). The
+  Account area, sign-in and sign-out, `account.*`, plans and lsuite Pass are gone; an old
+  `~/.lsuite/account.json` is ignored and left alone.
+- **lsuite Cloud is gone**: the Cloud area, `cloud.*`, synced folders and their settings
+  (`syncEveryMinutes`, `agent.cloudWrite`, `agent.cloudDelete`). Files you synced stay on this
+  computer.
+- **Plugins replace the Marketplace**: the Plugins area lists the plugins installed for each app
+  (`~/.lsuite/plugins/<app>/<id>/`, from their `plugin.toml`) with Remove, and **Build a plugin**
+  asks the lsuite agent to make one with the app's own plugin tools. `plugins.list` and
+  `plugins.remove` replace `market.*`; publishing and installing from a store are gone, and so is
+  `agent.publish`. Removing a plugin needs `agent.remove` for agents.
+- **The lsuite agent** runs on Claude Code or the Anthropic API (`ANTHROPIC_API_KEY`); the lsuite
+  AI option is gone.
+- Shortcuts: Ctrl/Cmd-1 Agent, -2 Apps, -3 Plugins.
 - **zenith is no longer an lsuite app**: the launcher no longer lists, installs or updates it.
   lsuite is now ryolune, kimchi, nori and folio. A copy of zenith that is already installed is
   left where it is.

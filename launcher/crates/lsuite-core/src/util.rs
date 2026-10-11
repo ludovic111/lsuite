@@ -1,4 +1,4 @@
-//! Small helpers every part uses: private atomic writes, the HTTP client, sizes for people.
+//! Small helpers every part uses: private atomic writes, the HTTP client, the server.
 
 use std::path::Path;
 use std::time::Duration;
@@ -29,6 +29,18 @@ pub fn write_private(path: &Path, bytes: &[u8]) -> std::io::Result<()> {
 
 pub const USER_AGENT: &str = concat!("lsuite-launcher/", env!("CARGO_PKG_VERSION"));
 
+pub const DEFAULT_SERVER: &str = "https://lsuite.xyz";
+
+/// The server the apps come from: `LSUITE_SERVER`, else lsuite.xyz.
+pub fn server() -> String {
+    std::env::var("LSUITE_SERVER").ok().map(|s| s.trim().trim_end_matches('/').to_string()).filter(|s| !s.is_empty()).unwrap_or_else(|| DEFAULT_SERVER.to_string())
+}
+
+/// One line from an error in Anthropic's shape (`{type: "error", error: {type, message}}`).
+pub fn error_line(status: u16, body: &serde_json::Value) -> String {
+    body["error"]["message"].as_str().map(str::to_string).unwrap_or_else(|| format!("The server answered {status}."))
+}
+
 /// The client for short API calls (15 s for the whole request).
 pub fn client() -> reqwest::Client {
     reqwest::Client::builder().user_agent(USER_AGENT).timeout(Duration::from_secs(20)).build().unwrap_or_default()
@@ -39,25 +51,7 @@ pub fn transfer_client() -> reqwest::Client {
     reqwest::Client::builder().user_agent(USER_AGENT).connect_timeout(Duration::from_secs(20)).build().unwrap_or_default()
 }
 
-/// `1.4 GB`, `820 KB`, `12 bytes` (decimal units, as storage is sold).
-pub fn bytes(n: u64) -> String {
-    const UNITS: [&str; 5] = ["KB", "MB", "GB", "TB", "PB"];
-    if n < 1000 {
-        return if n == 1 { "1 byte".into() } else { format!("{n} bytes") };
-    }
-    let mut v = n as f64;
-    let mut unit = "";
-    for u in UNITS {
-        v /= 1000.0;
-        unit = u;
-        if v < 1000.0 {
-            break;
-        }
-    }
-    if v < 10.0 { format!("{v:.1} {unit}") } else { format!("{v:.0} {unit}") }
-}
-
-/// A random token for loopback states (URL-safe).
+/// A random token for temporary names (URL-safe).
 pub fn random_token() -> String {
     use base64::Engine;
     use rand::RngCore;
@@ -103,17 +97,6 @@ pub fn pid_alive(pid: u32) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn sizes_read_like_a_store_sells_them() {
-        assert_eq!(bytes(0), "0 bytes");
-        assert_eq!(bytes(1), "1 byte");
-        assert_eq!(bytes(999), "999 bytes");
-        assert_eq!(bytes(1500), "1.5 KB");
-        assert_eq!(bytes(250_000_000), "250 MB");
-        assert_eq!(bytes(50_000_000_000), "50 GB");
-        assert_eq!(bytes(1_000_000_000_000), "1.0 TB");
-    }
 
     #[test]
     fn private_writes_replace_the_file() {

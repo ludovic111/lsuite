@@ -3312,10 +3312,9 @@ checksum = "4050469837a6ff301cd14c1f8f24f88549e6d548f24f64e2148eb0f72cebc51f"
 
 [[package]]
 name = "lsuite"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "anyhow",
- "chrono",
  "dirs",
  "futures",
  "gpui",
@@ -3337,7 +3336,7 @@ dependencies = [
 
 [[package]]
 name = "lsuite-cli"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "lsuite-core",
  "serde_json",
@@ -3346,7 +3345,7 @@ dependencies = [
 
 [[package]]
 name = "lsuite-core"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "base64 0.22.1",
  "chrono",
@@ -3358,7 +3357,6 @@ dependencies = [
  "minisign",
  "minisign-verify",
  "parking_lot",
- "percent-encoding",
  "rand 0.9.5",
  "reqwest",
  "semver",
@@ -3370,13 +3368,12 @@ dependencies = [
  "tokio",
  "toml 0.8.23",
  "tracing",
- "url",
  "zip",
 ]
 
 [[package]]
 name = "lsuite-mcp"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "lsuite-core",
  "serde_json",
@@ -3385,7 +3382,7 @@ dependencies = [
 
 [[package]]
 name = "lsuite-release"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "base64 0.22.1",
  "lsuite-core",

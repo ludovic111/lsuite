@@ -1,8 +1,8 @@
 //! Finding an app's latest release for this computer, and downloading it verified.
 //!
-//! The builds aren't public (lsuite's DISTRIBUTION.md): they come through lsuite.xyz with the
-//! account's token (`GET <server>/api/apps/<app>/latest`, then the file route, which sends the
-//! download on to a short-lived address). Nothing is installed unless its signature checks
+//! The builds come through lsuite.xyz (lsuite's DISTRIBUTION.md), no account needed:
+//! `GET <server>/api/apps/<app>/latest`, then the file route, which sends the download on to a
+//! short-lived address (`<server>` is `LSUITE_SERVER`, else lsuite.xyz). Nothing is installed unless its signature checks
 //! against the key built into the launcher (`catalog::APPS`): the minisign signature of the file
 //! itself for release-manifest apps (whose trusted comment must name the release's version), or
 //! the Ed25519 signature of `SHA256SUMS` plus the file's SHA-256 for checksum apps, so the server
@@ -102,29 +102,17 @@ pub fn is_newer(latest: &str, installed: &str) -> bool {
     }
 }
 
-/// Said when the apps are asked for while signed out.
-pub const SIGN_IN: &str = "Sign in to lsuite to get the apps: the account is free.";
-
 /// Finds the latest release of `app` for `p`, through lsuite.xyz.
 pub async fn latest(app: &App, p: Platform) -> CmdResult<Release> {
     if !app.supports(p) {
         return Err(format!("{} has no {} build yet.", app.name, p.os_name()));
     }
-    let acc = crate::account::read().ok_or(SIGN_IN)?;
-    let server = crate::account::server();
-    let r = util::client()
-        .get(format!("{server}/api/apps/{}/latest", app.id))
-        .bearer_auth(&acc.token)
-        .send()
-        .await
-        .map_err(|e| format!("Couldn't reach {server} for {}'s latest release ({e}).", app.name))?;
+    let server = util::server();
+    let r = util::client().get(format!("{server}/api/apps/{}/latest", app.id)).send().await.map_err(|e| format!("Couldn't reach {server} for {}'s latest release ({e}).", app.name))?;
     let status = r.status().as_u16();
     let v: Value = r.json().await.unwrap_or(Value::Null);
-    if status == 401 {
-        return Err(SIGN_IN.into());
-    }
     if status != 200 {
-        return Err(crate::account::error_line(status, &v));
+        return Err(util::error_line(status, &v));
     }
     let version = v["version"].as_str().ok_or_else(|| format!("{}'s release has no version.", app.name))?.trim_start_matches('v').to_string();
     let tag = v["tag"].as_str().unwrap_or("").to_string();
@@ -256,21 +244,9 @@ async fn download_inner(r: &Release, dest: &Path, progress: &mut Progress) -> Cm
         (Check::Minisign { .. }, None) => unreachable!(),
     };
     let failed = |e: reqwest::Error| format!("The download failed ({e}).");
-    let mut req = util::transfer_client().get(&r.url).header(reqwest::header::ACCEPT, "application/octet-stream");
-    // lsuite's file route needs the account; the address it sends on to doesn't (and the token
-    // isn't sent across the redirect).
-    if r.url.starts_with(&crate::account::server())
-        && let Some(acc) = crate::account::read()
-    {
-        req = req.bearer_auth(acc.token);
-    }
-    let res = req.send().await.map_err(failed)?;
+    let res = util::transfer_client().get(&r.url).header(reqwest::header::ACCEPT, "application/octet-stream").send().await.map_err(failed)?;
     if !res.status().is_success() {
-        let status = res.status().as_u16();
-        if status == 401 {
-            return Err(SIGN_IN.into());
-        }
-        return Err(format!("The download failed: the server answered {status}."));
+        return Err(format!("The download failed: the server answered {}.", res.status().as_u16()));
     }
     let total = res.content_length().filter(|&n| n > 0);
     if total.is_some_and(|n| n > MAX_DOWNLOAD) {

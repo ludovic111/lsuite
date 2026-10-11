@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Release workflow, macOS runners: import the Developer ID certificate into a throwaway keychain,
+# Release workflow, macOS runners (the self-hosted Mac mini): import the Developer ID certificate into a throwaway keychain,
 # check that it holds the signing identity, and write the App Store Connect API key, then hand
 # scripts/bundle-macos.sh the identity and the notarization key through $GITHUB_ENV. Same secrets as ryolune and kimchi
 # (see the lsuite repository's STANDARD.md). The certificate password may be empty (a .p12 exported without one).
@@ -11,6 +11,10 @@ for name in APPLE_CERTIFICATE_P12_BASE64 APPLE_SIGNING_IDENTITY APPLE_API_KEY_P8
   fi
 done
 keychain="$RUNNER_TEMP/signing.keychain-db"
+# On the self-hosted Mac the runner is the owner's account: save the search list exactly as it is,
+# before create-keychain adds to it, so scripts/cleanup-apple-signing.sh puts it back (the default
+# keychain is never touched).
+security list-keychains -d user | sed -e 's/^ *"//' -e 's/"$//' > "$RUNNER_TEMP/keychains-before"
 password=$(uuidgen)
 security create-keychain -p "$password" "$keychain"
 security set-keychain-settings -lut 21600 "$keychain"
@@ -21,10 +25,10 @@ security import "$RUNNER_TEMP/developer-id.p12" -k "$keychain" -P "${APPLE_CERTI
   -f pkcs12 -T /usr/bin/codesign
 rm -f "$RUNNER_TEMP/developer-id.p12"
 security set-key-partition-list -S apple-tool:,apple: -s -k "$password" "$keychain" > /dev/null
-# Search the new keychain first, keeping the runner's own keychains after it.
-existing=$(security list-keychains -d user | sed -e 's/^ *"//' -e 's/"$//')
-# shellcheck disable=SC2086
-security list-keychains -d user -s "$keychain" $existing
+# Search the new keychain first, keeping the user's own keychains after it.
+existing=()
+while IFS= read -r line; do existing+=("$line"); done < "$RUNNER_TEMP/keychains-before"
+security list-keychains -d user -s "$keychain" ${existing[@]+"${existing[@]}"}
 if ! security find-identity -v -p codesigning "$keychain" | grep -qF "$APPLE_SIGNING_IDENTITY"; then
   echo "The certificate does not hold a valid identity \"$APPLE_SIGNING_IDENTITY\" (was the private key exported with it?)." >&2
   security find-identity -v -p codesigning "$keychain" >&2

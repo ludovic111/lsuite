@@ -63,7 +63,7 @@ pub fn page(ws: &Workspace, window: &mut Window, cx: &mut Context<Workspace>) ->
             .gap(px(18.))
             .pt(px(10.))
             .child(div().flex().flex_col().gap(px(6.)).child(div().text_size(px(sz::XXL)).font_weight(FontWeight::BOLD).child("One agent for every app.")).child(div().max_w(px(720.)).text_size(px(sz::MD)).text_color(t.text_2).child("Ask for a job, in one app or across several. The agent reads each app's expert brief and skills, does the work there, looks at what it made and fixes it before it reports. Every app keeps its changes as one undo step.")))
-            .when(!ready, |d| d.child(div().p(px(14.)).glass(t.glass1).text_color(t.text_2).child("To run the agent: install Claude Code (it uses your Claude subscription), or sign in with an lsuite Pass plan.")))
+            .when(!ready, |d| d.child(div().p(px(14.)).glass(t.glass1).text_color(t.text_2).child("To run the agent: install Claude Code (it uses your Claude subscription), or set ANTHROPIC_API_KEY.")))
             .child(caps("Try", cx))
             .child(div().flex().flex_wrap().gap(px(10.)).children(SUGGESTIONS.iter().enumerate().map(|(i, s)| {
                 let text = s.to_string();

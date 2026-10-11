@@ -1,4 +1,4 @@
-//! The root view: the lsuite backdrop, the sidebar (Apps, Cloud, Account, Settings), the page
+//! The root view: the lsuite backdrop, the sidebar (Agent, Apps, Plugins, Settings), the page
 //! shown, and what floats above (dialogs, the app menu, toasts).
 
 use std::sync::Arc;
@@ -14,7 +14,7 @@ use crate::ui::input::{InputEvent, TextInput};
 use crate::ui::{GlassExt, caps, icon, tag, window_controls};
 use crate::views;
 
-actions!(lsuite, [Quit, Escape, Confirm, ShowApps, ShowCloud, ShowAccount, ShowSettings, CheckUpdates]);
+actions!(lsuite, [Quit, Escape, Confirm, ShowAgent, ShowApps, ShowPlugins, ShowSettings, CheckUpdates]);
 
 pub fn init(launcher: Arc<Launcher>, cx: &mut App) {
     let settings = lsuite_core::settings::load();
@@ -28,9 +28,9 @@ pub fn init(launcher: Arc<Launcher>, cx: &mut App) {
         KeyBinding::new(&format!("{m}-q"), Quit, None),
         KeyBinding::new("escape", Escape, Some("Workspace")),
         KeyBinding::new("enter", Confirm, Some("Workspace")),
-        KeyBinding::new(&format!("{m}-1"), ShowApps, None),
-        KeyBinding::new(&format!("{m}-2"), ShowCloud, None),
-        KeyBinding::new(&format!("{m}-3"), ShowAccount, None),
+        KeyBinding::new(&format!("{m}-1"), ShowAgent, None),
+        KeyBinding::new(&format!("{m}-2"), ShowApps, None),
+        KeyBinding::new(&format!("{m}-3"), ShowPlugins, None),
         KeyBinding::new(&format!("{m}-,"), ShowSettings, None),
         KeyBinding::new(&format!("{m}-r"), CheckUpdates, None),
     ]);
@@ -56,10 +56,6 @@ pub fn start(cx: &mut App) {
                     s.update = v;
                 }
             });
-        }
-        // Synced folders catch up once at start.
-        if s.syncs["pairs"].as_array().is_some_and(|p| !p.is_empty()) {
-            s.run_result("cloud.syncNow", json!({}), cx, |_, _, _| {});
         }
         if s.settings.check_on_start && !off && lsuite_core::apps::stale(&s.launcher) {
             s.run_then("apps.check", json!({}), cx, |s, v, cx| {
@@ -92,10 +88,8 @@ pub fn apply_theme(settings: &Settings, cx: &mut App) {
 pub struct Workspace {
     store: Entity<Store>,
     focus: FocusHandle,
-    /// The dialogs' text field (folder names, paths).
+    /// The dialogs' text field (a plugin's description).
     pub input: Entity<TextInput>,
-    /// The account page's key field.
-    pub key_input: Entity<TextInput>,
     /// The lsuite agent's composer.
     pub agent_input: Entity<TextInput>,
     last_dialog: Option<Dialog>,
@@ -108,8 +102,6 @@ impl Workspace {
         let focus = cx.focus_handle();
         window.focus(&focus, cx);
         let input = cx.new(TextInput::new);
-        let key_input = cx.new(|cx| TextInput::new(cx).placeholder("lsk_…"));
-        key_input.update(cx, |i, _| i.mono = true);
         let agent_input = cx.new(|cx| TextInput::new(cx).multiline(2).placeholder("Ask the lsuite agent: “Score my latest kimchi cut with a calm piano track”"));
         agent_input.update(cx, |i, _| i.submit_on_enter = true);
         let mut subs = vec![cx.observe_in(&store, window, |ws: &mut Self, _, window, cx| ws.store_changed(window, cx))];
@@ -127,37 +119,25 @@ impl Workspace {
                 ws.ask_agent(cx);
             }
         }));
-        subs.push(cx.subscribe_in(&key_input, window, |ws: &mut Self, _, e: &InputEvent, _, cx| {
-            if let InputEvent::Submit = e {
-                ws.sign_in_with_key(cx);
-            }
-        }));
-        Self { store, focus, input, key_input, agent_input, last_dialog: None, _subs: subs }
+        Self { store, focus, input, agent_input, last_dialog: None, _subs: subs }
     }
 
-    /// A dialog that just opened gets its field filled and focused.
+    /// A dialog that just opened gets its field cleared and focused.
     fn store_changed(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         let dialog = self.store.read(cx).dialog.clone();
         if dialog != self.last_dialog {
             self.last_dialog = dialog.clone();
-            let dir = self.store.read(cx).cloud_dir.clone();
-            let (text, placeholder) = match &dialog {
-                Some(Dialog::NewFolder) => (String::new(), "Folder name"),
-                Some(Dialog::Rename { path }) => (lsuite_core::cloud::name_of(path).to_string(), "New name"),
-                Some(Dialog::MoveTo { path }) => (lsuite_core::cloud::parent_of(path).to_string(), "Folder (empty: the top of your cloud)"),
-                Some(Dialog::UploadPath) => (String::new(), if cfg!(windows) { r"C:\Users\you\Documents\file.folio" } else { "/home/you/Documents/file.folio" }),
-                Some(Dialog::SyncPath) => (String::new(), if cfg!(windows) { r"C:\Users\you\Documents\Projects" } else { "/home/you/Documents/Projects" }),
-                Some(Dialog::PublishPath) => (String::new(), "The plugin's bundle folder (with plugin.toml)"),
-                _ => (String::new(), ""),
+            let placeholder = match &dialog {
+                Some(Dialog::BuildPlugin { .. }) => "What it does: a tape saturation with a warmth knob",
+                _ => "",
             };
-            let _ = dir;
             self.input.update(cx, |i, cx| {
-                i.set_text(text, cx);
+                i.set_text("", cx);
                 i.set_placeholder(placeholder, cx);
                 i.select_all_text(cx);
             });
             match dialog {
-                Some(Dialog::NewFolder | Dialog::Rename { .. } | Dialog::MoveTo { .. } | Dialog::UploadPath | Dialog::SyncPath | Dialog::PublishPath) => crate::ui::input::focus(&self.input, window, cx),
+                Some(Dialog::BuildPlugin { .. }) => crate::ui::input::focus(&self.input, window, cx),
                 _ => window.focus(&self.focus, cx),
             }
         }
@@ -176,24 +156,7 @@ impl Workspace {
             return;
         }
         self.agent_input.update(cx, |i, cx| i.set_text("", cx));
-        self.store.update(cx, |s, cx| {
-            let provider = s.agent_provider.clone();
-            s.run_result("agent.run", json!({ "prompt": prompt, "provider": provider }), cx, |s, _, _| s.agent = lsuite_core::agent::log(&s.launcher));
-            s.agent = lsuite_core::agent::log(&s.launcher);
-        });
-    }
-
-    pub fn sign_in_with_key(&mut self, cx: &mut Context<Self>) {
-        let key = self.key_input.read(cx).text().trim().to_string();
-        if key.is_empty() {
-            return;
-        }
-        self.key_input.update(cx, |i, cx| i.set_text("", cx));
-        self.store.update(cx, |s, cx| {
-            s.run_then("account.signIn", json!({ "key": key }), cx, |s, v, cx| {
-                s.toast(ToastKind::Success, format!("Signed in as {}. Every lsuite app on this computer is signed in too.", v["email"].as_str().unwrap_or("you")), cx);
-            })
-        });
+        self.store.update(cx, |s, cx| s.ask_agent(prompt, cx));
     }
 
     fn sidebar(&self, window: &mut Window, cx: &mut Context<Self>) -> AnyElement {
@@ -202,12 +165,7 @@ impl Workspace {
         let page = s.page;
         let mac = cfg!(target_os = "macos") && !window.is_fullscreen();
         let updates = s.apps["updates"].as_u64().unwrap_or(0);
-        let signed_in = s.signed_in();
-        let plan = s.account["planName"].as_str().map(str::to_string);
-        let cloud_pct = {
-            let (u, q) = (s.cloud_status["used"].as_f64().unwrap_or(0.), s.cloud_status["quota"].as_f64().unwrap_or(0.));
-            (q > 0.).then(|| format!("{:.0} %", u / q * 100.))
-        };
+        let plugins = s.plugins["count"].as_u64().unwrap_or(0);
         let nav = |id: &'static str, ic: &'static str, p: Page, badge: Option<AnyElement>| {
             let on = p == page;
             div()
@@ -226,7 +184,6 @@ impl Workspace {
                 .on_click(move |_, _, cx| cx.store().update(cx, |s, cx| s.go(p, cx)))
         };
         let tasks: Vec<(String, crate::store::TaskView)> = s.tasks.iter().map(|(k, v)| (k.clone(), v.clone())).collect();
-        let account = s.account.clone();
         div()
             .w(px(236.))
             .flex_none()
@@ -267,9 +224,7 @@ impl Workspace {
                     .pt(px(6.))
                     .child(nav("nav-agent", "bot", Page::Agent, None))
                     .child(nav("nav-apps", "layout-grid", Page::Apps, (updates > 0).then(|| tag(format!("{updates}"), page != Page::Apps, cx).into_any_element())))
-                    .child(nav("nav-market", "package", Page::Marketplace, None))
-                    .child(nav("nav-cloud", "cloud", Page::Cloud, cloud_pct.map(|p| div().font_family(MONO).text_size(px(sz::XS)).child(p).into_any_element())))
-                    .child(nav("nav-account", "user", Page::Account, plan.map(|p| div().font_family(MONO).text_size(px(sz::XS)).child(p.to_uppercase()).into_any_element())))
+                    .child(nav("nav-plugins", "package", Page::Plugins, (plugins > 0).then(|| div().font_family(MONO).text_size(px(sz::XS)).child(format!("{plugins}")).into_any_element())))
                     .child(nav("nav-settings", "settings", Page::Settings, None)),
             )
             .child(div().flex_1())
@@ -289,7 +244,6 @@ impl Workspace {
                     })),
                 )
             })
-            .child(views::account::chip(signed_in, &account, cx))
             .into_any_element()
     }
 
@@ -327,9 +281,7 @@ impl Workspace {
                     .child(match page {
                         Page::Agent => views::agent::actions(cx),
                         Page::Apps => views::apps::actions(cx),
-                        Page::Marketplace => views::market::actions(cx),
-                        Page::Cloud => views::cloud::actions(cx),
-                        Page::Account => views::account::actions(cx),
+                        Page::Plugins => views::plugins::actions(cx),
                         Page::Settings => div().into_any_element(),
                     })
                     .children(controls),
@@ -350,9 +302,7 @@ impl Render for Workspace {
         let body = match page {
             Page::Agent => views::agent::page(self, window, cx),
             Page::Apps => views::apps::page(window, cx),
-            Page::Marketplace => views::market::page(window, cx),
-            Page::Cloud => views::cloud::page(window, cx),
-            Page::Account => views::account::page(self, window, cx),
+            Page::Plugins => views::plugins::page(window, cx),
             Page::Settings => views::settings::page(window, cx),
         };
         div()
@@ -374,24 +324,11 @@ impl Render for Workspace {
                     views::overlays::confirm(ws, window, cx);
                 }
             }))
+            .on_action(cx.listener(|ws, _: &ShowAgent, _, cx| ws.store.update(cx, |s, cx| s.go(Page::Agent, cx))))
             .on_action(cx.listener(|ws, _: &ShowApps, _, cx| ws.store.update(cx, |s, cx| s.go(Page::Apps, cx))))
-            .on_action(cx.listener(|ws, _: &ShowCloud, _, cx| ws.store.update(cx, |s, cx| s.go(Page::Cloud, cx))))
-            .on_action(cx.listener(|ws, _: &ShowAccount, _, cx| ws.store.update(cx, |s, cx| s.go(Page::Account, cx))))
+            .on_action(cx.listener(|ws, _: &ShowPlugins, _, cx| ws.store.update(cx, |s, cx| s.go(Page::Plugins, cx))))
             .on_action(cx.listener(|ws, _: &ShowSettings, _, cx| ws.store.update(cx, |s, cx| s.go(Page::Settings, cx))))
             .on_action(cx.listener(|ws, _: &CheckUpdates, _, cx| ws.store.update(cx, |s, cx| s.check_updates(cx))))
-            .on_drop(cx.listener(|ws, paths: &gpui::ExternalPaths, _, cx| {
-                // Files dropped on the window go to the cloud folder shown.
-                ws.store.update(cx, |s, cx| {
-                    if !s.signed_in() {
-                        return s.toast(ToastKind::Info, "Sign in to lsuite to put files in your cloud.", cx);
-                    }
-                    s.go(Page::Cloud, cx);
-                    let into = s.cloud_dir.clone();
-                    for p in paths.paths() {
-                        s.run("cloud.upload", json!({ "source": p, "into": into }), cx);
-                    }
-                })
-            }))
             .relative()
             .size_full()
             .font_family(crate::theme::SANS)

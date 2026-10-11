@@ -12,21 +12,13 @@ use crate::{CmdResult, paths, util};
 pub struct AgentPermissions {
     /// Install and update apps.
     pub install: bool,
-    /// Remove apps.
+    /// Remove apps and plugins.
     pub remove: bool,
-    /// Upload, create folders, move and rename in lsuite Cloud.
-    pub cloud_write: bool,
-    /// Delete in lsuite Cloud.
-    pub cloud_delete: bool,
-    /// Sign in and out.
-    pub account: bool,
-    /// Publish plugins on the lsuite Marketplace.
-    pub publish: bool,
 }
 
 impl Default for AgentPermissions {
     fn default() -> Self {
-        Self { install: true, remove: false, cloud_write: true, cloud_delete: false, account: false, publish: false }
+        Self { install: true, remove: false }
     }
 }
 
@@ -41,14 +33,12 @@ pub struct Settings {
     pub auto_update: bool,
     /// Ask the system to show fewer translucent surfaces.
     pub reduce_transparency: bool,
-    /// How often the window syncs the synced folders (0: only when asked).
-    pub sync_every_minutes: u64,
     pub agent: AgentPermissions,
 }
 
 impl Default for Settings {
     fn default() -> Self {
-        Self { theme: "system".into(), check_on_start: true, auto_update: false, reduce_transparency: false, sync_every_minutes: 5, agent: AgentPermissions::default() }
+        Self { theme: "system".into(), check_on_start: true, auto_update: false, reduce_transparency: false, agent: AgentPermissions::default() }
     }
 }
 
