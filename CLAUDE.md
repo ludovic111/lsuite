@@ -13,12 +13,13 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   kimchi (video), nori (image and design: Photoshop + Illustrator + InDesign in one document) and
   folio (office: documents, spreadsheets and presentations). The suite's line: every kind of
   creative and office tool, combined, free and open source, driven by your agent.
-- **Linux only during the beta** (owner's decision, 2026-10-08): the launcher and the four apps
-  are built and shipped for Linux x86_64 only; macOS and Windows are "coming soon" everywhere on
-  the site (hero lines, stats, the launcher's download tiles, `/launcher/download/<macos|windows…>`
-  → `/launcher#downloads`). Their files were removed from every release (launcher, lsuite-builds
-  and the apps' public releases); the release workflows keep the macOS/Windows matrix lines
-  commented out. Past changelog cards still describe what those versions shipped.
+- **Linux and macOS during the beta** (Linux only from 2026-10-08; macOS back at the owner's
+  request on 2026-10-10): the launcher and the four apps are built for Linux x86_64 and macOS
+  (Apple silicon and Intel). The macOS jobs run on the Mac mini's self-hosted runners (label
+  `ludovics-mac-mini`, one per repo in `~/.actions-runners/<repo>`, own `RUSTUP_HOME`/`CARGO_HOME`;
+  `vars.MAC_RUNNER` overrides); Windows is "coming soon" everywhere on the site
+  (`/launcher/download/windows…` → `/launcher#downloads`), its matrix lines stay commented out.
+  Pages say "Linux and macOS · Windows coming soon"; flip them only once macOS builds are released.
 - **Entirely free, no account** (owner's decision, 2026-10-10): lsuite Pass (lsuite AI, lsuite
   Cloud, the lsuite Marketplace), the lsuite account and every page and API of theirs were removed
   (`ai.js`, `cloud.js`, `marketplace.js`, `live.js`, PASS.md, AI.md, CLOUD.md, MARKETPLACE.md).
@@ -36,7 +37,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   `files/<tag>/<name>`: public, 302 to GitHub's signed address) with
   `LSUITE_BUILDS_TOKEN` (Railway; 503 without it). `%VERSION:<app>%` and `/api/apps` read the
   versions there when the token is set (else the public releases while they last, then
-  `FALLBACK_VERSIONS`): ryolune 0.15.3, kimchi 0.10.0, nori 0.1.0 and folio 0.1.0.
+  `FALLBACK_VERSIONS`): ryolune 0.17.0, kimchi 0.12.0, nori 0.3.0 and folio 0.3.0 (2026-10-11, the first free releases, Linux and macOS).
   The apps' public GitHub releases become drafts once launcher 0.2.0 and each app's next version
   (whose updater reads lsuite.xyz) are out; the changelog cards' "Full notes" links to them will
   need another target then.
@@ -48,7 +49,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   updates the four apps from their signed releases and, from 0.3.0, lists their plugins and asks an
   app's agent to build one (no account, cloud or marketplace any more). Its page is
   `/launcher` (`pages/launcher.html`), downloads from `launcher-v*` releases of this repository
-  (0.1.0 and 0.1.1 published 2026-10-07; 0.2.0, which installs the apps through lsuite.xyz with an account, published 2026-10-08 and the latest; `launcher/CHANGELOG.md`),
+  (0.1.0 and 0.1.1 published 2026-10-07; 0.2.0, which installed the apps through lsuite.xyz with an account, 2026-10-08; 0.3.0, free and on Linux and macOS, 2026-10-11 and the latest; `launcher/CHANGELOG.md`),
   built by kimchi's suite release workflow (launcher/README.md, Releasing).
 - The favicon and the nav keep the plain lsuite grain tile (no lsuite logo).
 - Earlier completed notes below describe the previous pages; keep the current availability

@@ -346,7 +346,7 @@ test("the pages' versions and GET /api/apps read the builds when configured, els
   const gh = await fakeGitHub();
   const builds = createBuilds({ token: GH_TOKEN, api: gh.base });
   try {
-    assert.deepEqual(await appVersions(['kimchi', 'nori', 'ryolune', 'folio'], builds), { kimchi: '0.10.0', nori: '0.1.0', ryolune: '0.16.0', folio: '0.1.0' });
+    assert.deepEqual(await appVersions(['kimchi', 'nori', 'ryolune', 'folio'], builds), { kimchi: '0.10.0', nori: '0.1.0', ryolune: '0.16.0', folio: '0.3.0' });
     const versions = await appVersions(APP_NAMES, builds);
     const { apps } = await appsDocument('https://lsuite.xyz', versions);
     assert.equal(apps.find((a) => a.id === 'kimchi').version, '0.10.0');
@@ -354,7 +354,7 @@ test("the pages' versions and GET /api/apps read the builds when configured, els
     // GitHub down and nothing cached: the fallback versions.
     gh.state.fail = true;
     const cold = createBuilds({ token: GH_TOKEN, api: gh.base });
-    assert.deepEqual(await appVersions(['ryolune', 'folio'], cold), { ryolune: '0.15.3', folio: '0.1.0' });
+    assert.deepEqual(await appVersions(['ryolune', 'folio'], cold), { ryolune: '0.17.0', folio: '0.3.0' });
   } finally {
     await gh.close();
   }
