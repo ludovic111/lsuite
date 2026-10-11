@@ -37,7 +37,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   `files/<tag>/<name>`: public, 302 to GitHub's signed address) with
   `LSUITE_BUILDS_TOKEN` (Railway; 503 without it). `%VERSION:<app>%` and `/api/apps` read the
   versions there when the token is set (else the public releases while they last, then
-  `FALLBACK_VERSIONS`): ryolune 0.15.3, kimchi 0.10.0, nori 0.1.0 and folio 0.1.0.
+  `FALLBACK_VERSIONS`): ryolune 0.17.0, kimchi 0.12.0, nori 0.3.0 and folio 0.3.0 (2026-10-11, the first free releases, Linux and macOS).
   The apps' public GitHub releases become drafts once launcher 0.2.0 and each app's next version
   (whose updater reads lsuite.xyz) are out; the changelog cards' "Full notes" links to them will
   need another target then.
@@ -49,7 +49,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   updates the four apps from their signed releases and, from 0.3.0, lists their plugins and asks an
   app's agent to build one (no account, cloud or marketplace any more). Its page is
   `/launcher` (`pages/launcher.html`), downloads from `launcher-v*` releases of this repository
-  (0.1.0 and 0.1.1 published 2026-10-07; 0.2.0, which installs the apps through lsuite.xyz with an account, published 2026-10-08 and the latest; `launcher/CHANGELOG.md`),
+  (0.1.0 and 0.1.1 published 2026-10-07; 0.2.0, which installed the apps through lsuite.xyz with an account, 2026-10-08; 0.3.0, free and on Linux and macOS, 2026-10-11 and the latest; `launcher/CHANGELOG.md`),
   built by kimchi's suite release workflow (launcher/README.md, Releasing).
 - The favicon and the nav keep the plain lsuite grain tile (no lsuite logo).
 - Earlier completed notes below describe the previous pages; keep the current availability
