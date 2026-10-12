@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Release workflow, macOS runners (the self-hosted Mac mini): import the Developer ID certificate into a throwaway keychain,
+# Release workflow, macOS runners (the self-hosted Mac runner): import the Developer ID certificate into a throwaway keychain,
 # check that it holds the signing identity, and write the App Store Connect API key, then hand
 # scripts/bundle-macos.sh the identity and the notarization key through $GITHUB_ENV. Same secrets as ryolune and kimchi
 # (see the lsuite repository's STANDARD.md). The certificate password may be empty (a .p12 exported without one).

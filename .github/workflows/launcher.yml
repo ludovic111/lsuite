@@ -28,8 +28,8 @@ jobs:
       fail-fast: false
       matrix:
         # Linux on every push and pull request. macOS only when started by hand
-        # (gh workflow run launcher.yml --ref <branch>), on the owner's Mac mini, a self-hosted
-        # runner (vars.MAC_RUNNER=macos-latest sends it back to GitHub): a pull request, from a
+        # (gh workflow run launcher.yml --ref <branch>), on the maintainer's self-hosted
+        # macOS runner (vars.MAC_RUNNER=macos-latest sends it back to GitHub): a pull request, from a
         # fork or not, never reaches it. Windows is coming soon: its steps are kept below; add
         # {"name":"Windows","os":"windows-latest"} to the list to run them.
         include: ${{ fromJSON(github.event_name == 'workflow_dispatch' && format('[{{"name":"Linux","os":"ubuntu-22.04"}},{{"name":"macOS","os":"{0}"}}]', vars.MAC_RUNNER || 'ludovics-mac-mini') || '[{"name":"Linux","os":"ubuntu-22.04"}]') }}
@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # The Mac mini runs as the owner's account: keep its warm target/ between runs.
+          # The self-hosted Mac runner runs as the maintainer's account: keep its warm target/ between runs.
           clean: ${{ runner.environment == 'github-hosted' }}
           persist-credentials: false
       - name: Scratch folders

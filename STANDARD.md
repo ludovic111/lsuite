@@ -9,8 +9,8 @@ but MIT licensed, written in Rust, and **every app can be driven end to end by a
 | --- | --- | --- |
 | ryolune · music · the reference implementation | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) | `../ryolune` |
 | kimchi · video | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) | `../kimchi` |
-| nori · image and design | `ludovic111/nori` (not published yet) | `../nori` |
-| folio · office | `ludovic111/folio` (not published yet) | `../folio` |
+| nori · image and design | [ludovic111/nori](https://github.com/ludovic111/nori) | `../nori` |
+| folio · office | [ludovic111/folio](https://github.com/ludovic111/folio) | `../folio` |
 
 This file is the contract every app meets. Each app's `CLAUDE.md` has an "lsuite" section with
 the gaps that app still has against it. When an app closes a gap, update its section and the
@@ -55,7 +55,7 @@ Ship `docs/AI_CONTROL.md` (how to drive the app) and the generated `docs/COMMAND
   anything is replaced; the previous copy is kept until the new one starts.
 - `<APP>_NO_UPDATE=1` and a setting turn the check off. "Check for updates…" is also a command.
 - Release assets use stable names per platform so the lsuite app finds them (`launcher/` in the
-  lsuite repo): Linux x86_64 and macOS (arm64 and x86_64, built on the Mac mini's runner, signed
+  lsuite repo): Linux x86_64 and macOS (arm64 and x86_64, built on a self-hosted macOS runner, signed
   and notarized when the Apple secrets are set) during the beta; Windows x86_64 is coming soon,
   and no builds are made for it until then. The
   existing `<APP>_UPDATE_URL` overrides keep working for tests.
@@ -142,7 +142,7 @@ release keys are built in), and, from 0.3.0, lists every app's installed plugins
 requests to the right app's agent. It reads the discovery files of section 4 and never
 touches a copy it didn't install outside the usual places. It meets this standard's shape: one
 command registry, `lsuite-cli`, `lsuite-mcp` (agents held to `settings.agent`), design v2. Released
-as `launcher-vX.Y.Z` in the lsuite repo (0.1.1 is the latest), signed with its own key.
+as `launcher-vX.Y.Z` in the lsuite repo (0.3.0 is the latest), signed with its own key.
 
 ## Status (2026-10-11)
 
