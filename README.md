@@ -1,127 +1,119 @@
 # lsuite
 
-The site of **lsuite** (written in lowercase), at [lsuite.xyz](https://lsuite.xyz): every kind of
-creative and office tool, combined, free and open source, and driven by your agent. Four apps, all
-in beta:
+Free, open-source apps for video, music, images and documents, each one drivable end to end by
+your AI agent.
 
-**Get the launcher:** [lsuite.xyz/launcher](https://lsuite.xyz/launcher), or the latest `launcher-v*` [release](https://github.com/ludovic111/lsuite/releases).
-The four apps come only through it, with no account ([DISTRIBUTION.md](DISTRIBUTION.md)):
-their builds live in the private `ludovic111/lsuite-builds`, served by `builds.js`.
+**Status:** Beta · v0.3.0 · Linux and macOS
 
-**Beta: Linux and macOS.** While lsuite is in beta, the launcher and the four apps are built and
-shipped for Linux x86_64 and macOS (Apple silicon and Intel; built on the owner's Mac mini runner,
-label `ludovics-mac-mini`); Windows is coming soon (the site says so, and no builds are made for it).
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="assets/img/launcher/apps-light.webp">
+  <img src="assets/img/launcher/apps.webp" alt="The lsuite launcher listing the four lsuite apps" width="100%">
+</picture>
 
-| App | Kind | Page | Source |
+## What it is
+
+lsuite is a suite of four native desktop apps, written in Rust and released under the MIT
+licence. There are no accounts, no plans and nothing to buy. In every app, everything you can
+click is also a named command, so you, a script or an AI agent (through the built-in agent
+panel, a CLI or an MCP server) work on the same document with the same undo history.
+
+| App | For | Version | Source |
 | --- | --- | --- | --- |
-| ryolune | music | `/ryolune` | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) |
-| kimchi | video | `/kimchi` | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) |
-| nori | images, vectors and page layout | `/nori` | [ludovic111/nori](https://github.com/ludovic111/nori) |
-| folio | documents, spreadsheets and slides | `/folio` | [ludovic111/folio](https://github.com/ludovic111/folio) |
+| [kimchi](https://lsuite.xyz/kimchi) | video editing, motion graphics and generative video | 0.12.0 | [ludovic111/kimchi](https://github.com/ludovic111/kimchi) |
+| [ryolune](https://lsuite.xyz/ryolune) | music production (a DAW) | 0.17.0 | [ludovic111/ryolune](https://github.com/ludovic111/ryolune) |
+| [nori](https://lsuite.xyz/nori) | images, vector drawings and page layout | 0.3.0 | [ludovic111/nori](https://github.com/ludovic111/nori) |
+| [folio](https://lsuite.xyz/folio) | documents, spreadsheets and slides | 0.3.0 | [ludovic111/folio](https://github.com/ludovic111/folio) |
 
-lsuite is entirely free (owner's decision, 2026-10-10): the apps and the launcher are MIT
-licensed, with no account, no plan and nothing to buy. The paid lsuite Pass (lsuite AI, lsuite
-Cloud, the lsuite Marketplace) and the accounts it needed were removed that day. Every app has
-plugins, built by the person's own agent ([PLUGINS.md](PLUGINS.md)), and [STANDARD.md](STANDARD.md) is the contract they all meet.
+This repository holds what the four apps share:
 
-Plain HTML, CSS and JavaScript served by a dependency-free Node server (`server.js`).
+- **The launcher** (`launcher/`, v0.3.0): a native app, also called lsuite, that installs, updates,
+  opens and removes the apps from their signed builds, lists the plugins installed for each one,
+  and asks an app's agent to build a new plugin. It has its own CLI (`lsuite-cli`) and MCP server
+  (`lsuite-mcp`).
+- **The site**, [lsuite.xyz](https://lsuite.xyz): a page per app, the launcher's downloads, and
+  the public routes the launcher and the apps' updaters use to fetch builds.
+- **The design system** (`design/`): the tokens, components and rules every app and the site
+  follow, with a live preview at [lsuite.xyz/design](https://lsuite.xyz/design).
+- **The standard** every app meets ([STANDARD.md](STANDARD.md)), with a status table per app.
+
+## Getting it
+
+Download the launcher from [lsuite.xyz/launcher](https://lsuite.xyz/launcher), or from the
+latest `launcher-v*` [release](https://github.com/ludovic111/lsuite/releases):
+
+| System | File |
+| --- | --- |
+| Linux (x86-64) | `lsuite-linux-x86_64.AppImage` or `lsuite-linux-x86_64.tar.gz` |
+| macOS, Apple silicon | `lsuite-macos-arm64.dmg` |
+| macOS, Intel | `lsuite-macos-x86_64.dmg` |
+| Windows | Coming soon |
+
+The macOS builds are signed with a Developer ID and notarized by Apple. Open the launcher and
+install any of the four apps; it keeps them up to date and checks every download against the
+app's signing key before anything is replaced. Each app's source is in its own repository, so
+you can also build it yourself.
+
+## Usage
+
+The site is plain HTML, CSS and JavaScript served by a dependency-free Node server. It needs
+Node 22 or later:
 
 ```bash
 npm run dev     # http://localhost:4321
 npm test
 ```
 
-## Layout
+Without `LSUITE_BUILDS_TOKEN` the pages still render, but the build routes answer 503 (see
+[DISTRIBUTION.md](DISTRIBUTION.md)).
 
-- `index.html` is the suite page; `<app>/index.html` is each app's page, served at `/<app>`
-  (`/<app>/` and `/index.html` redirect to the bare path). The launcher's page is
-  `pages/launcher.html`, served at `/launcher`: the folder `launcher/` holds its Rust workspace,
-  which is never served (only `/assets/` is static). A page's app, for the nav, is its path's
-  first segment.
-- `partials/nav.html` and `partials/foot.html` are inserted where a page says
-  `<!-- include:nav -->` / `<!-- include:foot -->`; the nav link of the page's app gets
-  `aria-current="page"`. `%ORIGIN%` becomes the request's origin (Open Graph, canonical).
-- `assets/` is the only static folder: `styles.css` (every page, built on the design system's
-  `/design/tokens.css`, loaded first; all apps use monochrome v2 chrome, light and dark
-  follow the system), `main.js` (reveals, "Download for your OS", copy buttons, and the ryolune
-  theme gallery, unused for now), fonts (Chakra Petch, IBM Plex Mono, OFL)
-  and real native-app captures in `assets/img/<app>/` (both themes). Image credits are in
-  `assets/img/SOURCES.md`.
-- `pages/plugins.html` is `/plugins`: how plugins work in every app and how an agent builds one
-  (PLUGINS.md); it replaced the marketplace's page.
-- `builds.js` serves the apps' builds behind `/api/apps/<app>/…` (DISTRIBUTION.md).
-- `?v=` on `/assets/*.js|css` is replaced by a hash of the file, so those URLs are cached for good.
-- `%VERSION:<app>%` becomes the app's newest version in `ludovic111/lsuite-builds` (`builds.js`,
-  cached 5 min) when `LSUITE_BUILDS_TOKEN` is set, else the app's latest public GitHub release
-  while those last (cached 10 min); `FALLBACK_VERSIONS` when neither answers. So a page never
-  announces a version that cannot be had yet. `%VERSION:launcher%` is the newest published
-  `launcher-vX.Y.Z` release of `ludovic111/lsuite`.
-- CSP is `'self'` only: no inline scripts, no third-party requests.
+The launcher is a separate Rust workspace (Rust and GPUI):
 
-## The launcher
+```bash
+cd launcher
+cargo run -p lsuite                      # the window
+cargo run -p lsuite-cli -- apps.list     # any command, from a terminal
+cargo test --workspace
+```
 
-`launcher/` is **lsuite**, the suite's native launcher (Rust, GPUI; its own Cargo workspace, not
-part of the site's deployment): installs and updates the apps and, from 0.3.0, lists their plugins
-and asks an app's agent to build one. See [launcher/README.md](launcher/README.md). Its page is `/launcher` (`pages/launcher.html`,
-captures in `assets/img/launcher/`: `apps`, with `-light`, 2000x1250;
-mark in `assets/img/icons/lsuite.webp`, from `launcher/brand/icon.png`); the home page and the
-footer link to it. Its releases are published in this repository, tagged `launcher-vX.Y.Z`.
+## Documentation
 
-## Design system
+- [docs/site.md](docs/site.md): the site's files, routes and domains, and how an app's page is updated
+- [launcher/README.md](launcher/README.md): the launcher, its commands, environment and releases
+- [design/DESIGN.md](design/DESIGN.md): the design system
+- [STANDARD.md](STANDARD.md): the contract every lsuite app meets, and where each one stands
+- [PLUGINS.md](PLUGINS.md): plugins in every app, and how an agent builds one
+- [HARNESS.md](HARNESS.md): the agent harness each app ships
+- [DISTRIBUTION.md](DISTRIBUTION.md): how the apps' builds are published and served
+- [launcher/CHANGELOG.md](launcher/CHANGELOG.md): what changed in each launcher release
 
-`design/` holds the suite's shared design system: `DESIGN.md` (the spec), `tokens.json` (the
-source), `tokens.css` (generated by `node design/build.mjs`) and a live preview served at
-`/design` (`design/index.html`, `design/preview.js`). The server serves those three files as they
-are under `/design/`.
+## Project status and roadmap
 
-## Routes
+lsuite is in beta. The launcher and all four apps are released for Linux (x86-64) and macOS
+(Apple silicon and Intel). Known limits:
 
-| Path | Does |
-| --- | --- |
-| `/<app>/download[/<platform>]` | 302 to `/launcher` for the four apps: they come only through the lsuite app (DISTRIBUTION.md). Their pages say "Get <app> in the lsuite app". |
-| `/launcher/download[/<platform>]` | 302 to the matching asset of the newest published `launcher-vX.Y.Z` release of `ludovic111/lsuite` (`DOWNLOADS` in `server.js`, `tagPrefix`, looked up on the GitHub API, cached 10 min); without a platform the visitor's OS picks one (macOS and Windows, coming soon, land on `/launcher#downloads`); with no matching asset, that release's page, or the releases list: `macos-arm64`, `macos-x86_64` (.dmg), `windows-x86_64` (setup .exe), `windows-zip`, `linux-x86_64` (.AppImage), `linux-tar` (.tar.gz). The launcher is not one of the apps: not in `/api/apps`, no `/launcher/support`. |
-| `/api/apps/<app>/latest`, `…/latest.json`, `…/releases/latest`, `…/files/<tag>/<name>` | The apps' builds (DISTRIBUTION.md, `builds.js`), public (no token, nothing to sign in to): the newest release of `<app>-v*` in the private `ludovic111/lsuite-builds` (no drafts or pre-releases, newest by semver), with `latest.json` and `SHA256SUMS(.sig)` read on the server (cached 5 min) and every download address rewritten to the file route, which answers a 302 to GitHub's short-lived address (the file never passes through the site, the token never leaves it). Needs `LSUITE_BUILDS_TOKEN` (a fine-grained token, read-only on `lsuite-builds`; never in Git): without it 503; GitHub errors 502. |
-| `/api/ai/…`, `/api/account/…`, `/api/cloud…`, `/api/marketplace…`, `/api/billing/…` | Gone since 2026-10-10 (lsuite is free): a JSON 410 (`not_found_error`) telling older apps and launchers to update. Any other unknown `/api/…` is a JSON 404. |
-| `/api/apps` | The four apps for the lsuite launcher, public: `{apps: [{id, name, kind, summary, page, repo, version, published, platforms}]}` from `DOWNLOADS`, `REPOS` and the versions `%VERSION:<app>%` uses (the builds when configured); `Cache-Control: public, max-age=300`. |
-| `/plugins` | Plugins in every lsuite app (`pages/plugins.html`). `/marketplace[/…]` is a 301 to it. |
-| `/ai`, `/pass`, `/account[/…]` | 301 to `/` (the pages of lsuite Pass and the accounts, removed 2026-10-10). |
-| `/support`, `/<app>/support` | 302 to `LSUITE_DONATION_URL` (https only), else GitHub Sponsors. |
-| `/health` | `ok`, for Railway's health check. |
-| `/robots.txt`, `/sitemap.xml` | Generated for the request's origin. |
+- **Windows is not built yet.** Its code paths stay in the source, but no Windows builds are made
+  or shipped; the site says "coming soon".
+- **Ready-made builds come only through the launcher.** The apps' signed builds are served by
+  lsuite.xyz from a private build repository; their source stays public in each app's repository.
+- **The agent harness and its evaluations are partial** in every app: only some evaluation jobs
+  have been run so far (see the status table in [STANDARD.md](STANDARD.md)).
+- App-specific limits are listed in each app's README and release notes.
 
-## Domains
+Next: Windows builds, and closing each app's remaining gaps against the standard.
 
-- `LSUITE_CANONICAL_HOST=lsuite.xyz` on the host: any other host name (www, the Railway domain)
-  gets a 301 to the same path on lsuite.xyz.
-- **ryolune.com** is a Porkbun URL forward (permanent 301, path included, wildcard so www
-  follows) to `https://lsuite.xyz/ryolune`: `ryolune.com/support` → `/ryolune/support`,
-  `ryolune.com/download/macos-arm64` → `/ryolune/download/macos-arm64` (→ `/launcher`), and the
-  browser keeps URL fragments. The ryolune page's `#downloads` section now leads to the lsuite app. Its DNS is
-  Porkbun's forwarder (ALIAS and `*` CNAME to `uixie.porkbun.com`); no Railway service is involved.
-  `MOVED_HOSTS` in `server.js` does the same redirect should those hosts ever point here.
-- `/ondera` and `/ondera/*` redirect to `/ryolune` (its name before 0.11).
-- `/zenith` and `/zenith/*` redirect to the home page: zenith was an lsuite app (code) until
-  2026-10-10, when it was dropped.
-- The former ryolune site service (Railway project `ondera-site`) was deleted on 2026-10-01; its
-  domain `site-production-7751.up.railway.app`, which ryolune 0.11.0 linked from Help › Support,
-  no longer answers. 0.11.1 and later link to ryolune.com/support.
+## Contributing
 
-## Updating an app's page
+Bug reports and suggestions are welcome as GitHub issues. Report problems with an app in that
+app's repository; use this one for the launcher, the site and the design system. Before opening
+a pull request, run `npm test` for the site and `cargo test --workspace` in `launcher/`.
 
-The copy is written from each app's README and release notes. When an app ships: versions update by themselves;
-update what's new, features and screenshots. On kimchi's page that is "New in 0.x", the command
-count and a new card on top of the changelog (`#changelog`, from `../kimchi/CHANGELOG.md`, with
-`release--now` moved to it). Every app page has a changelog (`#changelog`) with `release--now` on the newest card.
-Placeholders still waiting for the app agents' captures are marked `shot--soon` with
-`data-capture="<app>/<file>"` (and `card__shot--soon` on the home cards): replace each with a
-`<picture>` like kimchi's hero.
-Screenshots live in `assets/img/<app>/` (2000x1250 WebP, dark and `-light`,
-`magick shot.png -quality 76 shot.webp`). kimchi's come from the real app on a
-virtual screen: `vscreen size 2000x1250`, then `vscreen start target/debug/kimchi` with
-`KIMCHI_WINDOW_SIZE=2000x1250` and scratch `KIMCHI_DATA_DIR`, `KIMCHI_CONFIG_DIR`, `LSUITE_HOME`,
-`KIMCHI_NO_UPDATE=1` (plus `KIMCHI_FFMPEG`/`KIMCHI_FFPROBE` if no ffmpeg is installed); build the
-project with `kimchi-cli` (`media.import`, `motion.addTemplate`, `captions.add`, `ui.select`,
-`ui.zoom fit=true`), switch with `app.setSetting key=appearance.mode value=dark|light`, and take
-`vscreen shot`. On the Mac: `KIMCHI_WINDOW_SIZE=1600x1000` and `kimchi-cli ui.screenshot`, scaled
-to 2000x1250. Open Graph images are 1200x630 captures of each page's hero in `assets/img/og/`.
-Pages reveal sections on scroll: full-page captures need `.reveal` forced visible.
+## Licence
+
+[MIT](LICENSE). The bundled fonts (Chakra Petch, IBM Plex Mono) are under the SIL Open Font
+License, and the Lucide icons under the ISC licence. Logos of other services are the trademarks of
+their owners ([assets/img/logos/SOURCES.md](assets/img/logos/SOURCES.md)); image credits are in
+[assets/img/SOURCES.md](assets/img/SOURCES.md).
+
+---
+
+Made by [Ludovic Marie](https://lu4ovic.com) · [GitHub](https://github.com/ludovic111)

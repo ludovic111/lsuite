@@ -112,7 +112,6 @@ export const DOWNLOADS = {
       'macos-x86_64': /_x64\.dmg$/,
       'linux-appimage': /_amd64\.AppImage$/,
       'linux-deb': /_amd64\.deb$/,
-      'linux-rpm': /\.x86_64\.rpm$/,
     },
     byOs: { macos: 'macos-arm64', linux: 'linux-appimage' },
   },

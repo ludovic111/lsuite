@@ -106,7 +106,7 @@ launcher 0.2 is ignored.
 2. Build and sign with the suite release workflow (it holds `LSUITE_UPDATE_SIGNING_KEY`, and the
    Apple Developer ID and notarization secrets):
    `gh workflow run suite-build.yml -R ludovic111/kimchi -f app=lsuite -f ref=<full commit SHA>`
-   (Linux AppImage and tar.gz on ubuntu-22.04; on the Mac mini, a self-hosted runner, the macOS
+   (Linux AppImage and tar.gz on ubuntu-22.04; on a self-hosted macOS runner, the macOS
    `.dmg` and `.app.tar.gz` for aarch64 and x86_64 through `scripts/bundle-macos.sh`, signed
    with Developer ID and notarized, the keychain made by `scripts/prepare-apple-signing.sh` and
    undone by `scripts/cleanup-apple-signing.sh`; each update file signed with `lsuite-release

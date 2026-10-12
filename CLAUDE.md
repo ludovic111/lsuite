@@ -1,6 +1,6 @@
 # lsuite.xyz
 
-The suite's site; see README.md (layout, routes, domains), STANDARD.md (the contract every
+The suite's site; see README.md, docs/site.md (layout, routes, domains), STANDARD.md (the contract every
 lsuite app meets, with a status table), PLUGINS.md (plugins), DISTRIBUTION.md (getting the apps)
 and HARNESS.md (the agent harness).
 Each app repo (`../ryolune`, `../kimchi`, `../nori`, `../folio`)
@@ -15,9 +15,8 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
   creative and office tool, combined, free and open source, driven by your agent.
 - **Linux and macOS during the beta** (Linux only from 2026-10-08; macOS back at the owner's
   request on 2026-10-10): the launcher and the four apps are built for Linux x86_64 and macOS
-  (Apple silicon and Intel). The macOS jobs run on the Mac mini's self-hosted runners (label
-  `ludovics-mac-mini`, one per repo in `~/.actions-runners/<repo>`, own `RUSTUP_HOME`/`CARGO_HOME`;
-  `vars.MAC_RUNNER` overrides); Windows is "coming soon" everywhere on the site
+  (Apple silicon and Intel). The macOS jobs run on the maintainer's self-hosted macOS runners
+  (one per repo, each with its own `RUSTUP_HOME`/`CARGO_HOME`; `vars.MAC_RUNNER` overrides the label); Windows is "coming soon" everywhere on the site
   (`/launcher/download/windows…` → `/launcher#downloads`), its matrix lines stay commented out.
   Pages say "Linux and macOS · Windows coming soon"; flip them only once macOS builds are released.
 - **Entirely free, no account** (owner's decision, 2026-10-10): lsuite Pass (lsuite AI, lsuite
@@ -65,7 +64,7 @@ has an "lsuite" section in its CLAUDE.md with its remaining gaps.
       ui.screenshot --path <file>` while it runs) when they change.
 - [x] kimchi 0.5 page (2026-10-03): New in 0.5 (keyframes, 2D motion, 3D, templates, transitions,
       colour, local captions, reverse/freeze, GPU export), 122 commands, new captures from the
-      real app (README, "Updating an app's page"), og image retaken. Home: kimchi's card, its
+      real app (docs/site.md, "Updating an app's page"), og image retaken. Home: kimchi's card, its
       agent-readiness column (`kimchi-cli`, `kimchi-mcp --live`, Agent panel) and the plug-in
       example; `STANDARD.md` count. Not yet checked by anyone: 3D on Metal, Windows builds.
 - [x] kimchi 0.6 page (2026-10-03): New in 0.6 (stability pass, logs and crash reports, what's new,
